@@ -33,12 +33,35 @@ export const login = async (email, password) => {
             }
         })
 
-        // const { token } = response.data.data;
-        // setToken(token);
+        const { token } = response.data.data;
+        setToken(token);
 
         return response;
     } catch (error) {
         if (error.response) {
+            throw error.response.data;
+        }
+        throw new Error("Network error");
+    }
+}
+
+export const registration = async(username, email, password) => {
+    try {
+        const response = await axios.post(`${API_URL}/auth/register`, {
+            username, email, password
+        }, {
+            headers: {
+                "Content-Type" : "application/json",
+                Accept:"application/json"
+            }
+        })
+
+        const { token } = response.data.data;
+        setToken(token);
+
+        return response;
+    } catch (error) {
+        if (error.response) {   
             throw error.response.data;
         }
         throw new Error("Network error");
