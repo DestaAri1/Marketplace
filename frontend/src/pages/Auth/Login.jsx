@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
 import Input from '../../components/Input'
-import Button from '../../components/Button'
 import { Link, useNavigate } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import { showErrorToast } from '../../utils/Toast';
+import { ToastContainer } from 'react-toastify';
+import Button from '../../components/Button';
 
 export default function Login() {
     const [formData, setFormData] = useState({ email: '', password: '' });
-    // const [loading, setLoading] = useState(false);
-    // const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
     const { login } = useAuth();
   
     const handleChange = (e) => {
@@ -16,15 +19,15 @@ export default function Login() {
   
     const handleSubmit = async (e) => {
       e.preventDefault();
-    //   setLoading(true);
+      setLoading(true);
       try {       
-        await login(formData.email, formData.password);
-        
-        // navigate('/', { state: { message: 'Login success! Welcome back my lord.' }});
+        var response = await login(formData.email, formData.password);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        navigate('/', { state: { message: response.data.message || 'Login Success!' }});
       } catch (err) {
-        // showErrorToast(err.message || "Failed to log in");
+        showErrorToast(err.message || "Failed to log in");
       } finally {
-        // setLoading(false);
+        setLoading(false);
       }
     };
   return (
@@ -52,12 +55,17 @@ export default function Login() {
                         value={formData.password}
                     />
                 </div>
-                <Button classes={'bg-indigo-600 hover:bg-indigo-700'} type={'submit'} name={'Login'}></Button>
+                <Button type={'submit'} classes={'bg-blue-500 hover:bg-blue-700'} disabled={loading}
+                  name={loading ? (<LoadingSpinner/>) : (
+                    'Login'
+                )}
+                />
             </form>
             <p className="text-sm text-center text-gray-600">
                 Don't have an account? <Link to={'/register'} className="text-indigo-500">Register</Link>
             </p>
         </div>
+        <ToastContainer />
     </div>
   )
 }

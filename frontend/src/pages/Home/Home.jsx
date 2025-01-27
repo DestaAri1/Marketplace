@@ -1,32 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
+import TimerToaster from '../../components/TimerToaster';
+import UserDropdown from '../../components/UserDropdown';
 
 export default function Home() {
     const [searchTerm, setSearchTerm] = useState("");
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
     const userName = "JohnDoeLongName"; // Contoh nama pengguna, ganti dengan data sebenarnya
-
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
-
-    const closeDropdown = () => {
-        setIsDropdownOpen(false);
-    };
-
-    // Close dropdown on outside click
-    useEffect(() => {
-        const handleOutsideClick = (event) => {
-            if (!event.target.closest('.user-dropdown')) {
-                closeDropdown();
-            }
-        };
-
-        document.addEventListener('click', handleOutsideClick);
-        return () => {
-            document.removeEventListener('click', handleOutsideClick);
-        };
-    }, []);
 
     const products = [
         { name: "Product 1", store: "Store A", price: 100, discountPrice: 80, image: "https://via.placeholder.com/150" },
@@ -36,6 +14,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+        <TimerToaster/>
         <header className="fixed top-0 left-0 w-full bg-indigo-600 text-white py-4 shadow-md z-50">
             <div className="container mx-auto px-4 flex items-center justify-between">
                 {/* Navbar Left */}
@@ -51,28 +30,7 @@ export default function Home() {
                 </nav>
 
                 {/* Navbar Right */}
-                <div className="flex items-center space-x-4 relative user-dropdown">
-                    <button 
-                        onClick={toggleDropdown}
-                        className="relative flex items-center space-x-2 border-2 border-white rounded-full focus:outline-none focus:border-gray-300 p-1"
-                    >
-                        <img 
-                            className="w-8 h-8 object-cover rounded-full" 
-                            src="https://via.placeholder.com/40" 
-                            alt="User dropdown" 
-                        />
-                        <span className="text-gray-800 text-sm font-medium">
-                            {userName.length > 10 ? `${userName.substring(0, 10)}...` : userName}
-                        </span>
-                    </button>
-                    {isDropdownOpen && (
-                        <div className="absolute right-0 top-12 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">
-                            <a href="#profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-                            <a href="#settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-                            <a href="#logout" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
-                        </div>
-                    )}
-                </div>
+                <UserDropdown userName={userName}/>
             </div>
         </header>
 

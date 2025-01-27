@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 import Input from '../../components/Input'
-import { Link } from 'react-router-dom'
-import Button from '../../components/Button'
+import { Link, useNavigate } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { showErrorToast } from '../../utils/Toast';
+import { ToastContainer } from 'react-toastify';
+import Button from '../../components/Button';
 
 export default function Register() {
         const [formData, setFormData] = useState({username: '', email: '', password: '' });
         const [loading, setLoading] = useState(false);
-        // const navigate = useNavigate();
+        const navigate = useNavigate();
         const { register } = useAuth();
     
         const handleChange = (e) => {
@@ -17,19 +19,20 @@ export default function Register() {
       
         const handleSubmit = async (e) => {
           e.preventDefault();
-        //   setLoading(true);
+          setLoading(true);
           try {       
-            await register(formData.username, formData.email, formData.password);
-
-            // navigate('/', { state: { message: 'Login success! Welcome back my lord.' }});
+            var response = await register(formData.username, formData.email, formData.password);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            navigate('/', { state: { message: response.data.message || 'Login success!' }});
           } catch (err) {
-            // showErrorToast(err.message || "Failed to log in");
+            showErrorToast(err.message || "Failed to log in");
           } finally {
             setLoading(false)
           }
         };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <ToastContainer />
         <div className="w-full max-w-md p-8 space-y-4 bg-white shadow-lg rounded-lg">
             <h2 className="text-2xl font-bold text-center text-gray-800">Registration</h2>
             <form className="space-y-6" onSubmit={handleSubmit}>
@@ -63,7 +66,11 @@ export default function Register() {
                         value={formData.password}
                     />
                 </div>
-                <Button classes={'bg-indigo-600 hover:bg-indigo-700'} type={'submit'} name={`${loading ? (<LoadingSpinner/>) : 'Register'}`}/>
+                <Button type={'submit'} classes={'bg-blue-500 hover:bg-blue-700'} disabled={loading}
+                  name={loading ? (<LoadingSpinner/>) : (
+                    'Register'
+                  )}
+                />
             </form>
             <p className="text-sm text-center text-gray-600">
                 Don't have an account? <Link to={"/login"}  className="text-indigo-500">Login</Link>
