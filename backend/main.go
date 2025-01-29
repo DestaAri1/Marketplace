@@ -3,8 +3,9 @@ package main
 import (
 	"github.com/DestaAri1/database"
 	"github.com/DestaAri1/handlers"
-	repository "github.com/DestaAri1/repositories"
-	services "github.com/DestaAri1/sevices"
+	"github.com/DestaAri1/middlewares"
+	"github.com/DestaAri1/repositories"
+	"github.com/DestaAri1/sevices"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
@@ -37,10 +38,10 @@ func main() {
 	server := app.Group("/api")
 	handlers.NewAuthHandler(server.Group(("/auth")), authService)
 	
-	// privateRoutes := server.Use(middlewares.AuthProtected(db))
+	privateRoutes := server.Use(middlewares.AuthProtected(db))
 	
 	//Handlers
-	// handlers.NewGetUserHandler(privateRoutes.Group("/auth"), authRepository)
+	handlers.NewGetUserHandler(privateRoutes.Group("/auth"), authRepository)
 	// handlers.NewUserHandler(privateRoutes.Group("/user"), userRepository, authRepository)
 	// handlers.NewEventHandler(privateRoutes.Group("/event"), eventRepository)
 	// handlers.NewTicketHandler(privateRoutes.Group("/ticket"), ticketRepository)

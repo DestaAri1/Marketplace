@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import TimerToaster from '../../components/TimerToaster';
-import UserDropdown from '../../components/UserDropdown';
+import UserDropdown from '../../../components/UserDropdown';
+import useAuth from '../../../hooks/useAuth';
+import TimerToaster from '../../../components/TimerToaster';
 
 export default function Home() {
     const [searchTerm, setSearchTerm] = useState("");
-    const userName = "JohnDoeLongName"; // Contoh nama pengguna, ganti dengan data sebenarnya
+    const {user} = useAuth()
 
     const products = [
         { name: "Product 1", store: "Store A", price: 100, discountPrice: 80, image: "https://via.placeholder.com/150" },
@@ -18,7 +19,7 @@ export default function Home() {
         <header className="fixed top-0 left-0 w-full bg-indigo-600 text-white py-4 shadow-md z-50">
             <div className="container mx-auto px-4 flex items-center justify-between">
                 {/* Navbar Left */}
-                <div className="flex items-center space-x-4">
+                <div className="flex w-[186px] items-center space-x-4">
                     <span className="text-lg font-bold">Marketplace</span>
                 </div>
 
@@ -30,11 +31,12 @@ export default function Home() {
                 </nav>
 
                 {/* Navbar Right */}
-                <UserDropdown userName={userName}/>
+                {user !== null ? <UserDropdown userName={user.username}/> : "dasds"}
+                
             </div>
         </header>
 
-        <main className="container mx-auto px-4 py-20">
+        <main className="container mx-auto px-32 py-20">
             {/* Search Bar */}
             <div className="mb-8">
                 <input
@@ -77,7 +79,7 @@ export default function Home() {
             {/* Product List Section */}
             <section id="products">
                 <h2 className="text-3xl font-bold text-gray-800 mb-6">🛍️ Product List</h2>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
                     {products.map((product, index) => (
                         <div key={index} className="p-6 bg-white rounded-lg shadow-lg">
                             <img

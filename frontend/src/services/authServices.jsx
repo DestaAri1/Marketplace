@@ -1,26 +1,6 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
-
-const API_URL = "http://localhost:3000/api"; 
-
-export const getToken = () => {
-    return Cookies.get('token') || localStorage.getItem('token')
-}
-
-export const setToken = (token) => {
-    Cookies.set('token', token, {
-        expires: 1,
-        path:'/',
-        sameSite:'Strict',
-        secure: process.env.NODE_ENV === 'production' // Use secure flag in production
-    })
-    localStorage.setItem('token', token);
-}
-
-export const removeToken = () => {
-    Cookies.remove('token', { path: '/' });
-    localStorage.removeItem('token');
-}
+import { getToken, removeToken, setToken } from './TokenServices';
+const API_URL = "http://localhost:3000/api"
 
 export const login = async (email, password) => {
     try {
@@ -65,5 +45,26 @@ export const registration = async(username, email, password) => {
             throw error.response.data;
         }
         throw new Error("Network error");
+    }
+}
+
+export const getUser = async() => {
+    const token = getToken()
+
+    if (!token) {
+        throw new Error('No token found');
+    }
+
+    try {
+        const response = await axios.get(`${API_URL}/auth/getUser`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        
+        return response.data.data;
+      } catch (error) {
+        removeToken();
+        throw error;
     }
 }
