@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import TopBar from '../../layout/Dashboard/TopBar';
 import SideBar from '../../layout/Dashboard/SideBar';
+import useAuth from '../../hooks/useAuth';
 
 export default function Dashboard() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const { user } = useAuth()
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -11,7 +13,7 @@ export default function Dashboard() {
 
     return (
     <div className="min-h-screen bg-gray-100">
-      <TopBar toggleSidebar={toggleSidebar} />
+      <TopBar toggleSidebar={toggleSidebar} user={user}/>
       <SideBar isOpen={isSidebarOpen} />
       <div className={`pt-20 pl-4 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
         <h1 className="text-3xl font-bold">Welcome to the Dashboard</h1>
