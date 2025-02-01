@@ -29,9 +29,11 @@ export default function UserDropdown({isDropdownOpen, role}) {
             {/* Dropdown Menu */}
             {isDropdownOpen && (
                 <div className="absolute text-left right-0 top-12 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-20 transition-all duration-200">
-                    {role === 0 && <Link to={'/dashboard'} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition">
-                        Dashboard
-                    </Link> }
+                    {role === 0 && 
+                        <Link to={'/dashboard'} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition">
+                            Dashboard
+                        </Link>
+                    }
                     <Link href="#profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition">
                         Profile
                     </Link>
