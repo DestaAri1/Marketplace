@@ -4,11 +4,13 @@ import useLoading from '../hooks/useLoading';
 import useAuth from '../hooks/useAuth';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner';
+import useSeller from '../hooks/useSeller';
 
 export default function UserDropdown({isDropdownOpen, role}) {
     const navigate = useNavigate();
     const { isLoading, setLoading } = useLoading(false);
     const { logout } = useAuth()
+    const { UpgradeSellerHook } = useSeller()
 
     const handleLogout = async () => {
         setLoading(true);
@@ -24,6 +26,18 @@ export default function UserDropdown({isDropdownOpen, role}) {
         }
       };
 
+    const handleSubmit = async(e) => {
+        e.preventDefault();
+        try {
+            var response = await UpgradeSellerHook()
+            console.log(response);
+            
+        } catch (error) {
+            console.log(error);
+            
+        }
+    }
+
     return (
         <>
             {/* Dropdown Menu */}
@@ -37,6 +51,11 @@ export default function UserDropdown({isDropdownOpen, role}) {
                     <Link href="#profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition">
                         Profile
                     </Link>
+                    {role === 2 && 
+                        <form className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition" onSubmit={handleSubmit}>
+                            <button type='submit'>Upgrade to Seller</button>
+                        </form>
+                    }
                     <Link href="#settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition">
                         Settings
                     </Link>

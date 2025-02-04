@@ -10,6 +10,7 @@ import (
 
 type SellerHandler struct {
 	repository models.SellerRequestRepository
+	user models.AuthRepository
 }
 
 func (h *SellerHandler) handlerError(ctx *fiber.Ctx, status int, message string) error {
@@ -35,8 +36,17 @@ func (h *SellerHandler) SellerRequest(ctx *fiber.Ctx) error{
     if userId == nil {
         return h.handlerError(ctx, fiber.StatusUnauthorized, "Unauthorized, userId not found")
     }
-
+	
     userIdUint := uint(userId.(float64))
+
+	user, err := h.user.GetUser(context, "id = ?", userId)
+	if err != nil {
+		return h.handlerError(ctx, fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	if user.Role != nil && *user.Role != 2 {
+		return h.handlerError(ctx, fiber.StatusBadGateway, "Invalid User")
+	}
     
     // Create seller request with just the user ID
     seller := &models.Seller_Request{
@@ -51,9 +61,10 @@ func (h *SellerHandler) SellerRequest(ctx *fiber.Ctx) error{
     return h.handlerSuccess(ctx, fiber.StatusCreated, "Request has been sended!", createdTicket)
 }
 
-func NewSellerHandler(router fiber.Router, repository models.SellerRequestRepository) {
+func NewSellerHandler(router fiber.Router, repository models.SellerRequestRepository, user models.AuthRepository) {
 	handler := &SellerHandler{
 		repository: repository,
+		user: user,
 	}
 	
 	router.Post("/upgrade", handler.SellerRequest)

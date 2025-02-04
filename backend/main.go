@@ -43,7 +43,7 @@ func main() {
 	
 	//Handlers
 	handlers.NewGetUserHandler(privateRoutes.Group("/auth"), authRepository)
-	handlers.NewSellerHandler(privateRoutes.Group("/seller"), sellerRepository)
+	handlers.NewSellerHandler(privateRoutes.Group("/seller"), sellerRepository, authRepository)
 	// handlers.NewUserHandler(privateRoutes.Group("/user"), userRepository, authRepository)
 	// handlers.NewEventHandler(privateRoutes.Group("/event"), eventRepository)
 	// handlers.NewTicketHandler(privateRoutes.Group("/ticket"), ticketRepository)
