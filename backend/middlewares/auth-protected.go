@@ -6,17 +6,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/DestaAri1/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
 )
 
-// func errorMiddleware(ctx *fiber.Ctx, status int, message string) error {
-// 	return ctx.Status(status).JSON(&fiber.Map{
-// 		"status":  "fail",
-// 		"message": message,
-// 	})
-// }
+func errorMiddleware(ctx *fiber.Ctx, status int, message string) error {
+	return ctx.Status(status).JSON(&fiber.Map{
+		"status":  "fail",
+		"message": message,
+	})
+}
 
 func AuthProtected(db *gorm.DB) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
@@ -67,4 +68,29 @@ func AuthProtected(db *gorm.DB) fiber.Handler {
 		ctx.Locals("userId", claims["id"])
 		return ctx.Next()
 	}
+}
+
+func RoleAuthorization(db *gorm.DB, allowedRoles ...models.UserRole) fiber.Handler {
+    return func(c *fiber.Ctx) error {
+        // Ambil userId dari Locals
+        userId, ok := c.Locals("userId").(float64) // Sesuaikan dengan tipe data userId yang disimpan di token
+        if !ok {
+            return errorMiddleware(c, fiber.StatusForbidden, "User not found")
+        }
+
+        // Query untuk mendapatkan user dari database
+        var user models.User
+        if err := db.First(&user, "id = ?", uint(userId)).Error; err != nil {
+            return errorMiddleware(c, fiber.StatusForbidden, "User not found")
+        }
+
+        // Cek apakah role user sesuai dengan allowedRoles
+        for _, role := range allowedRoles {
+            if *user.Role == role {
+                return c.Next()
+            }
+        }
+
+        return errorMiddleware(c, fiber.StatusForbidden, "Access denied")
+    }
 }

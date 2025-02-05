@@ -45,7 +45,7 @@ func (h *SellerHandler) SellerRequest(ctx *fiber.Ctx) error{
 	}
 
 	if user.Role != nil && *user.Role != 2 {
-		return h.handlerError(ctx, fiber.StatusBadGateway, "Invalid User")
+		return h.handlerError(ctx, fiber.StatusBadGateway, "Invalid access")
 	}
     
     // Create seller request with just the user ID
