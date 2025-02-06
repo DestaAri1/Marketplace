@@ -1,44 +1,65 @@
-import React from 'react'
+import React from 'react';
+import { User } from 'lucide-react';
+import UserDropdown from '../../components/UserDropdown';
 import useDropdown from '../../hooks/useDropdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser } from '@fortawesome/free-solid-svg-icons'
-import UserDropdown from '../../components/UserDropdown';
 
-export default function TopBar({ toggleSidebar, user }) {
-    const { isDropdownOpen, toggleDropdown } = useDropdown()
-    const { username = "Guest", role = "2" } = user || {};
-  
-    return (
-      <div className="fixed top-0 left-0 right-0 bg-white shadow-md p-4 flex justify-between items-center z-10">
-        <div className="flex items-center">
-          <button onClick={toggleSidebar} className="mr-4 text-gray-600 focus:outline-none">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-            </svg>
-          </button>
-          <input
-            type="text"
-            placeholder="Search..."
-            className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="relative user-dropdown">
-            <button
-                onClick={toggleDropdown}
-                className="relative flex items-center space-x-3 border-2 border-gray-300 hover:border-blue-800 rounded-full focus:outline-none transition-all duration-200 p-1"
-            >
-                {/* Profile Image with Border */}
-                <div className="w-10 h-10 rounded-full border-2 border-gray-300 hover:border-blue-800 p-0.5 overflow-hidden">
-                    <FontAwesomeIcon icon={faUser} className="w-full h-full" />
+export default function TopBar({ user, isCollapsed }) {
+  const { isDropdownOpen, toggleDropdown } = useDropdown();
+  const { username = "Guest", role = "2" } = user || {};
+
+  return (
+      <header className={`fixed top-0 right-0 bg-white border-b z-20 transition-all duration-300
+          ${isCollapsed ? 'left-16' : 'left-64'}`}>
+          <div className="flex items-center justify-between px-4 py-2">
+              <div className="flex items-center gap-4 flex-1">
+                  <div className="relative flex-1 max-w-xl">
+                      <input
+                          type="text"
+                          placeholder="Search..."
+                          className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg 
+                                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                   placeholder-gray-400"
+                      />
+                  </div>
+              </div>
+
+              {/* <div className="relative ml-4">
+                  <button
+                      onClick={toggleDropdown}
+                      className="flex items-center gap-3 px-3 py-2 rounded-full border-2 border-gray-200 
+                               hover:border-blue-500 transition-colors focus:outline-none focus:border-blue-500"
+                  >
+                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                          <User size={20} className="text-gray-600" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate">
+                          {username}
+                      </span>
+                      <div className={`absolute right-0 top-full mt-2 w-48 ${isDropdownOpen ? 'block' : 'hidden'}`}>
+                          <UserDropdown isDropdownOpen={isDropdownOpen} role={role} />
+                      </div>
+                  </button>
+              </div> */}
+              <div className="relative user-dropdown w-[186px]">
+                    {/* Profile Button */}
+                    <button
+                        onClick={toggleDropdown}
+                        className="relative flex items-center space-x-3 border-2 border-gray-200 hover:border-blue-500 rounded-full focus:outline-none transition-all duration-200 p-1"
+                    >
+                        {/* Profile Image with Border */}
+                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                            <User size={30} className="text-gray-600" />
+                        </div>
+
+                        {/* User Name */}
+                        <span className="text-sm font-medium text-left truncate w-[120px]">
+                            {username.length > 15 ? `${username.substring(0, 15)}...` : username}
+                        </span>
+                    </button>
+                    <UserDropdown isDropdownOpen={isDropdownOpen} role={role}/>
                 </div>
-
-                {/* User Name */}
-                <span className="text-sm font-medium text-left truncate w-[120px] hover:text-blue-800">
-                    {username.length > 15 ? `${username.substring(0, 15)}...` : username}
-                </span>
-                <UserDropdown isDropdownOpen={isDropdownOpen} role={role}/>
-            </button>
-        </div>
-      </div>
-    );
-};
+          </div>
+      </header>
+  );
+}
