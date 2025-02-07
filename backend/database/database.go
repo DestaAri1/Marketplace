@@ -40,7 +40,7 @@ func Init(DBMigrator func(db *gorm.DB) error) *gorm.DB {
 // 			log.Fatalf("Failed to hash password: %v", err)
 // 		}
 		
-// 		role := 0
+// 		var role models.UserRole
 //         admin := &models.User{
 //             Username	: "Admin User",
 //             Email 		: "admin@gmail.com",

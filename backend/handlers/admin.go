@@ -47,6 +47,12 @@ func (h *AdminHandler) handleValidationError(ctx *fiber.Ctx, err error) error {
 					message = fmt.Errorf("only numeric").Error()
 				}
 				return h.handlerError(ctx, fiber.StatusBadRequest, message)
+			case "Status":
+				switch err.Tag() {
+				case "required":
+					message = fmt.Errorf("status field is required").Error()
+				}
+				return h.handlerError(ctx, fiber.StatusBadRequest, message)
 			}
 		}
 	}
@@ -74,29 +80,49 @@ func (h *AdminHandler) AcceptRequest(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
     defer cancel()
 
+    // Validate user authentication
     userId := ctx.Locals("userId")
     if userId == nil {
         return h.handlerError(ctx, fiber.StatusUnauthorized, "Unauthorized, userId not found")
     }
-	
-    formData := &models.FormRequestSeller{}
-	
-	if err := ctx.BodyParser(formData); err != nil {
-		return h.handlerError(ctx, fiber.StatusUnprocessableEntity, err.Error())
-	}
-	
-	if err := validator.New().Struct(formData); err != nil {
-		return h.handleValidationError(ctx, err)
-	}
 
-	userIdUint := uint(formData.UserID)
-	
-	_, err := h.repository.AcceptRequest(context, userIdUint)
-    if err != nil {
-        return h.handlerError(ctx, fiber.StatusBadGateway, err.Error())
+    // Parse request body
+    formData := &models.FormRequestSeller{}
+    if err := ctx.BodyParser(formData); err != nil {
+        return h.handlerError(ctx, fiber.StatusUnprocessableEntity, err.Error())
     }
 
-    return h.handlerSuccess(ctx, fiber.StatusCreated, "Request has been accepted!", nil)
+    // Validate struct
+    validate := validator.New()
+    if err := validate.Struct(formData); err != nil {
+        return h.handleValidationError(ctx, err)
+    }
+
+    // Validate status and reason
+    if !formData.Status {
+        if formData.Reason == "" {
+            return h.handlerError(ctx, fiber.StatusBadRequest, "Reason is required when rejecting request")
+        }
+    }
+
+    userIdUint := uint(formData.UserID)
+
+    // Process the request
+    _, err := h.repository.AcceptRequest(context, formData, userIdUint)
+    if err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            return h.handlerError(ctx, fiber.StatusNotFound, "User not found")
+        }
+        return h.handlerError(ctx, fiber.StatusInternalServerError, "Failed to process request")
+    }
+
+    // Return appropriate success message based on status
+    successMsg := "Request has been rejected"
+    if formData.Status {
+        successMsg = "Request has been accepted!"
+    }
+
+    return h.handlerSuccess(ctx, fiber.StatusOK, successMsg, nil)
 }
 
 func NewAdminHandler(router fiber.Router, repository models.AdminRepository, db *gorm.DB,) {

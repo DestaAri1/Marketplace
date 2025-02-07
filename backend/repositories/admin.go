@@ -19,7 +19,8 @@ func (r *AdminRepository) GetAllRequest(ctx context.Context) ([]*models.SellerRe
         Select("seller_requests.user_id", 
                 "users.username", 
                 "users.email", 
-                "seller_requests.status").
+                "seller_requests.status",
+				"seller_requests.reason").
         Joins("JOIN users ON users.id = seller_requests.user_id").
         Scan(&requests)
 
@@ -30,22 +31,34 @@ func (r *AdminRepository) GetAllRequest(ctx context.Context) ([]*models.SellerRe
     return requests, nil
 }
 
-func (r *AdminRepository) AcceptRequest(ctx context.Context, userId uint) (*models.User, error) {
+func (r *AdminRepository) AcceptRequest(ctx context.Context, requestData *models.FormRequestSeller , userId uint) (*models.User, error) {
 	user := &models.User{}
 	requestSeller := &models.Seller_Request{}
 
-	sellerRole:=1
-	res := r.db.Model(user).Where("id = ?", userId).Update("role", sellerRole)
+	if requestData.Status {
+		sellerRole:=1
+		res := r.db.Model(user).Where("id = ?", userId).Update("role", sellerRole)
+	
+		if res.Error != nil {
+			return nil, res.Error
+		}
+		
+		res2 := r.db.Model(requestSeller).Where("user_id = ?", userId).Update("status", true)
+		
+		if res2.Error != nil {
+			return nil, res2.Error
+		}
+	} else {
+		res := r.db.Model(requestSeller).Where("user_id = ?", userId).Updates(map[string]interface{}{
+			"status" : false,
+			"reason": requestData.Reason,
+		})
 
-	if res.Error != nil {
-		return nil, res.Error
+		if res.Error != nil {
+			return nil, res.Error
+		}
 	}
-	
-	res2 := r.db.Model(requestSeller).Where("user_id = ?", userId).Update("status", true)
-	
-	if res2.Error != nil {
-		return nil, res2.Error
-	}
+
 	return user, nil
 }
 
