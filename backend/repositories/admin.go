@@ -49,10 +49,7 @@ func (r *AdminRepository) AcceptRequest(ctx context.Context, requestData *models
 			return nil, res2.Error
 		}
 	} else {
-		res := r.db.Model(requestSeller).Where("user_id = ?", userId).Updates(map[string]interface{}{
-			"status" : false,
-			"reason": requestData.Reason,
-		})
+		res := r.db.Where("user_id = ?", userId).Delete(&models.Seller_Request{})
 
 		if res.Error != nil {
 			return nil, res.Error

@@ -8,6 +8,7 @@ type FormRequestSeller struct{
     Reason  string  `json:"reason"`
 }
 
+
 type SellerRequestResponse struct {
     UserID    uint   `json:"user_id"`
     Username  string `json:"username"`
@@ -17,6 +18,22 @@ type SellerRequestResponse struct {
 }
 
 type AdminRepository interface {
-	GetAllRequest(ctx context.Context)([]*SellerRequestResponse, error)
+    GetAllRequest(ctx context.Context)([]*SellerRequestResponse, error)
 	AcceptRequest(ctx context.Context, requestData *FormRequestSeller, userId uint) (*User, error)
+}
+
+type FormRequestUpgradeUser struct{
+    Role    UserRole    `json:"role" validate:"required,numeric"`
+}
+
+type AllUserResponse struct {
+    ID       uint       `json:"id"`
+    Username string     `json:"username"`
+    Email    string     `json:"email"`
+    Role     UserRole   `json:"role"`
+}
+
+type AdminUserRepository interface{
+    GetAllUser(ctx context.Context)([]*AllUserResponse, error)
+    UpgradeUser(ctx context.Context, requestData *FormRequestUpgradeUser, userId uint)(*User, error)
 }

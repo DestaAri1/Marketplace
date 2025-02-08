@@ -61,6 +61,25 @@ func (h *SellerHandler) SellerRequest(ctx *fiber.Ctx) error{
     return h.handlerSuccess(ctx, fiber.StatusCreated, "Request has been sended!", createdTicket)
 }
 
+func (h *SellerHandler) GetStatusRequest(ctx *fiber.Ctx) error {
+	userId, ok := ctx.Locals("userId").(float64)
+
+	if !ok {
+		return h.handlerError(ctx, fiber.StatusUnauthorized, "Failed to get user ID from token")
+	}
+
+	data, err := h.repository.GetStatusRequest(context.Background(), "user_id = ?", userId)
+	if err != nil {
+		return h.handlerError(ctx, fiber.StatusInternalServerError, "Internal Server Error")
+	}
+
+	if data == nil {
+		return h.handlerError(ctx, fiber.StatusNotFound, "data not found")
+	}
+
+	return h.handlerSuccess(ctx, fiber.StatusOK, "", data)
+}
+
 func NewSellerHandler(router fiber.Router, repository models.SellerRequestRepository, user models.AuthRepository) {
 	handler := &SellerHandler{
 		repository: repository,
@@ -68,5 +87,6 @@ func NewSellerHandler(router fiber.Router, repository models.SellerRequestReposi
 	}
 	
 	router.Post("/upgrade", handler.SellerRequest)
+	router.Get("/upgrade/status", handler.GetStatusRequest)
 }
 

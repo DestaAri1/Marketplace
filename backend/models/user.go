@@ -30,4 +30,5 @@ type Seller_Request struct {
 
 type SellerRequestRepository interface {
 	SellerRequest(ctx context.Context, requestData *Seller_Request, userId uint) (*Seller_Request, error)
+	GetStatusRequest(ctx context.Context, query interface{}, args ...interface{}) (*Seller_Request, error)
 }

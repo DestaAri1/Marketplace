@@ -33,7 +33,7 @@ export default function SideBar({ isCollapsed, toggleCollapse }) {
             <nav className="flex-1 overflow-y-auto p-4">
                 <ul className="space-y-2">
                     <li>
-                        <Link to="/" 
+                        <Link to="/dashboard" 
                             className="flex items-center gap-3 p-3 hover:bg-blue-700/50 rounded-lg transition-colors text-sm"
                             title="Home">
                             <Home size={20} className="flex-shrink-0" />

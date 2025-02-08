@@ -10,14 +10,18 @@ export default function UserRequest() {
   useEffect(() => {
     if (!isFetched.current && GetAllUserHook) {
       GetAllUserHook()
-      .then((users) => setUser(users)) // Set user setelah Promise resolved
+      .then((users) => {
+        const filteredUsers = users.filter(user => !user.reason);
+        setUser(filteredUsers);
+      }) // Set user setelah Promise resolved
       .catch((error) => console.error("Error fetching users:", error));
       isFetched.current = true;
+      
     }
   }, [GetAllUserHook]);
 
   return (
-    <DashboardTemplate>
+    <DashboardTemplate title="List Request">
       <div className="overflow-x-auto bg-white shadow-md rounded-lg">
         <table className="w-full border-collapse">
           <thead>
@@ -30,7 +34,7 @@ export default function UserRequest() {
             </tr>
           </thead>
           <tbody>
-            {user.length > 0 ? (
+            {user && user.length > 0 ? (
               user.map((user, index) => (
                 <tr key={index} className="border-b hover:bg-gray-100">
                   <td className="py-3 px-4">{index + 1}</td>
@@ -45,11 +49,11 @@ export default function UserRequest() {
                     </span>
                   </td>
                   <td className="py-3 px-4 text-center">
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">
-                      Edit
+                    <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-sm">
+                      Terima
                     </button>
                     <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm ml-2">
-                      Delete
+                      Tolak
                     </button>
                   </td>
                 </tr>

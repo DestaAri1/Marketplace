@@ -2,7 +2,6 @@ import React from 'react';
 import { User } from 'lucide-react';
 import UserDropdown from '../../components/UserDropdown';
 import useDropdown from '../../hooks/useDropdown';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function TopBar({ user, isCollapsed }) {
   const { isDropdownOpen, toggleDropdown } = useDropdown();
@@ -23,24 +22,6 @@ export default function TopBar({ user, isCollapsed }) {
                       />
                   </div>
               </div>
-
-              {/* <div className="relative ml-4">
-                  <button
-                      onClick={toggleDropdown}
-                      className="flex items-center gap-3 px-3 py-2 rounded-full border-2 border-gray-200 
-                               hover:border-blue-500 transition-colors focus:outline-none focus:border-blue-500"
-                  >
-                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                          <User size={20} className="text-gray-600" />
-                      </div>
-                      <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate">
-                          {username}
-                      </span>
-                      <div className={`absolute right-0 top-full mt-2 w-48 ${isDropdownOpen ? 'block' : 'hidden'}`}>
-                          <UserDropdown isDropdownOpen={isDropdownOpen} role={role} />
-                      </div>
-                  </button>
-              </div> */}
               <div className="relative user-dropdown w-[186px]">
                     {/* Profile Button */}
                     <button

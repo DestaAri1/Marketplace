@@ -16,7 +16,7 @@ export default function Navbar({user}) {
         <div className="container mx-auto px-4 flex items-center justify-between">
             {/* Navbar Left */}
             <div className="flex w-[186px] items-center space-x-4">
-                <span className="text-lg font-bold">Marketplace</span>
+                <span className="text-base font-bold">Marketplace</span>
             </div>
 
             {/* Navbar Center */}
