@@ -6,6 +6,7 @@ import { AdminRoute, AuthRoute } from './utils/AuthRoute';
 import Home from './pages/Home/Home/Home';
 import Dashboard from './pages/Dashboard/Dashboard/Dashboard';
 import UserRequest from './pages/Dashboard/User/User/UserRequest';
+import UserList from './pages/Dashboard/User/User/UserList';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         {/* Admin/Seller Page */}
         <Route path='/dashboard' element={<AdminRoute><Dashboard/></AdminRoute>}/>
         <Route path='/dashboard/user_request' element={<AdminRoute><UserRequest/></AdminRoute>}/>
+        <Route path='/dashboard/user-list' element={<AdminRoute><UserList/></AdminRoute>}/>
       </Routes>
     </BrowserRouter>
   );

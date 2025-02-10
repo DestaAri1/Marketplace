@@ -4,12 +4,12 @@ import useAdmin from "../../../../hooks/useAdmin";
 
 export default function UserRequest() {
   const [user, setUser] = useState([]);
-  const { GetAllUserHook } = useAdmin();
+  const { GetAllUserRequestHook } = useAdmin();
   const isFetched = useRef(false);
 
   useEffect(() => {
-    if (!isFetched.current && GetAllUserHook) {
-      GetAllUserHook()
+    if (!isFetched.current && GetAllUserRequestHook) {
+      GetAllUserRequestHook()
       .then((users) => {
         const filteredUsers = users.filter(user => !user.reason);
         setUser(filteredUsers);
@@ -18,7 +18,7 @@ export default function UserRequest() {
       isFetched.current = true;
       
     }
-  }, [GetAllUserHook]);
+  }, [GetAllUserRequestHook]);
 
   return (
     <DashboardTemplate title="List Request">

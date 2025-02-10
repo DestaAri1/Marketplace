@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/DestaAri1/models"
 	"gorm.io/gorm"
@@ -26,7 +27,25 @@ func (r *AdminUserRepository) GetAllUser(ctx context.Context) ([]*models.AllUser
 }
 
 func (r *AdminUserRepository) UpgradeUser(ctx context.Context, formRequest *models.FormRequestUpgradeUser, userId uint)(*models.User, error) {
-	return nil, nil
+	user := &models.User{}
+	userRole := formRequest.Role
+
+	checkingData := r.db.Where("id = ?", userId).First(&user)
+
+	if checkingData.Error != nil { // Jika sudah ada, kembalikan error
+		if errors.Is(checkingData.Error, gorm.ErrRecordNotFound) {
+			return nil, errors.New("user not found")
+		}
+		return nil, checkingData.Error
+	}
+
+	res := r.db.Model(user).Where("id = ?", userId).Update("role", userRole)
+
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	
+	return user, nil
 }
 
 func NewAdminUserRepository(db *gorm.DB) models.AdminUserRepository{

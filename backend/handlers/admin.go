@@ -65,8 +65,6 @@ func (h *AdminHandler) GetAllRequest(ctx *fiber.Ctx) error {
 
     res, err := h.repository.GetAllRequest(context)
     if err != nil {
-        // Log error untuk debugging
-        log.Printf("Error getting seller requests: %v", err)
         return h.handlerError(ctx, fiber.StatusBadGateway, err.Error())
     }
 

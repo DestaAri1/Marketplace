@@ -118,7 +118,7 @@ export default function SideBar({ isCollapsed, toggleCollapse }) {
                                 <div className={`overflow-hidden transition-all duration-300 ease-in-out 
                                     ${subDropdown === 'normalUser' ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}
                                     ${isCollapsed ? 'pl-2' : 'pl-8'}`}>
-                                    <Link to="/user-list" className="flex items-center gap-3 p-2 hover:bg-blue-700/50 rounded-lg text-sm">
+                                    <Link to="/dashboard/user-list" className="flex items-center gap-3 p-2 hover:bg-blue-700/50 rounded-lg text-sm">
                                         <Users size={16} className="flex-shrink-0" />
                                         <div className={`transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap 
                                             ${isCollapsed ? 'w-0 opacity-0' : 'w-32 opacity-100'}`}>
