@@ -8,9 +8,7 @@ import { faUser } from '@fortawesome/free-solid-svg-icons'
 export default function Navbar({user}) {
   const { isDropdownOpen, toggleDropdown } = useDropdown();
   const { username = "Guest", role = "User" } = user || {};
-  console.log(user);
-  
-  
+
   return (
     <header className="fixed top-0 left-0 w-full bg-indigo-600 text-white py-4 shadow-md z-50">
         <div className="container mx-auto px-4 flex items-center justify-between">

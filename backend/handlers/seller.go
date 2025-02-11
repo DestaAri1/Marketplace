@@ -77,7 +77,7 @@ func (h *SellerHandler) GetStatusRequest(ctx *fiber.Ctx) error {
 		return h.handlerError(ctx, fiber.StatusNotFound, "data not found")
 	}
 
-	return h.handlerSuccess(ctx, fiber.StatusOK, "", data)
+	return h.handlerSuccess(ctx, fiber.StatusOK, "Process...", nil)
 }
 
 func NewSellerHandler(router fiber.Router, repository models.SellerRequestRepository, user models.AuthRepository) {

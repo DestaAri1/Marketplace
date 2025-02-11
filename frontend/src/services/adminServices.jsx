@@ -43,3 +43,30 @@ export const GetAllUser = async() => {
       throw error;
   }
 }
+
+export const AdjustRoleUser = async(user_id, role) => {
+  const token = getToken() 
+
+  if (!token) {
+      throw new Error('No token found');
+  }
+
+  try {
+    const response = await axios.post(`${API_URL}/admin/user/upgrade_user`, {
+        user_id, role
+    }, {
+        headers: {
+            "Content-Type" : "application/json",
+            Accept:"application/json",
+            Authorization: `Bearer ${token}`,
+        }
+    })
+
+    return response;
+} catch (error) {
+    if (error.response) {
+        throw error.response.data;
+    }
+    throw new Error("Network error");
+}
+}

@@ -94,7 +94,7 @@ func(h *AdminUserHandler) UpgradeUser(ctx *fiber.Ctx) error{
 
 	userIdUint := uint(formData.UserId)
 
-	if userIdUint == uint(models.Admin) {
+	if userIdUint == 1 {
 		return h.handlerError(ctx, fiber.StatusBadGateway, "unchangeable")
 	}
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getToken, removeToken } from "./TokenServices";
+import { getToken } from "./TokenServices";
 
 const API_URL = "http://localhost:3000/api"
 
