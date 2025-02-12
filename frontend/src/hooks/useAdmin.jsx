@@ -22,7 +22,7 @@ export default function useAdmin() {
     const AdjustRoleUserHook = async(user_id, role) => {
       try {
         var res = await AdjustRoleUser(user_id, role)
-        return res.data.data
+        return res
       } catch (error) {
         throw error
       }
