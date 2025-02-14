@@ -27,6 +27,10 @@ type FormRequestUpgradeUser struct{
     UserId  uint        `json:"user_id" validate:"required,numeric"`
 }
 
+type FormRequestDeleteUserByAdmin struct {
+    UserId  uint    `json:"user_id" validate:"required,numeric"`
+}
+
 type AllUserResponse struct {
     ID       uint       `json:"id"`
     Username string     `json:"username"`
@@ -37,4 +41,5 @@ type AllUserResponse struct {
 type AdminUserRepository interface{
     GetAllUser(ctx context.Context)([]*AllUserResponse, error)
     UpgradeUser(ctx context.Context, requestData *FormRequestUpgradeUser, userId uint)(*User, error)
+    DeleteUserByAdmin(ctx context.Context, requestData *FormRequestDeleteUserByAdmin, userId uint) (*User, error)
 }

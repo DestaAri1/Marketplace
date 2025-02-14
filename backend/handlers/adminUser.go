@@ -107,6 +107,41 @@ func(h *AdminUserHandler) UpgradeUser(ctx *fiber.Ctx) error{
 	return h.handlerSuccess(ctx, fiber.StatusOK, "Successfully upgrade a user", nil)
 }
 
+func (h *AdminUserHandler) DeleteUserByAdmin(ctx *fiber.Ctx) error{
+	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
+    defer cancel()
+
+    userId := ctx.Locals("userId")
+    if userId == nil {
+        return h.handlerError(ctx, fiber.StatusUnauthorized, "Unauthorized, userId not found")
+    }
+
+	formData := &models.FormRequestDeleteUserByAdmin{}
+
+	if err := ctx.BodyParser(&formData); err != nil  {
+		return h.handlerError(ctx, fiber.StatusUnprocessableEntity, err.Error())
+	}
+	
+	validate := validator.New()
+    if err := validate.Struct(formData); err != nil {
+		return h.handleValidationError(ctx, err)
+    }
+
+	userIdUint := uint(formData.UserId)
+	
+	if userIdUint == 1 {
+		return h.handlerError(ctx, fiber.StatusBadGateway, "immune")
+	}
+
+	_, err := h.repository.DeleteUserByAdmin(context, formData, userIdUint)
+	
+	if err != nil {
+		return h.handlerError(ctx, fiber.StatusBadGateway, err.Error())
+	}
+	
+	return h.handlerSuccess(ctx, fiber.StatusOK, "Successfully delete a user", nil)
+}
+
 func NewAdminUserHandler(router fiber.Router, repository models.AdminUserRepository, db *gorm.DB,) {
 	handler := &AdminUserHandler{
 		repository: repository,
@@ -116,4 +151,5 @@ func NewAdminUserHandler(router fiber.Router, repository models.AdminUserReposit
 	
 	protected.Get("/list", handler.GetAllUser)
 	protected.Post("/upgrade_user", handler.UpgradeUser)
+	protected.Delete("/delete_user", handler.DeleteUserByAdmin)
 }

@@ -48,6 +48,34 @@ func (r *AdminUserRepository) UpgradeUser(ctx context.Context, formRequest *mode
 	return user, nil
 }
 
+func (r *AdminUserRepository) DeleteUserByAdmin(ctx context.Context, formData *models.FormRequestDeleteUserByAdmin, userId uint) (*models.User, error) {
+	user := &models.User{}
+	data := formData.UserId
+
+	// Memulai transaksi
+	tx := r.db.Begin()
+
+	// Cek apakah user ada
+	if err := tx.Where("id = ?", data).First(user).Error; err != nil {
+		tx.Rollback()
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("user not found")
+		}
+		return nil, err
+	}
+
+	// Hapus user berdasarkan ID
+	if err := tx.Delete(&user).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// Commit transaksi jika berhasil
+	tx.Commit()
+
+	return user, nil
+}
+
 func NewAdminUserRepository(db *gorm.DB) models.AdminUserRepository{
 	return &AdminUserRepository{
 		db: db,
