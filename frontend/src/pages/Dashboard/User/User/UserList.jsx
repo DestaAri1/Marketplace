@@ -15,7 +15,8 @@ export default function UserList() {
     fetchUsers,
     handleRoleUpdate,
     isLoading,
-    isFetched
+    isFetched,
+    handleDeleteUser
   } = useUserManagement();
 
   const roleModal = useModal();
@@ -34,9 +35,11 @@ export default function UserList() {
     }
   };
 
-  const handleConfirmDelete = () => {
-    console.log('Deleting user:', deleteModal.selectedItem);
-    deleteModal.closeModal();
+  const handleConfirmDelete = async () => {
+    if (await handleDeleteUser(deleteModal.selectedItem.id)) {
+      deleteModal.closeModal();
+    }
+    // console.log('Deleting user:', deleteModal.selectedItem);
   };
 
   return (
@@ -65,6 +68,7 @@ export default function UserList() {
         onClose={deleteModal.closeModal}
         user={deleteModal.selectedItem}
         onConfirm={handleConfirmDelete}
+        isLoading={isLoading}
       />
     </DashboardTemplate>
   );

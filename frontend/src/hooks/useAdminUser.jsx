@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import useAdmin from "./useAdmin";
 import { showErrorToast, showSuccessToast } from "../utils/Toast";
 import { toast } from "react-toastify";
+import { DeleteUserByAdmin } from "../services/adminServices";
 
 export const useUserManagement = () => {
     const [users, setUsers] = useState([]);
@@ -34,8 +35,7 @@ export const useUserManagement = () => {
         }
         return false;
       } catch (error) {
-        console.error('Error changing user role:', error);
-        showErrorToast("Failed to change user role");
+        showErrorToast(error.message);
         return false;
       } finally {
         setIsLoading(false);
@@ -47,6 +47,27 @@ export const useUserManagement = () => {
         ? users.filter((u) => u.role === selectedRole)
         : users;
     };
+
+    const handleDeleteUser = async(userId) => {
+      setIsLoading(true);
+      try {
+        const response = await DeleteUserByAdmin(userId);
+        
+        if (response?.data?.message) {
+          // Ensure we clear any existing toasts before showing new one
+          toast.dismiss();
+          showSuccessToast(response.data.message);
+          await fetchUsers();
+          return true;
+        }
+        return false;
+      } catch (error) {
+        showErrorToast(error.message);
+        return false;
+      } finally {
+        setIsLoading(false);
+      }
+    }
   
     return {
       users: getFilteredUsers(),
@@ -55,6 +76,7 @@ export const useUserManagement = () => {
       fetchUsers,
       handleRoleUpdate,
       isLoading,
-      isFetched
+      isFetched,
+      handleDeleteUser
     };
   };

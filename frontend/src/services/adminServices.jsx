@@ -63,10 +63,36 @@ export const AdjustRoleUser = async(user_id, role) => {
     })
 
     return response;
-} catch (error) {
-    if (error.response) {
-        throw error.response.data;
-    }
-    throw new Error("Network error");
+  } catch (error) {
+      if (error.response) {
+          throw error.response.data;
+      }
+      throw new Error("Network error");
+  }
 }
+
+export const DeleteUserByAdmin = async(user_id) => {
+  const token = getToken()
+
+  if (!token) {
+    throw new Error('No token found');
+  }
+
+  try {
+    const response = await axios.delete(`${API_URL}/admin/user/delete_user`, {
+      headers: {
+          "Content-Type" : "application/json",
+          Accept:"application/json",
+          Authorization: `Bearer ${token}`,
+      },
+      data: { user_id } // <-- Tambahkan data di sini
+  });
+
+    return response;
+  } catch (error) {
+      if (error.response) {
+          throw error.response.data;
+      }
+      throw new Error("Network error");
+  }
 }

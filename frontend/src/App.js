@@ -2,11 +2,14 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
-import { AdminRoute, AuthRoute } from './utils/AuthRoute';
+import { AdminRoute, AuthRoute, SellerRoute } from './utils/AuthRoute';
 import Home from './pages/Home/Home/Home';
 import Dashboard from './pages/Dashboard/Dashboard/Dashboard';
 import UserRequest from './pages/Dashboard/User/User/UserRequest';
 import UserList from './pages/Dashboard/User/User/UserList';
+import DashboardSeller from './pages/Seller/Dashboard/DashboardSeller';
+import SellerArchive from './pages/Seller/Product/SellerArchive';
+import SellerProducts from './pages/Seller/Product/SellerProducts';
 
 function App() {
   return (
@@ -18,6 +21,11 @@ function App() {
 
         {/* Main Page */}
         <Route path='/' element={<Home/>}/>
+
+        {/* Seller Page */}
+        <Route path='/seller/dashboard' element={<SellerRoute><DashboardSeller/></SellerRoute>}/>
+        <Route path='/seller/archive-product' element={<SellerRoute><SellerArchive/></SellerRoute>}/>
+        <Route path='/seller/products' element={<SellerRoute><SellerProducts/></SellerRoute>}/>
 
         {/* Admin/Seller Page */}
         <Route path='/dashboard' element={<AdminRoute><Dashboard/></AdminRoute>}/>

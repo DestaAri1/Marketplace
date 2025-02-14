@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import useAuth from '../../hooks/useAuth';
-import SideBar from '../../layout/Dashboard/SideBar';
-import TopBar from '../../layout/Dashboard/TopBar';
+import React, { useState } from 'react'
 import { ToastContainer } from 'react-toastify';
+import TopBar from '../../layout/Dashboard/TopBar';
+import SideBar from '../../layout/Dashboard/SideBar';
+import useAuth from '../../hooks/useAuth';
 
-export default function DashboardTemplate({ children, title = "Dashboard" }) {
+export default function SellerDashboardTemplate({ children, title = "Dashboard" }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { user } = useAuth();
 
