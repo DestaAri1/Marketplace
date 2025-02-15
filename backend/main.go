@@ -33,6 +33,7 @@ func main() {
 	sellerRepository := repository.NewSellerRepository(db)
 	adminRepository := repository.NewAdminRepository(db)
 	adminUserRepository := repository.NewAdminUserRepository(db)
+	sellerProductRepository := repository.NewSellerProductRepository(db)
 
 	//Service
 	authService := services.NewAuthService(authRepository)
@@ -46,6 +47,7 @@ func main() {
 	//Handlers
 	handlers.NewGetUserHandler(privateRoutes.Group("/auth"), authRepository)
 	handlers.NewSellerHandler(privateRoutes.Group("/seller"), sellerRepository, authRepository)
+	handlers.NewSellerProductHandler(privateRoutes.Group("/seller/product"), sellerProductRepository, db)
 	handlers.NewAdminHandler(privateRoutes.Group("/admin/seller"), adminRepository, db)
 	handlers.NewAdminUserHandler(privateRoutes.Group("/admin/user"), adminUserRepository, db)
 	// handlers.NewUserHandler(privateRoutes.Group("/user"), userRepository, authRepository)

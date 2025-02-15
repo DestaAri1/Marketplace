@@ -1,0 +1,105 @@
+package handlers
+
+import (
+	"context"
+	"strconv"
+	"time"
+
+	"github.com/DestaAri1/middlewares"
+	"github.com/DestaAri1/models"
+	"github.com/DestaAri1/utils"
+	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
+)
+
+type BaseHandler struct{}
+
+func (h *BaseHandler) handlerError(ctx *fiber.Ctx, status int, message string) error {
+	return utils.HandlerError(ctx, status, message)
+}
+
+func (h *BaseHandler) handlerSuccess(ctx *fiber.Ctx, status int, message string, data interface{}) error {
+	return utils.HandlerSuccess(ctx, status, message, data)
+}
+
+func (h *BaseHandler) handleValidationError(ctx *fiber.Ctx, err error) error {
+	return utils.HandleValidationError(ctx, err)
+}
+
+type SellerProductHandler struct {
+	BaseHandler
+	repository models.SellerProductRepository
+}
+
+func (h *SellerProductHandler) GetAllProduct(ctx *fiber.Ctx) error {
+	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	data, err := h.repository.GetAllProduct(context)
+	if err != nil {
+		return h.handlerError(ctx, fiber.StatusBadRequest, err.Error())
+	}
+
+	return h.handlerSuccess(ctx, fiber.StatusOK, "", data)
+}
+
+func (h *SellerProductHandler) CreateOneProduct(ctx *fiber.Ctx) error {
+	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
+	defer cancel()
+
+	userId := ctx.Locals("userId")
+    if userId == nil {
+        return h.handlerError(ctx, fiber.StatusUnauthorized, "Unauthorized, userId not found")
+    }
+
+	userIdUint := uint(userId.(float64))
+
+	formData := &models.FormCreateProduct{}
+
+	if err := ctx.BodyParser(formData); err != nil {
+		return h.handlerError(ctx, fiber.StatusUnprocessableEntity, err.Error())
+	}
+
+	validate := validator.New()
+    if err := validate.Struct(formData); err != nil {
+        return h.handleValidationError(ctx, err)
+    }
+
+	_, err := h.repository.CreateOneProduct(context, formData, userIdUint)
+
+	if err != nil {
+		return h.handlerError(ctx, fiber.StatusBadGateway, err.Error())
+	}
+	
+	return h.handlerSuccess(ctx, fiber.StatusOK, "Successfully create a product", nil)
+}
+
+func (h *SellerProductHandler) GetOneProduct(ctx *fiber.Ctx) error {
+	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
+	defer cancel()
+
+	productId, _ := strconv.Atoi(ctx.Params("productId"))
+
+	userId := uint(ctx.Locals("userId").(float64))
+
+	product, err := h.repository.GetOneProduct(context, uint(productId), userId)
+
+	if err != nil {
+		return h.handlerError(ctx, fiber.StatusBadGateway, err.Error())
+	}
+
+	return h.handlerSuccess(ctx, fiber.StatusOK, "", product)
+}
+
+func NewSellerProductHandler(router fiber.Router, repository models.SellerProductRepository, db *gorm.DB,) {
+	handler := &SellerProductHandler{
+		repository: repository,
+	}
+
+	protected := router.Group("/").Use(middlewares.AuthProtected(db)).Use(middlewares.RoleAuthorization(db, models.Seller))
+	
+	protected.Get("/", handler.GetAllProduct)
+	protected.Post("/", handler.CreateOneProduct)
+	protected.Get("/:productId", handler.GetOneProduct)
+}
