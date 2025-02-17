@@ -67,11 +67,53 @@ func (r *SellerProductRepository) CreateOneProduct(ctx context.Context, formData
 	return product, nil
 }
 
-func (r *SellerProductRepository) UpdateProduct(ctx context.Context, updateData map[string]interface{}, productId uint) (*models.Product, error) {
-	return nil, nil
+func (r *SellerProductRepository) UpdateProduct(ctx context.Context, updateData map[string]interface{}, productId, userId uint) (*models.Product, error) {
+	product := &models.Product{}
+
+	// Memulai transaksi
+	tx := r.db.Begin()
+
+	// Mencari produk berdasarkan id dan user_id
+	if err := tx.Where("id = ? AND user_id = ?", productId, userId).First(product).Error; err != nil {
+		tx.Rollback()
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("product not found")
+		}
+		return nil, err
+	}
+
+	// Melakukan update pada produk
+	if err := tx.Model(product).Updates(updateData).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	tx.Commit()
+	return product, nil
 }
 
-func (r *SellerProductRepository) DeleteProduct(ctx context.Context, productId uint) error {
+func (r *SellerProductRepository) DeleteProduct(ctx context.Context, productId uint, userId uint) error {
+	product := &models.Product{}
+
+	// Memulai transaksi
+	tx := r.db.Begin()
+
+	// Mencari produk berdasarkan id dan user_id
+	if err := tx.Where("id = ? AND user_id = ?", productId, userId).First(product).Error; err != nil {
+		tx.Rollback()
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("product not found")
+		}
+		return err
+	}
+
+	// Melakukan update pada produk
+	if err := tx.Delete(product).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
 	return nil
 }
 

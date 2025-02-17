@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 	"time"
 
@@ -75,6 +76,48 @@ func (h *SellerProductHandler) CreateOneProduct(ctx *fiber.Ctx) error {
 	return h.handlerSuccess(ctx, fiber.StatusOK, "Successfully create a product", nil)
 }
 
+func (h *SellerProductHandler) UpdateProduct(ctx *fiber.Ctx) error {
+	productId, err := strconv.Atoi(ctx.Params("productId"))
+
+	if err != nil {
+        return h.handlerError(ctx, fiber.StatusBadRequest, "invalid product ID")
+    }
+
+	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
+	defer cancel()
+
+	userId := ctx.Locals("userId")
+    if userId == nil {
+        return h.handlerError(ctx, fiber.StatusUnauthorized, "userId not found")
+    }
+
+	userIdUint := uint(userId.(float64))
+
+	updateData := make(map[string]interface{})
+	if err := ctx.BodyParser(&updateData); err != nil {
+		return h.handlerError(ctx, fiber.StatusUnprocessableEntity, err.Error())
+	}
+
+	formData := &models.FormCreateProduct{}
+
+	if err := mapToStruct(updateData, formData); err != nil {
+		return h.handleValidationError(ctx, err)
+	}
+
+	validate := validator.New()
+    if err := validate.Struct(formData); err != nil {
+        return h.handleValidationError(ctx, err)
+    }
+
+	product, err := h.repository.UpdateProduct(context, updateData, uint(productId), userIdUint)
+
+	if err != nil {
+		return h.handlerError(ctx, fiber.StatusBadGateway, err.Error())
+	}
+	
+	return h.handlerSuccess(ctx, fiber.StatusOK, "Data has been updated", product)
+}
+
 func (h *SellerProductHandler) GetOneProduct(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
 	defer cancel()
@@ -92,6 +135,29 @@ func (h *SellerProductHandler) GetOneProduct(ctx *fiber.Ctx) error {
 	return h.handlerSuccess(ctx, fiber.StatusOK, "", product)
 }
 
+func (h *SellerProductHandler) DeleteProduct(ctx *fiber.Ctx) error {
+	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
+	defer cancel()
+
+	productId, _ := strconv.Atoi(ctx.Params("productId"))
+
+	userId := uint(ctx.Locals("userId").(float64))
+
+	if err := h.repository.DeleteProduct(context, uint(productId), userId); err != nil {
+		return h.handlerError(ctx, fiber.StatusUnprocessableEntity, "Something went wrong")
+	}
+	
+	return h.handlerSuccess(ctx, fiber.StatusOK, "Data successfully delete", nil)
+} 
+
+func mapToStruct(m map[string]interface{}, s interface{}) error {
+	data, err := json.Marshal(m)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(data, s)
+}
+
 func NewSellerProductHandler(router fiber.Router, repository models.SellerProductRepository, db *gorm.DB,) {
 	handler := &SellerProductHandler{
 		repository: repository,
@@ -102,4 +168,6 @@ func NewSellerProductHandler(router fiber.Router, repository models.SellerProduc
 	protected.Get("/", handler.GetAllProduct)
 	protected.Post("/", handler.CreateOneProduct)
 	protected.Get("/:productId", handler.GetOneProduct)
+	protected.Patch("/update/:productId", handler.UpdateProduct)
+	protected.Delete("/:productId", handler.DeleteProduct)
 }
