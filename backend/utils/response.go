@@ -36,6 +36,8 @@ func HandleValidationError(ctx *fiber.Ctx, err error) error {
 				message = handleStockValidation(err.Tag())
 			case "Price":
 				message = handlePriceValidation(err.Tag())
+			case "Category":
+				message = handleCategoryValdation(err.Tag())
 			case "Description":
 				if err.Tag() == "max" {
 					message = "Maximum 500 characters"
@@ -81,6 +83,18 @@ func handlePriceValidation(tag string) string {
 		return "Only numeric values allowed"
 	case "gt":
 		return "Cannot input 0 for price"
+	}
+	return ""
+}
+
+func handleCategoryValdation(tag string) string{
+	switch tag {
+	case "required":
+		return "Category field is required"
+	case "numeric":
+		return "Only numeric values allowed"
+	case "gt":
+		return "choose the right category"
 	}
 	return ""
 }

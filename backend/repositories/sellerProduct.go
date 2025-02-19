@@ -12,19 +12,21 @@ type SellerProductRepository struct {
 	db *gorm.DB
 }
 
-func (r *SellerProductRepository) GetAllProduct(ctx context.Context) ([]*models.ProductResponse, error) {
-	product := []*models.ProductResponse{}
+func (r *SellerProductRepository) GetAllProduct(ctx context.Context, userId uint) ([]*models.ProductResponse, error) {
+	products := []*models.ProductResponse{}
 
 	res := r.db.
 		Table("products").
-		Select("id", "name", "stock", "price", "description").
-		Scan(&product)
+		Select("products.id, products.name, products.stock, products.price, products.description, products.status, categories.name as category").
+		Joins("LEFT JOIN categories ON categories.id = products.category_id").
+		Where("products.user_id = ?", userId).
+		Scan(&products)
 
 	if res.Error != nil {
 		return nil, res.Error
 	}
 
-	return product, nil
+	return products, nil
 }
 
 func (r *SellerProductRepository) GetOneProduct(ctx context.Context, productId uint, userId uint) (*models.ProductResponse, error) {
@@ -32,9 +34,10 @@ func (r *SellerProductRepository) GetOneProduct(ctx context.Context, productId u
 
 	res := r.db.
 		Table("products").
-		Select("id", "name", "stock", "price", "description").
-		Where("id = ?", productId).
-		Where("user_id = ?", userId).
+		Select("products.id, products.name, products.stock, products.price, products.description, products.status, categories.name as category").
+		Joins("LEFT JOIN categories ON categories.id = products.category_id").
+		Where("products.id = ?", productId).
+		Where("products.user_id = ?", userId).
 		Scan(&product)
 
 	if res.Error != nil {
@@ -51,6 +54,15 @@ func (r *SellerProductRepository) GetOneProduct(ctx context.Context, productId u
 
 func (r *SellerProductRepository) CreateOneProduct(ctx context.Context, formData *models.FormCreateProduct, userId uint) (*models.Product, error) {
 	product := &models.Product{}
+	category := &models.Category{}
+	
+	if cekData := r.db.Model(category).Where("id = ?", formData.Category).First(category).Error; cekData != nil {
+		if errors.Is(cekData, gorm.ErrRecordNotFound) {
+			return nil, errors.New("category not found")
+		}
+		return nil, cekData
+	}
+
 	data := &models.Product{
 		Name: formData.Name,
 		Stock: *formData.Stock,

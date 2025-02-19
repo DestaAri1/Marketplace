@@ -13,7 +13,19 @@ type CategoryRepository struct {
 }
 
 func (r *CategoryRepository) GetAllCategory(ctx context.Context) ([]*models.CategoryResponse, error) {
-	return nil, nil
+	category := []*models.CategoryResponse{}
+
+	res := r.db.
+		Table("categories").
+		Select("id, name").
+		Order("name asc").
+		Scan(&category)
+
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return category, nil
 }
 
 func (r *CategoryRepository) CreateCategory(ctx context.Context, formData *models.FormCategory) (*models.Category, error) {
@@ -45,10 +57,47 @@ func (r *CategoryRepository) CreateCategory(ctx context.Context, formData *model
 }
 
 func (r *CategoryRepository) UpdateCategory(ctx context.Context, updateData map[string]interface{}, catId uint) (*models.Category, error) {
-	return nil, nil
+	category := &models.Category{}
+
+	tx := r.db.Begin()
+
+	if name, ok := updateData["name"].(string); ok {
+		var existingCategory models.Category
+		// Cek apakah ada kategori dengan nama yang sama selain kategori yang sedang diupdate
+		if err := tx.Where("name = ? AND id != ?", name, catId).First(&existingCategory).Error; err == nil {
+			tx.Rollback() // Batalkan transaksi jika nama sudah ada
+			return nil, errors.New("category already exists")
+		}
+	}
+
+	if err := tx.Model(category).Where("id = ?", catId).Updates(updateData).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	tx.Commit()
+	return category, nil
 }
 
 func (r *CategoryRepository) DeleteCategory(ctx context.Context, catId uint) error {
+	category := &models.Category{}
+
+	tx := r.db.Begin()
+
+	if err := tx.Where("id = ?", catId).First(&category).Error; err != nil {
+		tx.Rollback()
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("category not found")
+		}
+		return err
+	}
+	
+	if err := tx.Delete(category).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
 	return nil
 }
 

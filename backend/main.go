@@ -24,16 +24,12 @@ func main() {
 
 
 	//Repositories
-	// eventRepository := repository.NewEventRepositories(db)
-	// ticketRepository := repository.NewTicketRepository(db)
 	authRepository := repository.NewAuthRepository(db)
-	// foodRepository := repository.NewFoodRepositories(db)
-	// foodOrderRepository := repository.NewFoodOrderRepository(db)
-	// userRepository := repository.NewUserRepository(db)
 	sellerRepository := repository.NewSellerRepository(db)
 	adminRepository := repository.NewAdminRepository(db)
 	adminUserRepository := repository.NewAdminUserRepository(db)
 	sellerProductRepository := repository.NewSellerProductRepository(db)
+	categoryRepository := repository.NewCategoryRepository(db)
 
 	//Service
 	authService := services.NewAuthService(authRepository)
@@ -46,15 +42,19 @@ func main() {
 	
 	//Handlers
 	handlers.NewGetUserHandler(privateRoutes.Group("/auth"), authRepository)
-	handlers.NewSellerHandler(privateRoutes.Group("/seller"), sellerRepository, authRepository)
-	handlers.NewSellerProductHandler(privateRoutes.Group("/seller/product"), sellerProductRepository, db)
+
+	// Admin
 	handlers.NewAdminHandler(privateRoutes.Group("/admin/seller"), adminRepository, db)
 	handlers.NewAdminUserHandler(privateRoutes.Group("/admin/user"), adminUserRepository, db)
-	// handlers.NewUserHandler(privateRoutes.Group("/user"), userRepository, authRepository)
-	// handlers.NewEventHandler(privateRoutes.Group("/event"), eventRepository)
-	// handlers.NewTicketHandler(privateRoutes.Group("/ticket"), ticketRepository)
-	// handlers.NewFoodHandler(privateRoutes.Group("/food"),db, foodRepository)
-	// handlers.NewFoodOrderHandler(privateRoutes.Group("food_order"), db, foodOrderRepository)
+
+	// Admin and All
+	handlers.NewCategoryHandler(privateRoutes.Group("/category"), categoryRepository, db)
+
+	//Seller
+	handlers.NewSellerHandler(privateRoutes.Group("/seller"), sellerRepository, authRepository)
+	handlers.NewSellerProductHandler(privateRoutes.Group("/seller/product"), sellerProductRepository, db)
+
+	//All
 
 	app.Listen(":3000")
 }

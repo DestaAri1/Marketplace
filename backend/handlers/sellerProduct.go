@@ -8,25 +8,10 @@ import (
 
 	"github.com/DestaAri1/middlewares"
 	"github.com/DestaAri1/models"
-	"github.com/DestaAri1/utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
-
-type BaseHandler struct{}
-
-func (h *BaseHandler) handlerError(ctx *fiber.Ctx, status int, message string) error {
-	return utils.HandlerError(ctx, status, message)
-}
-
-func (h *BaseHandler) handlerSuccess(ctx *fiber.Ctx, status int, message string, data interface{}) error {
-	return utils.HandlerSuccess(ctx, status, message, data)
-}
-
-func (h *BaseHandler) handleValidationError(ctx *fiber.Ctx, err error) error {
-	return utils.HandleValidationError(ctx, err)
-}
 
 type SellerProductHandler struct {
 	BaseHandler
@@ -37,7 +22,14 @@ func (h *SellerProductHandler) GetAllProduct(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	data, err := h.repository.GetAllProduct(context)
+	userId := ctx.Locals("userId")
+    if userId == nil {
+        return h.handlerError(ctx, fiber.StatusUnauthorized, "Unauthorized, userId not found")
+    }
+
+	userIdUint := uint(userId.(float64))
+
+	data, err := h.repository.GetAllProduct(context, userIdUint)
 	if err != nil {
 		return h.handlerError(ctx, fiber.StatusBadRequest, err.Error())
 	}
