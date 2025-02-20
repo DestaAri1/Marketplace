@@ -7,33 +7,20 @@ export default function useAuth() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const getUserCalled = useRef(false);
-  const initPromise = useRef(null);
 
   const fetchUser = useCallback(async () => {
-    // If we already have a promise running, return that instead of creating a new one
-    if (initPromise.current) {
-      return initPromise.current;
-    }
-
-    // If we've already successfully fetched the user, don't fetch again
-    if (getUserCalled.current && user) {
-      return user;
-    }
-
+    if (getUserCalled.current || !token) return;
+    getUserCalled.current = true;
     try {
-      getUserCalled.current = true;
-      initPromise.current = getUser();
-      const userData = await initPromise.current;
+      const userData = await getUser();
       setUser(userData);
-      return userData;
     } catch (error) {
       console.error("Failed to fetch user data:", error);
       logout();
-      return null;
     } finally {
-      initPromise.current = null;
+      setIsLoading(false);
     }
-  }, [user]);
+  }, [token]);
 
   const logout = useCallback(() => {
     removeToken();
@@ -43,16 +30,13 @@ export default function useAuth() {
   }, []);
 
   useEffect(() => {
-    const currentToken = getToken();
-    
-    if (currentToken && !getUserCalled.current) {
-      fetchUser().finally(() => {
-        setIsLoading(false);
-      });
+    if (token) {
+      getUserCalled.current = false; // Reset flag sebelum memanggil fetchUser
+      fetchUser();
     } else {
       setIsLoading(false);
     }
-  }, [fetchUser]); // Add fetchUser to dependency array
+  }, [token, fetchUser]);
 
   const login = async (email, password) => {
     try {
@@ -61,9 +45,8 @@ export default function useAuth() {
       
       if (responseToken) {
         setTokenState(responseToken);
-        setToken(responseToken); // Save token to storage
-        getUserCalled.current = false; // Reset the flag for new login
-        // No need to call fetchUser here, it will be handled by useEffect
+        setToken(responseToken);
+        getUserCalled.current = false; // Reset flag agar useEffect bisa memanggil fetchUser
       }
       return response;
     } catch (error) {
@@ -78,9 +61,8 @@ export default function useAuth() {
       
       if (responseToken) {
         setTokenState(responseToken);
-        setToken(responseToken); // Save token to storage
-        getUserCalled.current = false; // Reset the flag for new registration
-        // No need to call fetchUser here, it will be handled by useEffect
+        setToken(responseToken);
+        getUserCalled.current = false; // Reset flag agar useEffect bisa memanggil fetchUser
       }
       return response;
     } catch (error) {

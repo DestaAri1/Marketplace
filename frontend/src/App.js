@@ -10,6 +10,7 @@ import UserList from './pages/Dashboard/User/User/UserList';
 import DashboardSeller from './pages/Seller/Dashboard/DashboardSeller';
 import SellerArchive from './pages/Seller/Product/SellerArchive';
 import SellerProducts from './pages/Seller/Product/SellerProducts';
+import ManageCategory from './pages/Dashboard/Product/ManageCategory';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path='/dashboard' element={<AdminRoute><Dashboard/></AdminRoute>}/>
         <Route path='/dashboard/user_request' element={<AdminRoute><UserRequest/></AdminRoute>}/>
         <Route path='/dashboard/user-list' element={<AdminRoute><UserList/></AdminRoute>}/>
+        <Route path='/dashboard/manage-category' element={<AdminRoute><ManageCategory/></AdminRoute>}/>
       </Routes>
     </BrowserRouter>
   );

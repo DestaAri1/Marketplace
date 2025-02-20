@@ -25,11 +25,13 @@ export const useUserManagement = () => {
       setIsLoading(true);
       try {
         const response = await AdjustRoleUserHook(userId, newRole);
+        console.log(response);
+        
         
         if (response?.data?.message) {
           // Ensure we clear any existing toasts before showing new one
           toast.dismiss();
-          showSuccessToast("Successfully adjust user role");
+          showSuccessToast(response.data.message);
           await fetchUsers();
           return true;
         }
