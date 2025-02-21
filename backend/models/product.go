@@ -4,15 +4,15 @@ import "context"
 
 type Product struct {
 	Base
-	Name        string   `json:"name" gorm:"text;not null"`
-	Stock       int   	 `json:"stock" gorm:"numeric;not null"`
+	Name        string   `json:"name" gorm:"type:varchar(255);not null"`
+	Stock       int      `json:"stock" gorm:"not null"`
 	Price       float64  `json:"price" gorm:"type:decimal(10,2);not null"`
-	CategoryId	uint	 `json:"category_id"`
-	Category	Category `json:"category" gorm:"foreignkey:CategoryId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	UserId      uint    `json:"user_id"`
-	User        User    `json:"user" gorm:"foreignkey:UserId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Status 		bool	`json:"status" gorm:"default:false"`
-	Description string  `json:"description" gorm:"type:text"`
+	CategoryId  uint     `json:"category_id"`
+	Category    Category `json:"category" gorm:"foreignKey:CategoryId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	UserId      uint     `json:"user_id"`
+	User        User     `json:"user" gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Status      bool     `json:"status,omitempty" gorm:"default:0"`
+	Description string   `json:"description,omitempty" gorm:"type:text"`
 }
 
 type ProductResponse struct {

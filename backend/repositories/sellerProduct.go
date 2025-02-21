@@ -64,11 +64,12 @@ func (r *SellerProductRepository) CreateOneProduct(ctx context.Context, formData
 	}
 
 	data := &models.Product{
-		Name: formData.Name,
-		Stock: *formData.Stock,
-		Price: *formData.Price,
-		UserId: userId,
-		Description: formData.Description,
+        Name: formData.Name,
+        Stock: *formData.Stock,
+        Price: *formData.Price,
+        UserId: userId,
+        CategoryId: uint(*formData.Category), // Tambahkan CategoryId
+        Description: formData.Description,
 	}
 
 	res := r.db.Model(product).Create(data)
