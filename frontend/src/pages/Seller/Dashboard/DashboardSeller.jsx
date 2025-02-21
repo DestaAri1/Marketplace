@@ -1,10 +1,10 @@
 import React from 'react'
-import SellerDashboardTemplate from '../SellerDashboardTemplate'
+import DashboardTemplate from '../../Dashboard/DashboardTemplate'
 
 export default function DashboardSeller() {
   return (
-    <SellerDashboardTemplate>
-        text
-    </SellerDashboardTemplate>
+    <DashboardTemplate>
+      adssad
+    </DashboardTemplate>
   )
 }
