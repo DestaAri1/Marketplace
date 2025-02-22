@@ -51,14 +51,14 @@ export const categoryApi = {
     if (!name?.trim()) {
         throw new Error('Category name is required');
       }
-      try {
-        const response = await apiClient.post(`/category`, {
-            name: name.trim()
-        })
-        return response
-      } catch (error) {
-        handleApiError(error)
-      }
+    try {
+      const response = await apiClient.post(`/category`, {
+          name: name.trim()
+      })
+      return response
+    } catch (error) {
+      handleApiError(error)
+    }
   },
 
   // Update category

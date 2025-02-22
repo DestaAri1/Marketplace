@@ -5,74 +5,91 @@ import { showSuccessToast } from "../utils/Toast";
 
 export default function useProduct() {
     const [products, setProducts] = useState([]);
-    const isFetched = useRef(false);
     const [isLoading, setIsLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState(false);
+    const isFetched = useRef(false);
 
-    const fetchProducts = async (filterStatus = statusFilter) => {
+    const handleApiCall = async (apiFunction, successMessage) => {
         setIsLoading(true);
         try {
-            const fetchedProducts = await sellerProductsApi.getAll();
-            const productsData = fetchedProducts?.data?.data || [];
-            const filteredProducts = productsData.filter(product => product.status === filterStatus);
-            setProducts(filteredProducts);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            toast.error(error.message || "Failed to fetch products");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleCreateProduct = async (formData) => {
-        setIsLoading(true);
-        try {
-            // Log data before processing
-            console.log('Raw form data:', formData);
-
-            // Ensure proper type conversion
-            const name = String(formData.name).trim();
-            const stock = parseInt(formData.stock, 10);
-            const price = parseFloat(formData.price);
-            const category_id = parseInt(formData.category_id, 10);
-            const description = String(formData.description).trim();
-
-            // Log processed data
-            console.log('Processed data:', {
-                name,
-                stock,
-                price,
-                category_id,
-                description
-            });
-
-            // Call API
-            const response = await sellerProductsApi.create(
-                name,
-                stock,
-                price,
-                category_id,
-                false, // status
-                description
-            );
-
+            const response = await apiFunction();
             if (response?.data?.message) {
                 toast.dismiss();
-                showSuccessToast(response.data.message || "Successfully create product");
+                showSuccessToast(response.data.message || successMessage);
                 await fetchProducts();
                 return true;
             }
             return false;
         } catch (error) {
-            console.error("Error creating product:", error);
-            // Show more detailed error message
-            const errorMessage = error.response?.data?.message || error.message || "Failed to create product";
+            const errorMessage = error.response?.data?.message || error.message || "Operation failed";
             toast.error(errorMessage);
             return false;
         } finally {
             setIsLoading(false);
         }
     };
+
+    const fetchProducts = async (filterStatus = statusFilter) => {
+        setIsLoading(true);
+        try {
+            const { data: { data = [] } = {} } = await sellerProductsApi.getAll() || {};
+            setProducts(data.filter(product => product.status === filterStatus));
+        } catch (error) {
+            toast.error(error.message || "Failed to fetch products");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleCreateProduct = async (formData, status) => {
+        const payload = {
+            name: String(formData.name).trim(),
+            stock: parseInt(formData.stock, 10),
+            price: parseFloat(formData.price),
+            category_id: parseInt(formData.category_id, 10),
+            description: String(formData.description).trim()
+        };
+
+        return handleApiCall(
+            () => sellerProductsApi.create(
+                payload.name,
+                payload.stock,
+                payload.price,
+                payload.category_id,
+                status,
+                payload.description
+            ),
+            "Successfully create product"
+        );
+    };
+
+    const handleStatus = (id, status) => 
+        handleApiCall(
+            () => sellerProductsApi.updateStatus(id, status),
+            "Successfully change status"
+        );
+
+    const handleUpdateProduct = (id, formData) => {
+        const payload = {
+            name: String(formData.name).trim(),
+            stock: parseInt(formData.stock, 10),
+            price: parseFloat(formData.price),
+            category_id: parseInt(formData.category_id, 10),
+            description: String(formData.description).trim()
+        };
+
+        return handleApiCall(
+            () => sellerProductsApi.update(id, payload),
+            "Successfully update product"
+        );
+    };
+
+    const handelDeleteProduct = (id) => {
+        return handleApiCall(
+            ()=> sellerProductsApi.delete(id),
+            "Successfully delete product"
+        )
+    }
 
     return {
         products,
@@ -81,6 +98,9 @@ export default function useProduct() {
         fetchProducts,
         statusFilter,
         setStatusFilter,
-        handleCreateProduct
+        handleCreateProduct,
+        handleStatus,
+        handleUpdateProduct,
+        handelDeleteProduct
     };
 }

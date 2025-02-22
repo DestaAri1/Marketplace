@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-export default function Modal({ isOpen, onClose, title, children, onConfirm, confirmText, confirmClass }) {
+export default function Modal({ isOpen, onClose, title, children, onConfirm, confirmText, confirmClass, width = "max-w-md" }) {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -27,7 +27,7 @@ export default function Modal({ isOpen, onClose, title, children, onConfirm, con
       `}
     >
       <div 
-        className={`bg-white rounded-lg p-6 w-full max-w-md transform transition-all duration-300 ease-in-out
+        className={`bg-white rounded-lg p-6 w-full ${width} transform transition-all duration-300 ease-in-out
           ${isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 -translate-y-4'}
         `}
       >
