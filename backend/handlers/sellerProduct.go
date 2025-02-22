@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"strconv"
@@ -110,6 +111,56 @@ func (h *SellerProductHandler) UpdateProduct(ctx *fiber.Ctx) error {
 	return h.handlerSuccess(ctx, fiber.StatusOK, "Data has been updated", product)
 }
 
+func (h *SellerProductHandler) UpdateStatusProduct(ctx *fiber.Ctx) error {
+	// Konversi productId dari parameter URL
+	productId, err := strconv.Atoi(ctx.Params("productId"))
+	if err != nil {
+		return h.handlerError(ctx, fiber.StatusBadRequest, "invalid product ID")
+	}
+
+	// Set context dengan timeout
+	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Ambil userId dari context
+	userId := ctx.Locals("userId")
+	if userId == nil {
+		return h.handlerError(ctx, fiber.StatusUnauthorized, "userId not found")
+	}
+	userIdUint := uint(userId.(float64))
+
+	// Membaca body request manual menggunakan json.Decoder
+	var formData models.FormStatusProduct
+	bodyReader := bytes.NewReader(ctx.Body()) // Konversi []byte ke io.Reader
+	decoder := json.NewDecoder(bodyReader)
+	decoder.DisallowUnknownFields() // Menolak field lain selain 'status'
+	
+	if err := decoder.Decode(&formData); err != nil {
+		return h.handlerError(ctx, fiber.StatusBadRequest, "Only 'status' field is allowed")
+	}
+
+	// Validasi field `status` wajib dikirim
+	validate := validator.New()
+	if err := validate.Struct(&formData); err != nil {
+		return h.handleValidationError(ctx, err)
+	}
+
+	// Pastikan hanya 'status' yang dikirim ke database
+	updateData := map[string]interface{}{
+		"status": *formData.Status,
+	}
+
+	// Update status produk
+	product, err := h.repository.UpdateProduct(context, updateData, uint(productId), userIdUint)
+	if err != nil {
+		return h.handlerError(ctx, fiber.StatusBadGateway, err.Error())
+	}
+
+	// Berhasil mengupdate status produk
+	return h.handlerSuccess(ctx, fiber.StatusOK, "Product status has been updated", product)
+}
+
+
 func (h *SellerProductHandler) GetOneProduct(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
 	defer cancel()
@@ -161,5 +212,6 @@ func NewSellerProductHandler(router fiber.Router, repository models.SellerProduc
 	protected.Post("/", handler.CreateOneProduct)
 	protected.Get("/:productId", handler.GetOneProduct)
 	protected.Patch("/update/:productId", handler.UpdateProduct)
+	protected.Patch("/update/status/:productId", handler.UpdateStatusProduct)
 	protected.Delete("/:productId", handler.DeleteProduct)
 }

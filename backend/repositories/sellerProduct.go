@@ -17,7 +17,7 @@ func (r *SellerProductRepository) GetAllProduct(ctx context.Context, userId uint
 
 	res := r.db.
 		Table("products").
-		Select("products.id, products.name, products.stock, products.price, products.description, products.status, categories.name as category").
+		Select("products.id, products.name, products.stock, products.price, products.description, products.status, categories.id as category_id, categories.name as category").
 		Joins("LEFT JOIN categories ON categories.id = products.category_id").
 		Where("products.user_id = ?", userId).
 		Scan(&products)
@@ -34,7 +34,7 @@ func (r *SellerProductRepository) GetOneProduct(ctx context.Context, productId u
 
 	res := r.db.
 		Table("products").
-		Select("products.id, products.name, products.stock, products.price, products.description, products.status, categories.name as category").
+		Select("products.id, products.name, products.stock, products.price, products.description, products.status, categories.id as category_id, categories.name as category").
 		Joins("LEFT JOIN categories ON categories.id = products.category_id").
 		Where("products.id = ?", productId).
 		Where("products.user_id = ?", userId).

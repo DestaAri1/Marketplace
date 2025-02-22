@@ -16,14 +16,16 @@ type Product struct {
 }
 
 type ProductResponse struct {
-	Id			uint	`json:"id"`
+	Id          uint    `json:"id"`
 	Name        string  `json:"name"`
 	Stock       int     `json:"stock"`
 	Price       float64 `json:"price"`
-	Category	string	`json:"category"`
-	Status		bool	`json:"status"`
+	CategoryId  uint    `json:"category_id"`
+	Category    string  `json:"category"`
+	Status      bool    `json:"status"`
 	Description string  `json:"description"`
 }
+
 
 type FormCreateProduct struct {
 	Name        string   `json:"name" validate:"required,min=3,max=100"`     // Minimal 3 karakter, maksimal 100
@@ -32,6 +34,10 @@ type FormCreateProduct struct {
 	Status		*bool	 `json:"status" validate:"omitempty"`
 	Category	*int	 `json:"category_id" validate:"required,numeric,gt=0"`
 	Description string   `json:"description" validate:"omitempty,max=500"`   // Opsional, maksimal 500 karakter
+}
+
+type FormStatusProduct struct {
+	Status		*bool	 `json:"status" validate:"required"`
 }
 
 type SellerProductRepository interface {
