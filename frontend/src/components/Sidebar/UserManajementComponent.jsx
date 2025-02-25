@@ -1,23 +1,32 @@
-import React from 'react'
-import DropdownButton from './DropdownButton'
-import { Package, ShoppingCart, Users, FileText, List} from 'lucide-react';
+import React, { memo } from 'react';
+import DropdownButton from './DropdownButton';
+import { Package, ShoppingCart, Users, FileText, List } from 'lucide-react';
 import DropdownContent from './DropdownContent';
 import SubDropdownButton from './SubDropdownButton';
 import SubDropdownContent from './SubDropdownContent';
 import SubNavlink from './SubNavlink';
 
-export default function UserManajementComponent({ isCollapsed, activeDropdown, subDropdown, toggleDropdown, toggleSubDropdown }) {
+// Use memo to prevent unnecessary re-renders
+const UserManajementComponent = memo(function UserManajementComponent({ 
+  isCollapsed, 
+  activeDropdown, 
+  subDropdown, 
+  toggleDropdown, 
+  toggleSubDropdown 
+}) {
+  const isActive = activeDropdown === 'management';
+  
   return (
-    <li>
+    <li className="dropdown-container">
       <DropdownButton
         title={"Management"}
         icon={Users}
         isCollapsed={isCollapsed}
-        isActive={activeDropdown === 'user'}
-        onClick={() => toggleDropdown('user')}
+        isActive={isActive}
+        onClick={() => toggleDropdown('management')}
       />
-
-      <DropdownContent isActive={activeDropdown === 'user'}>
+      
+      <DropdownContent isActive={isActive}>
         <SubDropdownButton
           title="Product"
           icon={Package}
@@ -25,10 +34,10 @@ export default function UserManajementComponent({ isCollapsed, activeDropdown, s
           isActive={subDropdown === 'seller'}
           onClick={() => toggleSubDropdown('seller')}
         />
-
+        
         <SubDropdownContent isActive={subDropdown === 'seller'} isCollapsed={isCollapsed}>
           <SubNavlink
-            to="/dashboard/manage-category"
+            to="/admin/manage-category"
             icon={List}
             title="Manage Category"
             isCollapsed={isCollapsed}
@@ -40,7 +49,7 @@ export default function UserManajementComponent({ isCollapsed, activeDropdown, s
             isCollapsed={isCollapsed}
           />
         </SubDropdownContent>
-
+        
         <SubDropdownButton
           title="Normal User"
           icon={Users}
@@ -48,16 +57,16 @@ export default function UserManajementComponent({ isCollapsed, activeDropdown, s
           isActive={subDropdown === 'normalUser'}
           onClick={() => toggleSubDropdown('normalUser')}
         />
-
+        
         <SubDropdownContent isActive={subDropdown === 'normalUser'} isCollapsed={isCollapsed}>
           <SubNavlink
-            to="/dashboard/user-list"
+            to="/admin/user-list"
             icon={Users}
             title="User List"
             isCollapsed={isCollapsed}
           />
           <SubNavlink
-            to="/dashboard/user_request"
+            to="/admin/user_request"
             icon={FileText}
             title="Requests"
             isCollapsed={isCollapsed}
@@ -65,5 +74,7 @@ export default function UserManajementComponent({ isCollapsed, activeDropdown, s
         </SubDropdownContent>
       </DropdownContent>
     </li>
-  )
-}
+  );
+});
+
+export default UserManajementComponent;

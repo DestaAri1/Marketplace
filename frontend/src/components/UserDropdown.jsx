@@ -2,7 +2,7 @@ import React from 'react'
 import { showErrorToast } from '../utils/Toast';
 import useLoading from '../hooks/useLoading';
 import useAuth from '../hooks/useAuth';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner';
 import useSeller from '../hooks/useSeller';
 
@@ -11,6 +11,9 @@ export default function UserDropdown({isDropdownOpen, role}) {
     const { isLoading, setLoading } = useLoading(false);
     const { logout } = useAuth()
     const { UpgradeSellerHook } = useSeller()
+
+    const location = useLocation();
+    const isSellerOrAdminRoute = location.pathname.startsWith('/seller/') || location.pathname.startsWith('/admin/');
 
     const handleLogout = async () => {
         setLoading(true);
@@ -44,8 +47,9 @@ export default function UserDropdown({isDropdownOpen, role}) {
             {isDropdownOpen && (
                 <div className="absolute text-left right-0 top-12 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-20 transition-all duration-200">
                     {(role === 0 || role === 1) && (
-                        <Link to={role === 0 ? '/dashboard': '/seller/dashboard'} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition">
-                            Dashboard
+                        <Link to={isSellerOrAdminRoute ? '/' : role === 0 ? '/admin/dashboard' : '/seller/dashboard'} 
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition">
+                            {isSellerOrAdminRoute ? 'Home' : 'Dashboard'}
                         </Link>
                     )}
                     <Link href="#profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition">

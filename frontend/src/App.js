@@ -8,7 +8,6 @@ import Dashboard from './pages/Dashboard/Dashboard/Dashboard';
 import UserRequest from './pages/Dashboard/User/User/UserRequest';
 import UserList from './pages/Dashboard/User/User/UserList';
 import DashboardSeller from './pages/Seller/Dashboard/DashboardSeller';
-import SellerArchive from './pages/Seller/Product/SellerArchive';
 import SellerProducts from './pages/Seller/Product/SellerProducts';
 import ManageCategory from './pages/Dashboard/Product/ManageCategory';
 
@@ -25,14 +24,13 @@ function App() {
 
         {/* Seller Page */}
         <Route path='/seller/dashboard' element={<SellerRoute><DashboardSeller/></SellerRoute>}/>
-        <Route path='/seller/archive-product' element={<SellerRoute><SellerArchive/></SellerRoute>}/>
         <Route path='/seller/products' element={<SellerRoute><SellerProducts/></SellerRoute>}/>
 
         {/* Admin/Seller Page */}
-        <Route path='/dashboard' element={<AdminRoute><Dashboard/></AdminRoute>}/>
-        <Route path='/dashboard/user_request' element={<AdminRoute><UserRequest/></AdminRoute>}/>
-        <Route path='/dashboard/user-list' element={<AdminRoute><UserList/></AdminRoute>}/>
-        <Route path='/dashboard/manage-category' element={<AdminRoute><ManageCategory/></AdminRoute>}/>
+        <Route path='/admin/dashboard' element={<AdminRoute><Dashboard/></AdminRoute>}/>
+        <Route path='/admin/user_request' element={<AdminRoute><UserRequest/></AdminRoute>}/>
+        <Route path='/admin/user-list' element={<AdminRoute><UserList/></AdminRoute>}/>
+        <Route path='/admin/manage-category' element={<AdminRoute><ManageCategory/></AdminRoute>}/>
       </Routes>
     </BrowserRouter>
   );

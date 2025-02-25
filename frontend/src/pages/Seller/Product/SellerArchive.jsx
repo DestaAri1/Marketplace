@@ -44,8 +44,8 @@ export default function SellerArchive() {
     }
   }
 
-  const handleConfirmStatus = async(data) => {
-    if (await handleStatus(statusModal.selectedItem.id,data)) {
+  const handleConfirmStatus = async() => {
+    if (await handleStatus(statusModal.selectedItem.id,true)) {
       statusModal.closeModal();
     }
   }
