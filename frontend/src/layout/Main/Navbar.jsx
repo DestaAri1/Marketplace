@@ -1,13 +1,33 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import UserDropdown from '../../components/UserDropdown'
 import { Link } from 'react-router-dom'
 import useDropdown from '../../hooks/useDropdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons'
+import useSeller from '../../hooks/useSeller';
 
 export default function Navbar({user}) {
   const { isDropdownOpen, toggleDropdown } = useDropdown();
   const { username = "Guest", role = "User" } = user || {};
+      const { status, fetchStatus } = useSeller();
+      
+      // Menggunakan ref untuk menghindari memanggil API berulang kali
+      const [dataFetched, setDataFetched] = useState(false);
+  
+      // Panggil fetchStatus hanya sekali saat komponen dimuat dan user valid
+      useEffect(() => {
+          if (user?.role === 2 && !dataFetched) {
+              fetchStatus();
+              setDataFetched(true);
+          }
+      }, [user, dataFetched]); // Hapus fetchStatus dari dependencies
+  
+      // Log status setiap kali status berubah
+      useEffect(() => {
+          if (user?.role === 2 && status) {
+              console.log("Status dari seller:", status);
+          }
+      }, [status, user]);
 
   return (
     <header className="fixed top-0 left-0 w-full bg-indigo-600 text-white py-4 shadow-md z-50">
@@ -42,7 +62,7 @@ export default function Navbar({user}) {
                         {username.length > 15 ? `${username.substring(0, 15)}...` : username}
                     </span>
                 </button>
-                <UserDropdown isDropdownOpen={isDropdownOpen} role={role}/>
+                <UserDropdown isDropdownOpen={isDropdownOpen} role={role} status={status}/>
               </div>
             </> : <Link className='w-[186px] rounded-md border border-slate-300 py-2 px-4 text-center text-sm transition-all shadow-sm hover:shadow-lg text-white hover:text-slate-600 hover:bg-slate-200 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none' 
             to={'/login'}>Sign In</Link>}

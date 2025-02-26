@@ -6,7 +6,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner';
 import useSeller from '../hooks/useSeller';
 
-export default function UserDropdown({isDropdownOpen, role}) {
+export default function UserDropdown({isDropdownOpen, role, status}) {
     const navigate = useNavigate();
     const { isLoading, setLoading } = useLoading(false);
     const { logout } = useAuth()
@@ -32,12 +32,9 @@ export default function UserDropdown({isDropdownOpen, role}) {
     const handleSubmit = async(e) => {
         e.preventDefault();
         try {
-            var response = await UpgradeSellerHook()
-            console.log(response);
-            
+            var response = await UpgradeSellerHook()      
         } catch (error) {
             console.log(error);
-            
         }
     }
 
@@ -57,7 +54,9 @@ export default function UserDropdown({isDropdownOpen, role}) {
                     </Link>
                     {role === 2 && 
                         <form className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition" onSubmit={handleSubmit}>
-                            <button type='submit'>Upgrade to Seller</button>
+                            <button type='submit' disabled={!!status}>
+                                Upgrade to Seller {status?.message}
+                            </button>
                         </form>
                     }
                     <Link href="#settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition">
