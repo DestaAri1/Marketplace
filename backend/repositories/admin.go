@@ -35,21 +35,21 @@ func (r *AdminRepository) AcceptRequest(ctx context.Context, requestData *models
 	user := &models.User{}
 	requestSeller := &models.Seller_Request{}
 
-	if requestData.Status {
-		sellerRole:=1
+	if requestData.Status == 2 {
+		sellerRole := 1
 		res := r.db.Model(user).Where("id = ?", userId).Update("role", sellerRole)
 	
 		if res.Error != nil {
 			return nil, res.Error
 		}
 		
-		res2 := r.db.Model(requestSeller).Where("user_id = ?", userId).Update("status", true)
+		res2 := r.db.Model(requestSeller).Where("user_id = ?", userId).Update("status", 2)
 		
 		if res2.Error != nil {
 			return nil, res2.Error
 		}
 	} else {
-		res := r.db.Where("user_id = ?", userId).Delete(&models.Seller_Request{})
+		res := r.db.Model(requestSeller).Where("user_id = ?", userId).Update("status", 1)
 
 		if res.Error != nil {
 			return nil, res.Error

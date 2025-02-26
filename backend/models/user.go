@@ -23,7 +23,7 @@ type User struct {
 type Seller_Request struct {
 	Base
 	UserID		int		`json:"user_id"`
-	Status		bool	`json:"status" gorm:"default:false"`
+	Status		int		`json:"status" gorm:"default:0"`
 	Reason		string	`json:"reason" gorm:"type:text"`
 	User		User	`json:"user" gorm:"foreignkey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }

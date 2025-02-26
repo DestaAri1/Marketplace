@@ -97,7 +97,7 @@ func (h *AdminHandler) AcceptRequest(ctx *fiber.Ctx) error {
     }
 
     // Validate status and reason
-    if !formData.Status {
+    if formData.Status == 1{
         if formData.Reason == "" {
             return h.handlerError(ctx, fiber.StatusBadRequest, "Reason is required when rejecting request")
         }
@@ -116,7 +116,7 @@ func (h *AdminHandler) AcceptRequest(ctx *fiber.Ctx) error {
 
     // Return appropriate success message based on status
     successMsg := "Request has been rejected"
-    if formData.Status {
+    if formData.Status == 2 {
         successMsg = "Request has been accepted!"
     }
 

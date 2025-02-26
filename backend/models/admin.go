@@ -4,7 +4,7 @@ import "context"
 
 type FormRequestSeller struct{
 	UserID	int		`json:"user_id" validate:"required,numeric"`
-    Status  bool    `json:"status"`
+    Status  int     `json:"status"`
     Reason  string  `json:"reason"`
 }
 
@@ -13,7 +13,7 @@ type SellerRequestResponse struct {
     UserID    uint   `json:"user_id"`
     Username  string `json:"username"`
     Email     string `json:"email"`
-    Status    bool   `json:"status"`
+    Status    int    `json:"status"`
     Reason    string `json:"reason"`
 }
 

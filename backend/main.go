@@ -51,10 +51,11 @@ func main() {
 	handlers.NewCategoryHandler(privateRoutes.Group("/category"), categoryRepository, db)
 
 	//Seller
-	handlers.NewSellerHandler(privateRoutes.Group("/seller"), sellerRepository, authRepository)
 	handlers.NewSellerProductHandler(privateRoutes.Group("/seller/product"), sellerProductRepository, db)
-
+	
 	//All
-
+	
+	//User
+	handlers.NewSellerHandler(privateRoutes.Group("/user"), sellerRepository, authRepository,db)
 	app.Listen(":3000")
 }

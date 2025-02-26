@@ -4,8 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/DestaAri1/middlewares"
 	"github.com/DestaAri1/models"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 type SellerHandler struct {
@@ -80,13 +82,15 @@ func (h *SellerHandler) GetStatusRequest(ctx *fiber.Ctx) error {
 	return h.handlerSuccess(ctx, fiber.StatusOK, "Process...", nil)
 }
 
-func NewSellerHandler(router fiber.Router, repository models.SellerRequestRepository, user models.AuthRepository) {
+func NewSellerHandler(router fiber.Router, repository models.SellerRequestRepository, user models.AuthRepository, db *gorm.DB) {
 	handler := &SellerHandler{
 		repository: repository,
 		user: user,
 	}
+
+	protected := router.Group("/").Use(middlewares.AuthProtected(db)).Use(middlewares.RoleAuthorization(db, models.UserNormal))
 	
-	router.Post("/upgrade", handler.SellerRequest)
-	router.Get("/upgrade/status", handler.GetStatusRequest)
+	protected.Post("/upgrade", handler.SellerRequest)
+	protected.Get("/upgrade/status", handler.GetStatusRequest)
 }
 
