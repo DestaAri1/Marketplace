@@ -35,7 +35,11 @@ func (r *SellerRepository) SellerRequest(ctx context.Context, requestData *model
 func (r *SellerRepository) GetStatusRequest(ctx context.Context, query interface{}, args ...interface{}) (*models.Seller_Request, error) {
 	sellerRequest := &models.Seller_Request{}
 
-	if res := r.db.Model(&models.Seller_Request{}).Where(query, args).Where("status = ?", 0).First(sellerRequest); res.Error != nil {
+	if res := r.db.Model(&models.Seller_Request{}).
+		Where(query, args...).
+		Where("status = ?", 0).
+		Order("created_at DESC"). // Urutkan berdasarkan created_at terbaru
+		First(sellerRequest); res.Error != nil {
 		return nil, res.Error
 	}
 	return sellerRequest, nil

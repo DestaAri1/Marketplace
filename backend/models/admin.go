@@ -10,6 +10,7 @@ type FormRequestSeller struct{
 
 
 type SellerRequestResponse struct {
+    ID        uint   `json:"id"`
     UserID    uint   `json:"user_id"`
     Username  string `json:"username"`
     Email     string `json:"email"`
@@ -19,7 +20,7 @@ type SellerRequestResponse struct {
 
 type AdminRepository interface {
     GetAllRequest(ctx context.Context)([]*SellerRequestResponse, error)
-	AcceptRequest(ctx context.Context, requestData *FormRequestSeller, userId uint) (*User, error)
+	AcceptRequest(ctx context.Context, requestData *FormRequestSeller, userId uint, requestId uint) (*User, error)
 }
 
 type FormRequestUpgradeUser struct{

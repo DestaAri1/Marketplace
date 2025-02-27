@@ -11,23 +11,9 @@ import (
 )
 
 type SellerHandler struct {
+	BaseHandler
 	repository models.SellerRequestRepository
 	user models.AuthRepository
-}
-
-func (h *SellerHandler) handlerError(ctx *fiber.Ctx, status int, message string) error {
-	return ctx.Status(status).JSON(&fiber.Map{
-		"status": "fail",
-		"message" : message,
-	})
-}
-
-func (h *SellerHandler) handlerSuccess(ctx *fiber.Ctx, status int, message string, data interface{}) error {
-	return ctx.Status(status).JSON(&fiber.Map{
-		"status" : "success",
-		"message" : message,
-		"data" : data,
-	})
 }
 
 func (h *SellerHandler) SellerRequest(ctx *fiber.Ctx) error{
@@ -70,13 +56,14 @@ func (h *SellerHandler) GetStatusRequest(ctx *fiber.Ctx) error {
 		return h.handlerError(ctx, fiber.StatusUnauthorized, "Failed to get user ID from token")
 	}
 
-	data, err := h.repository.GetStatusRequest(context.Background(), "user_id = ?", userId)
+	_, err := h.repository.GetStatusRequest(context.Background(), "user_id = ?", userId)
 	if err != nil {
+		// Jika error adalah record tidak ditemukan
+		if err == gorm.ErrRecordNotFound {
+			return h.handlerSuccess(ctx, fiber.StatusOK, "", nil)
+		}
+		// Error lainnya (kesalahan server)
 		return h.handlerError(ctx, fiber.StatusInternalServerError, "Internal Server Error")
-	}
-
-	if data == nil {
-		return h.handlerError(ctx, fiber.StatusNotFound, "data not found")
 	}
 
 	return h.handlerSuccess(ctx, fiber.StatusOK, "Process...", nil)

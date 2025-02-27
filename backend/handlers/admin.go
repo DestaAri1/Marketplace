@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
+	"strconv"
 	"time"
 
 	"github.com/DestaAri1/middlewares"
@@ -15,22 +15,8 @@ import (
 )
 
 type AdminHandler struct {
+	BaseHandler
 	repository models.AdminRepository
-}
-
-func (h *AdminHandler) handlerError(ctx *fiber.Ctx, status int, message string) error {
-	return ctx.Status(status).JSON(&fiber.Map{
-		"status":  "fail",
-		"message": message,
-	})
-}
-
-func (h *AdminHandler) handlerSuccess(ctx *fiber.Ctx, status int, message string, data interface{}) error {
-	return ctx.Status(status).JSON(&fiber.Map{
-		"status" : "success",
-		"message" : message,
-		"data" : data,
-	})
 }
 
 func (h *AdminHandler) handleValidationError(ctx *fiber.Ctx, err error) error {
@@ -68,15 +54,14 @@ func (h *AdminHandler) GetAllRequest(ctx *fiber.Ctx) error {
         return h.handlerError(ctx, fiber.StatusBadGateway, err.Error())
     }
 
-    // Tambahkan debug log
-    log.Printf("Found %d seller requests", len(res))
-
     return h.handlerSuccess(ctx, fiber.StatusOK, "Seller Requests", res)
 }
 
 func (h *AdminHandler) AcceptRequest(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
     defer cancel()
+
+	requestId, _ := strconv.Atoi(ctx.Params("id"))
 
     // Validate user authentication
     userId := ctx.Locals("userId")
@@ -106,12 +91,12 @@ func (h *AdminHandler) AcceptRequest(ctx *fiber.Ctx) error {
     userIdUint := uint(formData.UserID)
 
     // Process the request
-    _, err := h.repository.AcceptRequest(context, formData, userIdUint)
+    _, err := h.repository.AcceptRequest(context, formData, userIdUint, uint(requestId))
     if err != nil {
         if errors.Is(err, gorm.ErrRecordNotFound) {
             return h.handlerError(ctx, fiber.StatusNotFound, "User not found")
         }
-        return h.handlerError(ctx, fiber.StatusInternalServerError, "Failed to process request")
+        return h.handlerError(ctx, fiber.StatusInternalServerError, err.Error())
     }
 
     // Return appropriate success message based on status
@@ -130,6 +115,6 @@ func NewAdminHandler(router fiber.Router, repository models.AdminRepository, db 
 
 	protected := router.Group("/").Use(middlewares.AuthProtected(db)).Use(middlewares.RoleAuthorization(db, models.Admin))
 	
-	protected.Post("/upgrade", handler.AcceptRequest)
+	protected.Patch("/upgrade/:id", handler.AcceptRequest)
 	protected.Get("/list", handler.GetAllRequest)
 }

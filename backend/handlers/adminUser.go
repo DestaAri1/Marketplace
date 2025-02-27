@@ -14,22 +14,8 @@ import (
 )
 
 type AdminUserHandler struct {
+	BaseHandler
 	repository models.AdminUserRepository
-}
-
-func (h *AdminUserHandler) handlerError(ctx *fiber.Ctx, status int, message string) error {
-	return ctx.Status(status).JSON(&fiber.Map{
-		"status":  "fail",
-		"message": message,
-	})
-}
-
-func (h *AdminUserHandler) handlerSuccess(ctx *fiber.Ctx, status int, message string, data interface{}) error {
-	return ctx.Status(status).JSON(&fiber.Map{
-		"status" : "success",
-		"message" : message,
-		"data" : data,
-	})
 }
 
 func (h *AdminUserHandler) handleValidationError(ctx *fiber.Ctx, err error) error {
