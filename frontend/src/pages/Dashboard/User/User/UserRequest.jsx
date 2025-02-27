@@ -1,73 +1,74 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import DashboardTemplate from "../../DashboardTemplate";
-import useAdmin from "../../../../hooks/useAdmin";
+import UserList from "../../../../components/SellerRequest/UserList";
+import useRequestSeller from "../../../../hooks/useRequestSeller";
+import UserFileter from "../../../../components/SellerRequest/UserFileter";
+import { useModal } from "../../../../hooks/useModal";
+import AcceptRequestModal from "../../../../components/SellerRequest/AcceptRequestModal";
+import RejectRequestModal from "../../../../components/SellerRequest/RejectRequestModal";
 
 export default function UserRequest() {
-  const [user, setUser] = useState([]);
-  const { GetAllUserRequestHook } = useAdmin();
-  const isFetched = useRef(false);
+  const {
+    users,
+    isFetched,
+    isLoading,
+    fetchRequestUser,
+    selectedStatus,
+    setSelectedStatus,
+    handleAcceptRequest,
+    handleRejectRequest
+  } = useRequestSeller()
 
   useEffect(() => {
-    if (!isFetched.current && GetAllUserRequestHook) {
-      GetAllUserRequestHook()
-      .then((users) => {
-        const filteredUsers = users.filter(user => !user.reason);
-        setUser(filteredUsers);
-      }) // Set user setelah Promise resolved
-      .catch((error) => console.error("Error fetching users:", error));
-      isFetched.current = true;
-      
+    if(!isFetched.current) {
+      fetchRequestUser()
+      isFetched.current = true
     }
-  }, [GetAllUserRequestHook]);
+  },[fetchRequestUser,isFetched])
 
+  const acceptModal = useModal()
+  const rejectModal = useModal()
+
+  const handleConfirmAcceptRequest = async() => {
+    if (await handleAcceptRequest(acceptModal.selectedItem.id, acceptModal.selectedItem.user_id, 2)) {
+      acceptModal.closeModal()
+    }
+  }
+
+  const pass = rejectModal.selectedItem
+  const handleConfirmRejectRequest = async(data) => {
+    if (await handleRejectRequest(pass.id, pass.user_id, 1, data)) {
+      rejectModal.closeModal()
+    } 
+  }
+  
   return (
     <DashboardTemplate title="List Request">
-      <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-200 text-gray-700 uppercase text-sm">
-              <th className="py-3 px-4 text-left">No</th>
-              <th className="py-3 px-4 text-left">Username</th>
-              <th className="py-3 px-4 text-left">Email</th>
-              <th className="py-3 px-4 text-left">Status</th>
-              <th className="py-3 px-4 text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {user && user.length > 0 ? (
-              user.map((user, index) => (
-                <tr key={index} className="border-b hover:bg-gray-100">
-                  <td className="py-3 px-4">{index + 1}</td>
-                  <td className="py-3 px-4">{user.username}</td>
-                  <td className="py-3 px-4">{user.email}</td>
-                  <td className="py-3 px-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-white text-xs font-semibold ${
-                        user.status === 1 ? "bg-green-500" : "bg-red-500"
-                      }`}
-                    >
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-center">
-                    <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-sm">
-                      Terima
-                    </button>
-                    <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm ml-2">
-                      Tolak
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="text-center py-3 px-4">
-                  Tidak ada data user
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <UserFileter 
+        selectedStatus={selectedStatus}
+        setSelectedStatus={setSelectedStatus}
+      />
+      <UserList
+        user={users}
+        onUpdate={acceptModal.openModal}
+        onDelete={rejectModal.openModal}
+      />
+
+      <AcceptRequestModal
+        user={acceptModal.selectedItem}
+        isOpen={acceptModal.isOpen}
+        onClose={acceptModal.closeModal}
+        isLoading={isLoading}
+        onConfirm={handleConfirmAcceptRequest}
+      />
+
+      <RejectRequestModal
+        isLoading={isLoading}
+        isOpen={rejectModal.isOpen}
+        onClose={rejectModal.closeModal}
+        user={rejectModal.selectedItem}
+        onConfirm={handleConfirmRejectRequest}
+      />
     </DashboardTemplate>
   );
 }

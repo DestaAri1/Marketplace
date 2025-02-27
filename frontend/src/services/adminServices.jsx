@@ -1,6 +1,28 @@
 import axios from "axios";
 import { getToken } from "./TokenServices";
+import apiClient from "./apiClient";
+import handleApiError from "./errorServiceHandler";
 const API_URL = "http://localhost:3000/api"
+
+export const sellerRequestAPI = {
+  getAll : async() => {
+    try {
+      const response = await apiClient.get('/admin/seller/list')
+      return response
+    } catch (error) {
+      handleApiError(error)
+    }
+  },
+
+  acceptRequest : async(id,payload) => {
+    try {
+      const response = await apiClient.patch(`/admin/seller/upgrade/${id}`,payload)
+      return response
+    } catch (error) {
+      handleApiError(error)
+    }
+  },
+}
 
 export const GetAllUserRequest = async() => {
     const token = getToken() 
