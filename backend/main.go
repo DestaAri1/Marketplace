@@ -30,6 +30,7 @@ func main() {
 	adminUserRepository := repository.NewAdminUserRepository(db)
 	sellerProductRepository := repository.NewSellerProductRepository(db)
 	categoryRepository := repository.NewCategoryRepository(db)
+	userProductRepository := repository.NewUserProductRepository((db))
 
 	//Service
 	authService := services.NewAuthService(authRepository)
@@ -54,7 +55,8 @@ func main() {
 	handlers.NewSellerProductHandler(privateRoutes.Group("/seller/product"), sellerProductRepository, db)
 	
 	//All
-	
+	handlers.NewUserProductHandler(privateRoutes.Group("/product"), userProductRepository)
+
 	//User
 	handlers.NewSellerHandler(privateRoutes.Group("/user"), sellerRepository, authRepository,db)
 	app.Listen(":3000")

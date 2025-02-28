@@ -26,7 +26,6 @@ type ProductResponse struct {
 	Description string  `json:"description"`
 }
 
-
 type FormCreateProduct struct {
 	Name        string   `json:"name" validate:"required,min=3,max=100"`     // Minimal 3 karakter, maksimal 100
 	Stock       *int     `json:"stock" validate:"required,numeric,min=1"`    // Minimal stok 1
@@ -46,4 +45,19 @@ type SellerProductRepository interface {
 	CreateOneProduct(ctx context.Context, formData *FormCreateProduct, userId uint) (*Product, error)
 	UpdateProduct(ctx context.Context, updateData map[string]interface{}, productId uint, userId uint) (*Product, error)
 	DeleteProduct(ctx context.Context, productId uint, userId uint) error
+}
+
+type UserProductResponse struct {
+	Id          uint    `json:"id"`
+	Product     string  `json:"product"`
+	Seller		string	`json:"seller"`
+	Stock       int     `json:"stock"`
+	Price       float64 `json:"price"`
+	Category    string  `json:"category"`
+	Description string  `json:"description"`
+}
+
+type UserProductRepository interface{
+	UserGetAllProduct(ctx context.Context) ([]*UserProductResponse, error)
+	GetOneProduct(ctx context.Context, productId uint) (*UserProductResponse, error)
 }
