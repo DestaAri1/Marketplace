@@ -1,34 +1,47 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 
-export default function Modal({ isOpen, onClose, title, children, onConfirm, confirmText, confirmClass, width = "max-w-md" }) {
-    const [isVisible, setIsVisible] = useState(false);
+export default function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  onConfirm,
+  confirmText,
+  confirmClass,
+  width = "max-w-md",
+}) {
+  const [isVisible, setIsVisible] = useState(false);
 
-    useEffect(() => {
-      if (isOpen) {
-        setIsVisible(true);
-      } else {
-        const timer = setTimeout(() => {
-          setIsVisible(false);
-        }, 300);
-        return () => clearTimeout(timer);
-      }
-    }, [isOpen]);
-  
-    if (!isVisible && !isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true);
+    } else {
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!isVisible && !isOpen) return null;
   return (
-    <div 
+    <div
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
         }
       }}
       className={`fixed inset-0 bg-black transition-opacity duration-300 ease-in-out z-50 flex items-center justify-center
-        ${isOpen ? 'bg-opacity-50 opacity-100' : 'bg-opacity-0 opacity-0'}
+        ${isOpen ? "bg-opacity-50 opacity-100" : "bg-opacity-0 opacity-0"}
       `}
     >
-      <div 
+      <div
         className={`bg-white rounded-lg p-6 w-full ${width} transform transition-all duration-300 ease-in-out
-          ${isOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 -translate-y-4'}
+          ${
+            isOpen
+              ? "scale-100 opacity-100 translate-y-0"
+              : "scale-95 opacity-0 -translate-y-4"
+          }
         `}
       >
         <div className="flex justify-between items-center mb-4">
@@ -40,9 +53,7 @@ export default function Modal({ isOpen, onClose, title, children, onConfirm, con
             ✕
           </button>
         </div>
-        <div className="mb-6">
-          {children}
-        </div>
+        <div className="mb-6">{children}</div>
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
@@ -62,5 +73,5 @@ export default function Modal({ isOpen, onClose, title, children, onConfirm, con
         </div>
       </div>
     </div>
-  )
+  );
 }

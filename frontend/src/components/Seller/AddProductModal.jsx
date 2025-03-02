@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import Modal from '../Modal';
-import Input from '../Input';
+import React, { useState } from "react";
+import Modal from "../Modal";
+import Input from "../Input";
 
 export default function AddProductModal({
   onConfirm,
@@ -9,21 +9,21 @@ export default function AddProductModal({
   isLoading,
   category,
   formData,
-  setFormData
+  setFormData,
 }) {
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
 
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
@@ -40,7 +40,7 @@ export default function AddProductModal({
       onConfirm={handleConfirm}
       confirmText={isLoading ? "Processing..." : "Save"}
       confirmClass="bg-green-500 hover:bg-green-700"
-      width='max-w-4xl'
+      width="max-w-4xl"
     >
       <div className="grid grid-cols-2 gap-4">
         {/* Kolom Pertama */}
@@ -52,7 +52,10 @@ export default function AddProductModal({
             onChange={handleChange}
           />
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="category"
+              className="block text-sm font-medium text-gray-700"
+            >
               Category
             </label>
             <select
@@ -70,7 +73,7 @@ export default function AddProductModal({
             </select>
           </div>
         </div>
-        
+
         {/* Kolom Kedua */}
         <div className="space-y-4">
           <Input
@@ -91,10 +94,13 @@ export default function AddProductModal({
           />
         </div>
       </div>
-      
+
       {/* Kolom Ketiga: Description */}
       <div className="mt-4">
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="description"
+          className="block text-sm font-medium text-gray-700"
+        >
           Description
         </label>
         <textarea

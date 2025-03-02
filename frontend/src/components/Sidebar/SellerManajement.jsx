@@ -1,19 +1,19 @@
-import React, { memo } from 'react';
-import DropdownButton from './DropdownButton';
-import { Package } from 'lucide-react';
-import DropdownContent from './DropdownContent';
-import SubNavlink from './SubNavlink';
+import React, { memo } from "react";
+import DropdownButton from "./DropdownButton";
+import { Package } from "lucide-react";
+import DropdownContent from "./DropdownContent";
+import SubNavlink from "./SubNavlink";
 
 // Use memo to prevent unnecessary re-renders
-const SellerManajement = memo(function SellerManajement({ 
-  isCollapsed, 
-  activeDropdown, 
-  subDropdown, 
-  toggleDropdown, 
-  toggleSubDropdown 
+const SellerManajement = memo(function SellerManajement({
+  isCollapsed,
+  activeDropdown,
+  subDropdown,
+  toggleDropdown,
+  toggleSubDropdown,
 }) {
-  const isActive = activeDropdown === 'product';
-  
+  const isActive = activeDropdown === "product";
+
   return (
     <li className="dropdown-container">
       <DropdownButton
@@ -21,16 +21,16 @@ const SellerManajement = memo(function SellerManajement({
         icon={Package}
         isCollapsed={isCollapsed}
         isActive={isActive}
-        onClick={() => toggleDropdown('product')}
+        onClick={() => toggleDropdown("product")}
       />
-      
+
       <DropdownContent isActive={isActive}>
         <SubNavlink
           to="/seller/products"
           icon={Package}
           title="Products"
           isCollapsed={isCollapsed}
-          classes={isCollapsed ? 'ml-4' : "ml-8"}
+          classes={isCollapsed ? "ml-4" : "ml-8"}
         />
       </DropdownContent>
     </li>

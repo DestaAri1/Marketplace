@@ -1,7 +1,15 @@
-import React from 'react'
+import React from "react";
+import TimerToaster from "../../components/TimerToaster";
+import Navbar from "../../layout/Main/Navbar";
+import useAuth from "../../hooks/useAuth";
 
-export default function MainTemplate() {
+export default function MainTemplate({ children }) {
+  const { user } = useAuth();
   return (
-    <div>MainTemplate</div>
-  )
+    <div className="home-container">
+      <TimerToaster />
+      <Navbar user={user} />
+      {children}
+    </div>
+  );
 }

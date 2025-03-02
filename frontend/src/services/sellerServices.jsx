@@ -19,4 +19,4 @@ export const requestToBeSellerApi = {
       handleApiError(error);
     }
   },
-}
+};

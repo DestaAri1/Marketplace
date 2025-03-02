@@ -1,5 +1,5 @@
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const toastConfig = {
   position: "top-right",
@@ -13,7 +13,7 @@ const toastConfig = {
   // Add this to prevent the removalReason error
   onClose: () => {},
   // Optional: Add this if you want to ensure cleanup
-  onOpen: () => {}
+  onOpen: () => {},
 };
 
 export const showSuccessToast = (message) => {

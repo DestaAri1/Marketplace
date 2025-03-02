@@ -1,6 +1,10 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
-import { login as authLogin, getUser, registration } from '../services/authServices';
-import { getToken, removeToken, setToken } from '../services/TokenServices';
+import { useEffect, useState, useCallback, useRef } from "react";
+import {
+  login as authLogin,
+  getUser,
+  registration,
+} from "../services/authServices";
+import { getToken, removeToken, setToken } from "../services/TokenServices";
 
 export default function useAuth() {
   const [token, setTokenState] = useState(() => getToken());
@@ -44,7 +48,7 @@ export default function useAuth() {
 
   useEffect(() => {
     const currentToken = getToken();
-    
+
     if (currentToken && !getUserCalled.current) {
       fetchUser().finally(() => {
         setIsLoading(false);
@@ -58,7 +62,7 @@ export default function useAuth() {
     try {
       const response = await authLogin(email, password);
       const responseToken = response?.data?.data?.token;
-      
+
       if (responseToken) {
         setTokenState(responseToken);
         setToken(responseToken); // Save token to storage
@@ -75,7 +79,7 @@ export default function useAuth() {
     try {
       const response = await registration(username, email, password);
       const responseToken = response?.data?.data?.token;
-      
+
       if (responseToken) {
         setTokenState(responseToken);
         setToken(responseToken); // Save token to storage

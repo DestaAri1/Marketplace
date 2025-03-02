@@ -16,7 +16,7 @@ export default function UserList() {
     handleRoleUpdate,
     isLoading,
     isFetched,
-    handleDeleteUser
+    handleDeleteUser,
   } = useUserManagement();
 
   const roleModal = useModal();
@@ -27,7 +27,7 @@ export default function UserList() {
       fetchUsers();
       isFetched.current = true;
     }
-  }, [fetchUsers]);
+  }, [fetchUsers, isFetched]);
 
   const handleConfirmRoleChange = async (newRole) => {
     if (await handleRoleUpdate(roleModal.selectedItem.id, newRole)) {
@@ -43,13 +43,13 @@ export default function UserList() {
   };
 
   return (
-    <DashboardTemplate title='User List'>
-      <UserFilters 
+    <DashboardTemplate title="User List">
+      <UserFilters
         selectedRole={selectedRole}
         setSelectedRole={setSelectedRole}
       />
 
-      <UserTable 
+      <UserTable
         users={users}
         onRoleChange={roleModal.openModal}
         onDelete={deleteModal.openModal}

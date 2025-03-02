@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Products Component */
+  .products-title {
+    @apply text-3xl font-bold text-gray-800 mb-8 flex items-center gap-2;
+  }
+
+  .products-grid {
+    @apply grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4;
+  }
+
+  .product-card {
+    @apply bg-white rounded-2xl shadow-lg transition-all duration-300 transform hover:-translate-y-1 overflow-hidden;
+  }
+
+  .product-card:hover {
+    @apply shadow-2xl;
+  }
+
+  .product-image-container {
+    @apply relative overflow-hidden;
+  }
+
+  .product-image {
+    @apply w-full h-56 object-cover transition-transform duration-500;
+  }
+
+  .product-card:hover .product-image {
+    @apply scale-110;
+  }
+
+  .product-image-overlay {
+    @apply absolute inset-0 bg-black/40 opacity-0 flex items-center justify-center transition-opacity duration-300;
+  }
+
+  .product-card:hover .product-image-overlay {
+    @apply opacity-100;
+  }
+
+  .product-discount-badge {
+    @apply absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold;
+  }
+
+  .product-content {
+    @apply p-6;
+  }
+
+  .product-title {
+    @apply text-xl font-bold text-gray-800 mb-2 transition-colors duration-300;
+  }
+
+  .product-card:hover .product-title {
+    @apply text-indigo-600;
+  }
+
+  .product-store {
+    @apply text-sm text-gray-600;
+  }
+
+  .product-price-container {
+    @apply flex items-center justify-between mb-4;
+  }
+
+  .product-original-price {
+    @apply line-through text-sm text-gray-400;
+  }
+
+  .product-discount-price {
+    @apply text-lg font-bold text-red-500;
+  }
+
+  .product-regular-price {
+    @apply text-lg font-bold text-gray-900;
+  }
+
+  .product-cart-button {
+    @apply p-2 text-indigo-600 hover:text-white hover:bg-indigo-600 rounded-full transition-colors duration-300 border-2 border-indigo-600;
+  }
+
+  .product-view-details {
+    @apply block text-center text-sm font-semibold text-indigo-600 py-2 rounded-lg transition-colors duration-300;
+  }
+
+  .product-card:hover .product-view-details {
+    @apply text-white bg-indigo-600;
+  }
+
+  /* Home Component */
+  .home-container {
+    @apply min-h-screen bg-gradient-to-b from-gray-50 to-gray-100;
+  }
+
+  .home-main {
+    @apply container mx-auto px-4 md:px-8 lg:px-16 xl:px-32 py-8 md:py-12 lg:py-20 animate-fadeIn;
+  }
+
+  .search-container {
+    @apply mb-12 max-w-2xl mx-auto transition-transform duration-300;
+  }
+
+  .search-container:hover {
+    @apply scale-105;
+  }
+
+  .search-input {
+    @apply w-full p-4 pl-12 border-2 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-white/80 backdrop-blur-sm;
+  }
+
+  .search-icon {
+    @apply absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5;
+  }
+
+  .loading-spinner {
+    @apply animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-600;
+  }
+
+  .no-products {
+    @apply text-center py-12 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg;
+  }
+
+  .products-section {
+    @apply animate-slideUp;
+  }
+
+  /* Promotions Component */
+  .promotions-section {
+    @apply mb-12;
+  }
+
+  .promotions-title {
+    @apply text-3xl font-bold text-gray-800 mb-8 flex items-center gap-2;
+  }
+
+  .promotions-grid {
+    @apply grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .promotion-card {
+    @apply relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300 transform;
+  }
+
+  .promotion-card:hover {
+    @apply shadow-2xl -translate-y-1;
+  }
+
+  .promotion-icon {
+    @apply bg-white/20 backdrop-blur-sm p-2 rounded-lg;
+  }
+
+  .promotion-content {
+    @apply relative p-6 flex flex-col h-full;
+  }
+
+  .promotion-heading {
+    @apply text-2xl font-bold text-white mb-2;
+  }
+
+  .promotion-description {
+    @apply text-white/90;
+  }
+
+  .promotion-button {
+    @apply mt-4 px-6 py-2 bg-white/20 backdrop-blur-sm rounded-lg text-white font-semibold transition-colors duration-300;
+  }
+
+  .promotion-button:hover {
+    @apply bg-white/30;
+  }
+}

@@ -1,94 +1,95 @@
-import React, { useState } from 'react'
-import useAuth from '../../../hooks/useAuth';
-import TimerToaster from '../../../components/TimerToaster';
-import Navbar from '../../../layout/Main/Navbar';
+import React, { useEffect, useState } from "react";
+import Promotions from "../../../components/Home/Promotions";
+import Products from "../../../components/Home/Products";
+import useUserProduct from "../../../hooks/useUserProduct";
+import { Search } from "lucide-react";
+import MainTemplate from "../MainTemplate";
 
 export default function Home() {
-    const [searchTerm, setSearchTerm] = useState("");
-    const {user} = useAuth()
+  const { products, loading, isFetched, fetchProducts, getOneProduct } =
+    useUserProduct();
+  const [searchTerm, setSearchTerm] = useState("");
 
-    const products = [
-        { name: "Product 1", store: "Store A", price: 100, discountPrice: 80, image: "https://via.placeholder.com/150" },
-        { name: "Product 2", store: "Store B", price: 150, image: "https://via.placeholder.com/150" },
-        { name: "Product 3", store: "Store C", price: 200, discountPrice: 180, image: "https://via.placeholder.com/150" },
-    ];
+  // Save scroll position before page refresh
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      localStorage.setItem("scrollPosition", window.scrollY.toString());
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
+
+  // Restore scroll position after page loads
+  useEffect(() => {
+    const restoreScrollPosition = () => {
+      const scrollPosition = localStorage.getItem("scrollPosition");
+      if (scrollPosition) {
+        window.scrollTo(0, parseInt(scrollPosition));
+        localStorage.removeItem("scrollPosition"); // Clear after restore
+      }
+    };
+
+    // Wait for content to load before restoring scroll
+    if (!loading && products.length > 0) {
+      restoreScrollPosition();
+    }
+  }, [loading, products]);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      if (!isFetched.current) {
+        await fetchProducts();
+        isFetched.current = true;
+      }
+    };
+
+    loadProducts();
+  }, [fetchProducts, isFetched]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-        <TimerToaster/>
-        <Navbar user={user}/>
+    <MainTemplate>
+      <main className="home-main">
+        {/* Search Bar */}
+        <div className="search-container">
+          <div className="relative">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search for products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Search className="search-icon" />
+          </div>
+        </div>
 
-        <main className="container mx-auto px-32 py-20">
-            {/* Search Bar */}
-            <div className="mb-8">
-                <input
-                    type="text"
-                    className="w-full p-4 border rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-indigo-200"
-                    placeholder="Search for products..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
+        {/* Promotions Section */}
+        <div className="mb-16">
+          <Promotions />
+        </div>
 
-            {/* Promotions Section */}
-            <section id="promotions" className="mb-12">
-                <h2 className="text-3xl font-bold text-gray-800 mb-6">🔥 Hot Promotions</h2>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <div className="p-6 bg-yellow-100 rounded-lg shadow-lg flex items-center space-x-4">
-                        <img src="https://via.placeholder.com/100" alt="Promo 1" className="w-24 h-24 rounded-lg" />
-                        <div>
-                            <h3 className="text-xl font-bold">Special Promo 1</h3>
-                            <p className="text-gray-600">Don't miss this deal!</p>
-                        </div>
-                    </div>
-                    <div className="p-6 bg-yellow-100 rounded-lg shadow-lg flex items-center space-x-4">
-                        <img src="https://via.placeholder.com/100" alt="Promo 2" className="w-24 h-24 rounded-lg" />
-                        <div>
-                            <h3 className="text-xl font-bold">Special Promo 2</h3>
-                            <p className="text-gray-600">Limited time offer!</p>
-                        </div>
-                    </div>
-                    <div className="p-6 bg-yellow-100 rounded-lg shadow-lg flex items-center space-x-4">
-                        <img src="https://via.placeholder.com/100" alt="Promo 3" className="w-24 h-24 rounded-lg" />
-                        <div>
-                            <h3 className="text-xl font-bold">Exclusive Deal</h3>
-                            <p className="text-gray-600">Shop now and save big!</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="loading-spinner"></div>
+          </div>
+        )}
 
-            {/* Product List Section */}
-            <section id="products">
-                <h2 className="text-3xl font-bold text-gray-800 mb-6">🛍️ Product List</h2>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
-                    {products.map((product, index) => (
-                        <div key={index} className="p-6 bg-white rounded-lg shadow-lg">
-                            <img
-                                src={product.image}
-                                alt={product.name}
-                                className="w-full h-48 object-cover rounded-lg mb-4"
-                            />
-                            <h3 className="text-xl font-bold text-gray-800">{product.name}</h3>
-                            <p className="text-sm text-gray-600 mb-2">Store: {product.store}</p>
-                            <p className="text-lg font-semibold text-gray-900">
-                                {product.discountPrice ? (
-                                    <>
-                                        <span className="line-through text-gray-400 mr-2">${product.price}</span>
-                                        <span className="text-red-500">${product.discountPrice}</span>
-                                    </>
-                                ) : (
-                                    <>${product.price}</>
-                                )}
-                            </p>
-                            <button className="mt-4 px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
-                                Add to Cart
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            </section>
-        </main>
-    </div>
-  )
+        {/* Error State */}
+        {!loading && products.length === 0 && (
+          <div className="no-products">
+            <p className="text-gray-600 text-lg">No products found</p>
+          </div>
+        )}
+
+        {/* Product List Section */}
+        {!loading && products.length > 0 && (
+          <div className="products-section">
+            <Products products={products} />
+          </div>
+        )}
+      </main>
+    </MainTemplate>
+  );
 }

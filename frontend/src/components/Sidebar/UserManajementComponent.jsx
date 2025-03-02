@@ -1,21 +1,21 @@
-import React, { memo } from 'react';
-import DropdownButton from './DropdownButton';
-import { Package, ShoppingCart, Users, FileText, List } from 'lucide-react';
-import DropdownContent from './DropdownContent';
-import SubDropdownButton from './SubDropdownButton';
-import SubDropdownContent from './SubDropdownContent';
-import SubNavlink from './SubNavlink';
+import React, { memo } from "react";
+import DropdownButton from "./DropdownButton";
+import { Package, ShoppingCart, Users, FileText, List } from "lucide-react";
+import DropdownContent from "./DropdownContent";
+import SubDropdownButton from "./SubDropdownButton";
+import SubDropdownContent from "./SubDropdownContent";
+import SubNavlink from "./SubNavlink";
 
 // Use memo to prevent unnecessary re-renders
-const UserManajementComponent = memo(function UserManajementComponent({ 
-  isCollapsed, 
-  activeDropdown, 
-  subDropdown, 
-  toggleDropdown, 
-  toggleSubDropdown 
+const UserManajementComponent = memo(function UserManajementComponent({
+  isCollapsed,
+  activeDropdown,
+  subDropdown,
+  toggleDropdown,
+  toggleSubDropdown,
 }) {
-  const isActive = activeDropdown === 'management';
-  
+  const isActive = activeDropdown === "management";
+
   return (
     <li className="dropdown-container">
       <DropdownButton
@@ -23,19 +23,22 @@ const UserManajementComponent = memo(function UserManajementComponent({
         icon={Users}
         isCollapsed={isCollapsed}
         isActive={isActive}
-        onClick={() => toggleDropdown('management')}
+        onClick={() => toggleDropdown("management")}
       />
-      
+
       <DropdownContent isActive={isActive}>
         <SubDropdownButton
           title="Product"
           icon={Package}
           isCollapsed={isCollapsed}
-          isActive={subDropdown === 'seller'}
-          onClick={() => toggleSubDropdown('seller')}
+          isActive={subDropdown === "seller"}
+          onClick={() => toggleSubDropdown("seller")}
         />
-        
-        <SubDropdownContent isActive={subDropdown === 'seller'} isCollapsed={isCollapsed}>
+
+        <SubDropdownContent
+          isActive={subDropdown === "seller"}
+          isCollapsed={isCollapsed}
+        >
           <SubNavlink
             to="/admin/manage-category"
             icon={List}
@@ -49,16 +52,19 @@ const UserManajementComponent = memo(function UserManajementComponent({
             isCollapsed={isCollapsed}
           />
         </SubDropdownContent>
-        
+
         <SubDropdownButton
           title="Normal User"
           icon={Users}
           isCollapsed={isCollapsed}
-          isActive={subDropdown === 'normalUser'}
-          onClick={() => toggleSubDropdown('normalUser')}
+          isActive={subDropdown === "normalUser"}
+          onClick={() => toggleSubDropdown("normalUser")}
         />
-        
-        <SubDropdownContent isActive={subDropdown === 'normalUser'} isCollapsed={isCollapsed}>
+
+        <SubDropdownContent
+          isActive={subDropdown === "normalUser"}
+          isCollapsed={isCollapsed}
+        >
           <SubNavlink
             to="/admin/user-list"
             icon={Users}

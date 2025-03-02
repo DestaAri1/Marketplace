@@ -24,17 +24,22 @@ export const ProtectedRoute = ({ children }) => (
 export const SellerRoute = ({ children }) => {
   const { user } = useAuth();
   return (
-    <RouteGuard condition={!getToken() || (user && user.role !== 1)} redirect="/">
+    <RouteGuard
+      condition={!getToken() || (user && user.role !== 1)}
+      redirect="/"
+    >
       {children}
     </RouteGuard>
   );
 };
 
-
 export const AdminRoute = ({ children }) => {
   const { user } = useAuth();
   return (
-    <RouteGuard condition={!getToken() || (user && user.role !== 0)} redirect="/">
+    <RouteGuard
+      condition={!getToken() || (user && user.role !== 0)}
+      redirect="/"
+    >
       {children}
     </RouteGuard>
   );

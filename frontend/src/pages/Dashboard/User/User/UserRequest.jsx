@@ -16,35 +16,41 @@ export default function UserRequest() {
     selectedStatus,
     setSelectedStatus,
     handleAcceptRequest,
-    handleRejectRequest
-  } = useRequestSeller()
+    handleRejectRequest,
+  } = useRequestSeller();
 
   useEffect(() => {
-    if(!isFetched.current) {
-      fetchRequestUser()
-      isFetched.current = true
+    if (!isFetched.current) {
+      fetchRequestUser();
+      isFetched.current = true;
     }
-  },[fetchRequestUser,isFetched])
+  }, [fetchRequestUser, isFetched]);
 
-  const acceptModal = useModal()
-  const rejectModal = useModal()
+  const acceptModal = useModal();
+  const rejectModal = useModal();
 
-  const handleConfirmAcceptRequest = async() => {
-    if (await handleAcceptRequest(acceptModal.selectedItem.id, acceptModal.selectedItem.user_id, 2)) {
-      acceptModal.closeModal()
+  const handleConfirmAcceptRequest = async () => {
+    if (
+      await handleAcceptRequest(
+        acceptModal.selectedItem.id,
+        acceptModal.selectedItem.user_id,
+        2
+      )
+    ) {
+      acceptModal.closeModal();
     }
-  }
+  };
 
-  const pass = rejectModal.selectedItem
-  const handleConfirmRejectRequest = async(data) => {
+  const pass = rejectModal.selectedItem;
+  const handleConfirmRejectRequest = async (data) => {
     if (await handleRejectRequest(pass.id, pass.user_id, 1, data)) {
-      rejectModal.closeModal()
-    } 
-  }
-  
+      rejectModal.closeModal();
+    }
+  };
+
   return (
     <DashboardTemplate title="List Request">
-      <UserFileter 
+      <UserFileter
         selectedStatus={selectedStatus}
         setSelectedStatus={setSelectedStatus}
       />

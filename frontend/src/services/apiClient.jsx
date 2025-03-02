@@ -12,13 +12,12 @@ export const apiClient = axios.create({
   },
 });
 
-// Request interceptor to add token
+// Request interceptor to add token if available
 apiClient.interceptors.request.use((config) => {
   const token = getToken();
-  if (!token) {
-    throw new Error("No token found");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-  config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 

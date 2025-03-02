@@ -11,37 +11,37 @@ export default function UpdateProductModal({
   product,
   category,
 }) {
-    const [data, setData] = useState({});
+  const [data, setData] = useState({});
 
-    useEffect(() => {
-        if (product?.id) {
-            // Ensure we're setting all required fields
-            setData({
-                name: product.name || '',
-                stock: product.stock || 0,
-                price: product.price || 0,
-                category_id: product.category_id || '',
-                description: product.description || ''
-            });
-        }
-    }, [product]);
+  useEffect(() => {
+    if (product?.id) {
+      // Ensure we're setting all required fields
+      setData({
+        name: product.name || "",
+        stock: product.stock || 0,
+        price: product.price || 0,
+        category_id: product.category_id || "",
+        description: product.description || "",
+      });
+    }
+  }, [product]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setData(prev => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-    const handleConfirm = async () => {
-        // Validate data before submitting
-        if (!data.name || !data.stock || !data.price || !data.category_id) {
-            toast.error("Please fill in all required fields");
-            return;
-        }
-        await onConfirm(data);
-    };
+  const handleConfirm = async () => {
+    // Validate data before submitting
+    if (!data.name || !data.stock || !data.price || !data.category_id) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    await onConfirm(data);
+  };
 
   return (
     <Modal
@@ -62,23 +62,26 @@ export default function UpdateProductModal({
             onChange={handleChange}
           />
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="category"
+              className="block text-sm font-medium text-gray-700"
+            >
               Category
             </label>
             <select
-                name="category_id"
-                value={data.category_id || ""}
-                onChange={handleChange}
-                className="w-full px-3 py-2 mt-4 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              name="category_id"
+              value={data.category_id || ""}
+              onChange={handleChange}
+              className="w-full px-3 py-2 mt-4 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
             >
-            <option value="" disabled>
+              <option value="" disabled>
                 Select Category
-            </option>
-            {category.map((cat) => (
+              </option>
+              {category.map((cat) => (
                 <option key={cat.id} value={cat.id}>
-                {cat.name}
+                  {cat.name}
                 </option>
-            ))}
+              ))}
             </select>
           </div>
         </div>
@@ -104,7 +107,10 @@ export default function UpdateProductModal({
       </div>
 
       <div className="mt-4">
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="description"
+          className="block text-sm font-medium text-gray-700"
+        >
           Description
         </label>
         <textarea
