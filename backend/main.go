@@ -1,63 +1,102 @@
 package main
 
 import (
-	"github.com/DestaAri1/database"
+	db "github.com/DestaAri1/database"
 	"github.com/DestaAri1/handlers"
 	"github.com/DestaAri1/middlewares"
-	"github.com/DestaAri1/repositories"
-	"github.com/DestaAri1/sevices"
+	"github.com/DestaAri1/models"
+	repository "github.com/DestaAri1/repositories"
+	services "github.com/DestaAri1/sevices"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"gorm.io/gorm"
 )
 
-func main() {
-	db := db.Init(db.DBMigrator)
+// App configuration
+func setupApp() *fiber.App {
 	app := fiber.New(fiber.Config{
-		AppName: "TicketBooking",
+		AppName:      "TicketBooking",
 		ServerHeader: "Fiber",
 	})
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:5000", // Ganti dengan URL front-end React kamu
+		AllowOrigins: "http://localhost:5000",
 		AllowMethods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
 	}))
 
+	return app
+}
 
-	//Repositories
-	authRepository := repository.NewAuthRepository(db)
-	sellerRepository := repository.NewSellerRepository(db)
-	adminRepository := repository.NewAdminRepository(db)
-	adminUserRepository := repository.NewAdminUserRepository(db)
-	sellerProductRepository := repository.NewSellerProductRepository(db)
-	categoryRepository := repository.NewCategoryRepository(db)
-	userProductRepository := repository.NewUserProductRepository((db))
+// Repository initialization
+type AppRepositories struct {
+	auth          models.AuthRepository
+	seller        models.SellerRequestRepository
+	admin         models.AdminRepository
+	adminUser     models.AdminUserRepository
+	sellerProduct models.SellerProductRepository
+	category      models.CategoryRepository
+	userProduct   models.UserProductRepository
+}
 
-	//Service
-	authService := services.NewAuthService(authRepository)
+func setupRepositories(database *gorm.DB) AppRepositories {
+	return AppRepositories{
+		auth:          repository.NewAuthRepository(database),
+		seller:        repository.NewSellerRepository(database),
+		admin:         repository.NewAdminRepository(database),
+		adminUser:     repository.NewAdminUserRepository(database),
+		sellerProduct: repository.NewSellerProductRepository(database),
+		category:      repository.NewCategoryRepository(database),
+		userProduct:   repository.NewUserProductRepository(database),
+	}
+}
 
-	//Routing
-	server := app.Group("/api")
-	handlers.NewAuthHandler(server.Group(("/auth")), authService)
+// Service initialization
+type AppServices struct {
+	auth models.AuthServices
+}
+
+func setupServices(repos AppRepositories) AppServices {
+	return AppServices{
+		auth: services.NewAuthService(repos.auth),
+	}
+}
+
+// Route setup
+func setupRoutes(app *fiber.App, database *gorm.DB, repos AppRepositories, services AppServices) {
+	// API group
+	api := app.Group("/api")
 	
-	privateRoutes := server.Use(middlewares.AuthProtected(db))
-	
-	//Handlers
-	handlers.NewGetUserHandler(privateRoutes.Group("/auth"), authRepository)
+	// Public routes
+	auth := api.Group("/auth")
+	handlers.NewUserProductHandler(api.Group("/product"), repos.userProduct)
+	handlers.NewAuthHandler(auth, services.auth)
 
-	// Admin
-	handlers.NewAdminHandler(privateRoutes.Group("/admin/seller"), adminRepository, db)
-	handlers.NewAdminUserHandler(privateRoutes.Group("/admin/user"), adminUserRepository, db)
+	// Protected routes
+	protected := api.Use(middlewares.AuthProtected(database))
 
-	// Admin and All
-	handlers.NewCategoryHandler(privateRoutes.Group("/category"), categoryRepository, db)
+	// User routes
+	handlers.NewGetUserHandler(protected.Group("/auth"), repos.auth)
+	handlers.NewSellerHandler(protected.Group("/user"), repos.seller, repos.auth, database)
 
-	//Seller
-	handlers.NewSellerProductHandler(privateRoutes.Group("/seller/product"), sellerProductRepository, db)
-	
-	//All
-	handlers.NewUserProductHandler(privateRoutes.Group("/product"), userProductRepository)
+	// Admin routes
+	handlers.NewAdminHandler(protected.Group("/admin/seller"), repos.admin, database)
+	handlers.NewAdminUserHandler(protected.Group("/admin/user"), repos.adminUser, database)
 
-	//User
-	handlers.NewSellerHandler(privateRoutes.Group("/user"), sellerRepository, authRepository,db)
+	// Common routes
+	handlers.NewCategoryHandler(protected.Group("/category"), repos.category, database)
+	handlers.NewSellerProductHandler(protected.Group("/seller/product"), repos.sellerProduct, database)
+}
+
+func main() {
+	// Initialize components
+	database := db.Init(db.DBMigrator)
+	app := setupApp()
+	repositories := setupRepositories(database)
+	services := setupServices(repositories)
+
+	// Setup routes
+	setupRoutes(app, database, repositories, services)
+
+	// Start server
 	app.Listen(":3000")
 }

@@ -16,7 +16,7 @@ func (r *AdminRepository) GetAllRequest(ctx context.Context) ([]*models.SellerRe
     var requests []*models.SellerRequestResponse
 
     result := r.db.
-        Table("seller_requests").
+		Table("seller_requests").
         Select( "seller_requests.id",
 				"seller_requests.user_id", 
                 "users.username", 
