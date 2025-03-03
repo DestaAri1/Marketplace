@@ -44,7 +44,10 @@ export default function Home() {
       }
     };
 
-    loadProducts();
+    // Hanya jalankan jika komponen di-mount pertama kali
+    if (!isFetched.current) {
+      loadProducts();
+    }
   }, [fetchProducts, isFetched]);
 
   return (

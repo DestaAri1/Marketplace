@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 
 export default function RoleModal({
@@ -8,7 +8,15 @@ export default function RoleModal({
   onConfirm,
   isLoading,
 }) {
-  const [newRole, setNewRole] = useState(user?.role || null);
+  const [localUser, setLocalUser] = useState(null);
+  const [newRole, setNewRole] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      setLocalUser(user);
+      setNewRole(user.role);
+    }
+  }, [user]);
 
   const roleOptions = [
     { value: 0, label: "Admin" },
@@ -17,8 +25,8 @@ export default function RoleModal({
   ];
 
   const getRoleChangeText = () => {
-    if (!user || newRole === null) return "";
-    const fromRole = roleOptions.find((r) => r.value === user.role)?.label;
+    if (!localUser || newRole === null) return "";
+    const fromRole = roleOptions.find((r) => r.value === localUser.role)?.label;
     const toRole = roleOptions.find((r) => r.value === newRole)?.label;
     return `dari ${fromRole} menjadi ${toRole}`;
   };
@@ -26,6 +34,8 @@ export default function RoleModal({
   const handleConfirm = () => {
     onConfirm(newRole);
   };
+
+  if (!localUser) return null;
 
   return (
     <Modal
@@ -37,7 +47,7 @@ export default function RoleModal({
       confirmClass="bg-yellow-500 hover:bg-yellow-700"
     >
       <div className="space-y-4">
-        <p>Pilih role baru untuk user {user?.username}:</p>
+        <p>Pilih role baru untuk user {localUser.username}:</p>
         <select
           value={newRole || ""}
           onChange={(e) => setNewRole(Number(e.target.value))}
@@ -47,15 +57,16 @@ export default function RoleModal({
             <option
               key={role.value}
               value={role.value}
-              disabled={role.value === user?.role}
+              disabled={role.value === localUser.role}
             >
               {role.label}
             </option>
           ))}
         </select>
-        {newRole !== user?.role && (
+        {newRole !== localUser.role && (
           <p className="text-sm text-gray-600">
-            Anda akan mengubah role user {user?.username} {getRoleChangeText()}
+            Anda akan mengubah role user {localUser.username}{" "}
+            {getRoleChangeText()}
           </p>
         )}
       </div>

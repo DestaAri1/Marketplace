@@ -6,7 +6,6 @@ export const productUserApi = {
       const response = await apiClient.get("/product");
       return response;
     } catch (error) {
-      console.error("Error fetching products:", error);
       throw error;
     }
   },
@@ -16,7 +15,6 @@ export const productUserApi = {
       const response = await apiClient.get(`/product/${id}`);
       return response;
     } catch (error) {
-      console.error("Error fetching product:", error);
       throw error;
     }
   },

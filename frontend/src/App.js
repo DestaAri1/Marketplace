@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
-import { AdminRoute, AuthRoute, SellerRoute } from "./utils/AuthRoute";
+import { AdminRoute, AuthRoute, ProtectedRoute, SellerRoute } from "./utils/AuthRoute";
 import Home from "./pages/Home/Home/Home";
 import Dashboard from "./pages/Dashboard/Dashboard/Dashboard";
 import UserRequest from "./pages/Dashboard/User/User/UserRequest";
@@ -10,6 +10,7 @@ import UserList from "./pages/Dashboard/User/User/UserList";
 import DashboardSeller from "./pages/Seller/Dashboard/DashboardSeller";
 import SellerProducts from "./pages/Seller/Product/SellerProducts";
 import ManageCategory from "./pages/Dashboard/Product/ManageCategory";
+import DetailProduct from "./pages/Home/Product/DetailProduct";
 
 function App() {
   return (
@@ -35,7 +36,14 @@ function App() {
 
         {/* Main Page */}
         <Route path="/" element={<Home />} />
-
+        <Route
+          path="/product/:id"
+          element={
+            <ProtectedRoute>
+              <DetailProduct />
+            </ProtectedRoute>
+          }
+        />
         {/* Seller Page */}
         <Route
           path="/seller/dashboard"

@@ -6,7 +6,7 @@ export default function useUserProduct() {
   const [products, setProducts] = useState([]);
   const [loading, setIsLoading] = useState(false);
   const isFetched = useRef(false);
-
+  const fetchPromise = useRef(null);
 
   const handleApiCall = async (apiFunction, errorMessage) => {
     setIsLoading(true);
@@ -14,22 +14,36 @@ export default function useUserProduct() {
       const response = await apiFunction();
       return response?.data?.data;
     } catch (error) {
-      toast.error(error.message || errorMessage);
+      if (!toast.isActive("connection-error")) {
+        toast.error(error.message || errorMessage, {
+          toastId: "connection-error",
+        });
+      }
       return null;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fetchProducts = () => handleApiCall(
-    productUserApi.getAll,
-    "Failed to fetch products"
-  ).then(data => data && setProducts(data));
+  const fetchProducts = async () => {
+    if (fetchPromise.current) {
+      return fetchPromise.current;
+    }
 
-  const getOneProduct = (id) => handleApiCall(
-    () => productUserApi.getOne(id), 
-    "Failed to fetch product"
-  );
+    fetchPromise.current = handleApiCall(
+      productUserApi.getAll,
+      "Failed to fetch products"
+    ).then((data) => {
+      if (data) setProducts(data);
+      fetchPromise.current = null;
+      return data;
+    });
+
+    return fetchPromise.current;
+  };
+
+  const getOneProduct = (id) =>
+    handleApiCall(() => productUserApi.getOne(id), "Failed to fetch product");
 
   return {
     products,

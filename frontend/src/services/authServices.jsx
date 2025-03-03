@@ -1,37 +1,80 @@
 import axios from "axios";
-import { getToken, removeToken, setToken } from "./TokenServices";
+import { getToken, setToken, removeToken } from "./TokenServices";
 
-const API_URL = "http://localhost:3000/api/auth";
-const config = {
-  headers: { "Content-Type": "application/json", Accept: "application/json" },
-};
+const API_URL = "http://localhost:3000/api";
 
-const handleRequest = async (url, data) => {
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+});
+
+// Interceptor untuk request
+api.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+      // console.log("Request headers:", config.headers); // Temporary debug
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor untuk response
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      removeToken();
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const login = async (email, password) => {
   try {
-    const response = await axios.post(`${API_URL}/${url}`, data, config);
-    setToken(response.data.data.token);
+    const response = await api.post("/auth/login", { email, password });
+    const token = response.data?.data?.token;
+    if (token) {
+      setToken(token);
+    }
     return response;
   } catch (error) {
-    throw error.response?.data || new Error("Network error");
+    throw error.response?.data || error;
   }
 };
 
-export const login = (email, password) =>
-  handleRequest("login", { email, password });
-export const registration = (username, email, password) =>
-  handleRequest("register", { username, email, password });
+export const registration = async (username, email, password) => {
+  try {
+    const response = await api.post("/auth/register", {
+      username,
+      email,
+      password,
+    });
+    const token = response.data?.data?.token;
+    if (token) {
+      setToken(token);
+    }
+    return response;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
 
 export const getUser = async () => {
-  const token = getToken();
-  if (!token) throw new Error("No token found");
-
   try {
-    const response = await axios.get(`${API_URL}/getUser`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await api.get("/auth/getUser");
     return response.data.data;
   } catch (error) {
-    removeToken();
+    if (error.response?.status === 401) {
+      removeToken();
+    }
     throw error;
   }
 };

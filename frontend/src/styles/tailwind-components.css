@@ -169,4 +169,101 @@
   .promotion-button:hover {
     @apply bg-white/30;
   }
+
+  /* Product Detail Component */
+  .product-detail-container {
+    @apply min-h-screen flex items-center justify-center py-8;
+  }
+
+  .product-detail-wrapper {
+    @apply container mx-auto px-4 max-w-7xl;
+  }
+
+  .product-detail-card {
+    @apply flex flex-col md:flex-row gap-8 bg-white rounded-2xl shadow-lg p-6;
+  }
+
+  .product-detail-image-section {
+    @apply md:w-1/2;
+  }
+
+  .product-detail-image-wrapper {
+    @apply relative;
+  }
+
+  .product-detail-image {
+    @apply w-full h-[400px] rounded-xl shadow-md object-cover transition duration-300;
+  }
+
+  .group:hover .product-detail-image {
+    @apply scale-105;
+  }
+
+  .product-detail-image-overlay {
+    @apply absolute inset-0 bg-black bg-opacity-0 transition-all duration-300 rounded-xl;
+  }
+
+  .group:hover .product-detail-image-overlay {
+    @apply bg-opacity-10;
+  }
+
+  .product-detail-info {
+    @apply md:w-1/2 flex flex-col justify-between min-h-[400px];
+  }
+
+  .product-detail-content {
+    @apply space-y-6;
+  }
+
+  .product-detail-header {
+    @apply text-3xl font-bold text-gray-900 mb-2;
+  }
+
+  .product-detail-stock {
+    @apply flex items-center gap-2;
+  }
+
+  .product-detail-stock-badge {
+    @apply px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium;
+  }
+
+  .product-detail-stock-count {
+    @apply text-gray-600;
+  }
+
+  .product-detail-price-section {
+    @apply space-y-2;
+  }
+
+  .product-detail-price-wrapper {
+    @apply flex items-center gap-4;
+  }
+
+  .product-detail-current-price {
+    @apply text-2xl font-bold text-gray-900;
+  }
+
+  .product-detail-original-price {
+    @apply text-lg text-gray-400 line-through;
+  }
+
+  .product-detail-discount {
+    @apply bg-red-100 text-red-800 text-sm font-semibold px-3 py-1 rounded-full;
+  }
+
+  .product-detail-description {
+    @apply space-y-3;
+  }
+
+  .product-detail-description-title {
+    @apply text-xl font-semibold text-gray-900;
+  }
+
+  .product-detail-description-text {
+    @apply text-gray-600 leading-relaxed;
+  }
+
+  .product-detail-add-cart {
+    @apply w-full bg-blue-600 text-white py-3 px-6 rounded-xl hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02] font-semibold text-lg shadow-md hover:shadow-xl active:scale-[0.98] disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:scale-100;
+  }
 }

@@ -1,103 +1,125 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import {
   login as authLogin,
   getUser,
   registration,
 } from "../services/authServices";
-import { getToken, removeToken, setToken } from "../services/TokenServices";
+import { getToken, removeToken } from "../services/TokenServices";
 
 export default function useAuth() {
-  const [token, setTokenState] = useState(() => getToken());
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const getUserCalled = useRef(false);
-  const initPromise = useRef(null);
+  const fetchPromise = useRef(null);
+  const mounted = useRef(false);
 
   const fetchUser = useCallback(async () => {
-    // If we already have a promise running, return that instead of creating a new one
-    if (initPromise.current) {
-      return initPromise.current;
+    if (!getToken()) {
+      setIsLoading(false);
+      return null;
     }
 
-    // If we've already successfully fetched the user, don't fetch again
-    if (getUserCalled.current && user) {
-      return user;
+    if (fetchPromise.current) {
+      return fetchPromise.current;
     }
 
     try {
-      getUserCalled.current = true;
-      initPromise.current = getUser();
-      const userData = await initPromise.current;
-      setUser(userData);
+      fetchPromise.current = getUser();
+      const userData = await fetchPromise.current;
+      if (mounted.current) {
+        setUser((prev) => {
+          // Hanya update jika data benar-benar berbeda
+          if (JSON.stringify(prev) !== JSON.stringify(userData)) {
+            return userData;
+          }
+          return prev;
+        });
+      }
       return userData;
     } catch (error) {
       console.error("Failed to fetch user data:", error);
-      logout();
+      if (mounted.current) {
+        logout();
+      }
       return null;
     } finally {
-      initPromise.current = null;
+      fetchPromise.current = null;
+      if (mounted.current) {
+        setIsLoading(false);
+      }
     }
-  }, [user]);
+  }, []);
 
   const logout = useCallback(() => {
     removeToken();
-    setTokenState(null);
     setUser(null);
-    getUserCalled.current = false;
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
-    const currentToken = getToken();
+    mounted.current = true;
 
-    if (currentToken && !getUserCalled.current) {
-      fetchUser().finally(() => {
+    const initAuth = async () => {
+      if (getToken()) {
+        await fetchUser();
+      } else {
         setIsLoading(false);
-      });
-    } else {
-      setIsLoading(false);
-    }
-  }, [fetchUser]); // Add fetchUser to dependency array
-
-  const login = async (email, password) => {
-    try {
-      const response = await authLogin(email, password);
-      const responseToken = response?.data?.data?.token;
-
-      if (responseToken) {
-        setTokenState(responseToken);
-        setToken(responseToken); // Save token to storage
-        getUserCalled.current = false; // Reset the flag for new login
-        // No need to call fetchUser here, it will be handled by useEffect
       }
-      return response;
-    } catch (error) {
-      throw error;
-    }
-  };
+    };
 
-  const register = async (username, email, password) => {
-    try {
-      const response = await registration(username, email, password);
-      const responseToken = response?.data?.data?.token;
+    initAuth();
 
-      if (responseToken) {
-        setTokenState(responseToken);
-        setToken(responseToken); // Save token to storage
-        getUserCalled.current = false; // Reset the flag for new registration
-        // No need to call fetchUser here, it will be handled by useEffect
+    return () => {
+      mounted.current = false;
+    };
+  }, [fetchUser]);
+
+  const login = useCallback(
+    async (email, password) => {
+      setIsLoading(true);
+      try {
+        const response = await authLogin(email, password);
+        if (mounted.current) {
+          await fetchUser();
+        }
+        return response;
+      } finally {
+        if (mounted.current) {
+          setIsLoading(false);
+        }
       }
-      return response;
-    } catch (error) {
-      throw error;
-    }
-  };
+    },
+    [fetchUser]
+  );
 
-  return {
-    login,
-    register,
-    logout,
-    user,
-    token,
-    isLoading,
-  };
+  const register = useCallback(
+    async (username, email, password) => {
+      setIsLoading(true);
+      try {
+        const response = await registration(username, email, password);
+        if (mounted.current) {
+          await fetchUser();
+        }
+        return response;
+      } finally {
+        if (mounted.current) {
+          setIsLoading(false);
+        }
+      }
+    },
+    [fetchUser]
+  );
+
+  // Memoize return value untuk mencegah re-render yang tidak perlu
+  const authValue = useMemo(
+    () => ({
+      login,
+      register,
+      logout,
+      user,
+      isLoading,
+    }),
+    [login, register, logout, user, isLoading]
+  );
+
+  return authValue;
 }

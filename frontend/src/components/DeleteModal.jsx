@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 
 export default function DeleteModal({
@@ -8,11 +8,22 @@ export default function DeleteModal({
   onConfirm,
   isLoading,
 }) {
+  const [localUser, setLocalUser] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      setLocalUser(user);
+    }
+  }, [user]);
+
   const handleConfirm = () => {
-    if (user?.id) {
-      onConfirm(user.id);
+    if (localUser?.id) {
+      onConfirm(localUser.id);
     }
   };
+
+  if (!localUser) return null;
+
   return (
     <Modal
       isOpen={isOpen}
@@ -23,8 +34,8 @@ export default function DeleteModal({
       confirmClass="bg-red-500 hover:bg-red-700"
     >
       <p>
-        Apakah Anda yakin ingin menghapus user {user?.username}? Tindakan ini
-        tidak dapat dibatalkan.
+        Apakah Anda yakin ingin menghapus user {localUser.username}? Tindakan
+        ini tidak dapat dibatalkan.
       </p>
     </Modal>
   );

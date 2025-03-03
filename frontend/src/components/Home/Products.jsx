@@ -1,6 +1,7 @@
 import React from "react";
 import { ShoppingCartIcon, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
+import { encryptId } from "../../utils/crypto";
 
 export default function Products({ products }) {
   const handleAddToCart = (e, product) => {
@@ -18,7 +19,7 @@ export default function Products({ products }) {
       <div className="products-grid">
         {products.map((product, index) => (
           <Link
-            to={`/product/${product.id}`}
+            to={`/product/${encryptId(product.id)}`}
             key={index}
             className="product-card"
           >
