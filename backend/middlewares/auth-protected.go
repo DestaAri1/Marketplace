@@ -7,10 +7,30 @@ import (
 	"time"
 
 	"github.com/DestaAri1/models"
+	"github.com/DestaAri1/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
 )
+
+// Helper function untuk mendapatkan user dari cache atau database
+func getUserFromCacheOrDB(db *gorm.DB, userID float64) (*models.User, error) {
+	// Check cache first
+	if user, exists := utils.GlobalUserCache.GetUser(uint(userID)); exists {
+		return user, nil
+	}
+
+	// If not in cache, get from database
+	var user models.User
+	if err := db.First(&user, userID).Error; err != nil {
+		return nil, err
+	}
+
+	// Save to cache
+	utils.GlobalUserCache.SetUser(uint(userID), &user)
+
+	return &user, nil
+}
 
 func errorMiddleware(ctx *fiber.Ctx, status int, message string) error {
 	return ctx.Status(status).JSON(&fiber.Map{
@@ -73,14 +93,14 @@ func AuthProtected(db *gorm.DB) fiber.Handler {
 func RoleAuthorization(db *gorm.DB, allowedRoles ...models.UserRole) fiber.Handler {
     return func(c *fiber.Ctx) error {
         // Ambil userId dari Locals
-        userId, ok := c.Locals("userId").(float64) // Sesuaikan dengan tipe data userId yang disimpan di token
+        userId, ok := c.Locals("userId").(float64)
         if !ok {
             return errorMiddleware(c, fiber.StatusForbidden, "User not found")
         }
 
-        // Query untuk mendapatkan user dari database
-        var user models.User
-        if err := db.First(&user, "id = ?", uint(userId)).Error; err != nil {
+        // Gunakan cache untuk mendapatkan user
+        user, err := getUserFromCacheOrDB(db, userId)
+        if err != nil {
             return errorMiddleware(c, fiber.StatusForbidden, "User not found")
         }
 

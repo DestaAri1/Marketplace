@@ -24,7 +24,7 @@ type AdminRepository interface {
 }
 
 type FormRequestUpgradeUser struct{
-    Role    UserRole    `json:"role" validate:"required,numeric"`
+    Role    *UserRole   `json:"role" validate:"required,numeric"`
     UserId  uint        `json:"user_id" validate:"required,numeric"`
 }
 

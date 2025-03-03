@@ -1,0 +1,16 @@
+[1.650ms] [rows:2] SELECT products.id, products.name as product, products.stock, products.price, products.description, categories.name as category, users.username as seller FROM `products` LEFT JOIN users ON users.id = products.user_id LEFT JOIN categories ON categories.id = products.category_id WHERE products.status = 1
+
+2025/03/03 12:24:06 C:/Users/Desta/Documents/Belajar/E-Commerce/backend/middlewares/auth-protected.go:69
+[1.568ms] [rows:1] SELECT * FROM `users` WHERE id = 3 ORDER BY `users`.`id` LIMIT 1
+
+2025/03/03 12:24:06 C:/Users/Desta/Documents/Belajar/E-Commerce/backend/middlewares/auth-protected.go:69
+[1.356ms] [rows:1] SELECT * FROM `users` WHERE id = 3 ORDER BY `users`.`id` LIMIT 1
+
+2025/03/03 12:24:06 C:/Users/Desta/Documents/Belajar/E-Commerce/backend/middlewares/auth-protected.go:69
+[0.781ms] [rows:1] SELECT * FROM `users` WHERE id = 3 ORDER BY `users`.`id` LIMIT 1
+
+2025/03/03 12:24:06 C:/Users/Desta/Documents/Belajar/E-Commerce/backend/middlewares/auth-protected.go:69
+[0.542ms] [rows:1] SELECT * FROM `users` WHERE id = 3 ORDER BY `users`.`id` LIMIT 1
+
+2025/03/03 12:24:06 C:/Users/Desta/Documents/Belajar/E-Commerce/backend/repositories/seller_request.go:42
+[1.319ms] [rows:1] SELECT * FROM `seller_requests` WHERE user_id = 3 AND status = 0 ORDER BY created_at DESC,`seller_requests`.`id` LIMIT 1
