@@ -36,6 +36,7 @@ type AppRepositories struct {
 	sellerProduct models.SellerProductRepository
 	category      models.CategoryRepository
 	userProduct   models.UserProductRepository
+	cart 		  models.CartRepository
 }
 
 func setupRepositories(database *gorm.DB) AppRepositories {
@@ -47,6 +48,7 @@ func setupRepositories(database *gorm.DB) AppRepositories {
 		sellerProduct: repository.NewSellerProductRepository(database),
 		category:      repository.NewCategoryRepository(database),
 		userProduct:   repository.NewUserProductRepository(database),
+		cart:		   repository.NewCartRepository(database),
 	}
 }
 
@@ -68,11 +70,14 @@ func setupRoutes(app *fiber.App, database *gorm.DB, repos AppRepositories, servi
 	
 	// Public routes
 	auth := api.Group("/auth")
-	handlers.NewUserProductHandler(api.Group("/product"), repos.userProduct)
 	handlers.NewAuthHandler(auth, services.auth)
+	handlers.NewUserProductHandler(api.Group("/product"), repos.userProduct)
 
 	// Protected routes
 	protected := api.Use(middlewares.AuthProtected(database))
+
+	//Public Protected Routes
+	handlers.NewCartHandler(protected.Group("/cart"), repos.cart)
 
 	// User routes
 	handlers.NewGetUserHandler(protected.Group("/auth"), repos.auth)

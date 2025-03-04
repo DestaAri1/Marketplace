@@ -6,5 +6,5 @@ import (
 )
 
 func DBMigrator(db *gorm.DB) error {
-	return db.AutoMigrate(&models.User{}, &models.Seller_Request{}, &models.Product{}, &models.Category{})
+	return db.AutoMigrate(&models.User{}, &models.Seller_Request{}, &models.Product{}, &models.Category{}, &models.Cart{})
 }

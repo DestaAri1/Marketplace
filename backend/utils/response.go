@@ -44,6 +44,10 @@ func HandleValidationError(ctx *fiber.Ctx, err error) error {
 				if err.Tag() == "max" {
 					message = "Maximum 500 characters"
 				}
+			case "ProductID" :
+				message = handleProductIDValidation(err.Tag())
+			case "Quantity" :
+				message = handleQuantityValidation(err.Tag())
 			}
 			if message != "" {
 				return HandlerError(ctx, fiber.StatusBadRequest, message)
@@ -107,6 +111,30 @@ func handleStatusValidation(tag string) string {
 		return "Status is required"
 	case "numeric":
 		return "status only number"
+	}
+	return ""
+}
+
+func handleProductIDValidation(tag string) string {
+	switch tag {
+	case "required" :
+		return "Product is required"
+	case "numeric" :
+		return "only number"
+	case "gt" :
+		return "cannot input 0"
+	}
+	return ""
+}
+
+func handleQuantityValidation(tag string) string {
+	switch tag {
+	case "required" :
+		return "Quantity is required"
+	case "numeric" :
+		return "Only number"
+	case "min" :
+		return "minimun quantity is 1"
 	}
 	return ""
 }
