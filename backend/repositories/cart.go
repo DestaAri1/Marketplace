@@ -20,6 +20,12 @@ func (r *CartRepository) CreateCart(ctx context.Context, cart *models.FormCreate
 
 	// Check if product exists and has enough stock
 	var product models.Product
+	checkUser := tx.Where("id = ? AND user_id = ?", cart.ProductID, userId).First(&product)
+	if checkUser.Error == nil {
+		tx.Rollback()
+		return errors.New("you cannot add your own product")
+	}
+	
 	res := tx.Where("id = ? AND status = ?", cart.ProductID, 1).First(&product)
 	if res.Error != nil {
 		if res.Error == gorm.ErrRecordNotFound {
