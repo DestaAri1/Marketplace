@@ -81,11 +81,7 @@
   }
 
   .product-view-details {
-    @apply block text-center text-sm font-semibold text-indigo-600 py-2 rounded-lg transition-colors duration-300;
-  }
-
-  .product-card:hover .product-view-details {
-    @apply text-white bg-indigo-600;
+    @apply block text-center text-sm font-semibold text-indigo-600 py-2 rounded-lg transition-colors duration-300 hover:text-white hover:bg-indigo-600;
   }
 
   /* Home Component */

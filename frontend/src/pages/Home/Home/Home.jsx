@@ -4,11 +4,16 @@ import Products from "../../../components/Home/Products";
 import useUserProduct from "../../../hooks/useUserProduct";
 import { Search } from "lucide-react";
 import MainTemplate from "../MainTemplate";
+import { useModal } from "../../../hooks/useModal";
+import useAuth from "../../../hooks/useAuth";
+import CreateCartModal from "../../../components/Home/CreateCartModal";
+import useCart from "../../../hooks/useCart";
 
 export default function Home() {
-  const { products, loading, isFetched, fetchProducts, getOneProduct } =
-    useUserProduct();
+  const { products, loading, isFetched, fetchProducts } = useUserProduct();
+  const { handleCreateCart, isLoading } = useCart()
   const [searchTerm, setSearchTerm] = useState("");
+  const { user } = useAuth();
 
   // Save scroll position before page refresh
   useEffect(() => {
@@ -50,6 +55,14 @@ export default function Home() {
     }
   }, [fetchProducts, isFetched]);
 
+  const createCart = useModal();
+
+  const handleSubmitCreateCart = async(data) => {
+    if (await handleCreateCart(createCart.selectedItem.id, data)) {
+      createCart.closeModal()
+    }
+  }
+
   return (
     <MainTemplate>
       <main className="home-main">
@@ -89,8 +102,23 @@ export default function Home() {
         {/* Product List Section */}
         {!loading && products.length > 0 && (
           <div className="products-section">
-            <Products products={products} />
+            <Products
+              products={products}
+              openModal={createCart.openModal}
+              user={user}
+            />
           </div>
+        )}
+
+        {/* Only render CreateCartModal if user exists */}
+        {user && (
+          <CreateCartModal
+            isOpen={createCart.isOpen}
+            onClose={createCart.closeModal}
+            product={createCart.selectedItem}
+            onConfirm={handleSubmitCreateCart}
+            isLoading={isLoading}
+          />
         )}
       </main>
     </MainTemplate>

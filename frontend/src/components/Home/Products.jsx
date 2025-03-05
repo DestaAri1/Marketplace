@@ -1,13 +1,18 @@
 import React from "react";
 import { ShoppingCartIcon, Eye } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { encryptId } from "../../utils/crypto";
 
-export default function Products({ products }) {
-  const handleAddToCart = (e, product) => {
-    e.preventDefault(); // Prevent link navigation when clicking the cart button
-    // Add your cart logic here
-    console.log("Adding to cart:", product);
+export default function Products({ products, openModal, user }) {
+  const navigate = useNavigate();
+
+  const handleCartClick = (e, product) => {
+    e.preventDefault(); // Prevent link navigation
+    if (!user) {
+      navigate("/login"); // Redirect to login if no user
+    } else {
+      openModal(product); // Open cart modal if user exists
+    }
   };
 
   return (
@@ -18,11 +23,7 @@ export default function Products({ products }) {
       </h2>
       <div className="products-grid">
         {products.map((product, index) => (
-          <Link
-            to={`/product/${encryptId(product.id)}`}
-            key={index}
-            className="product-card"
-          >
+          <div key={index} className="product-card">
             <div className="product-image-container">
               <img
                 src={product.image}
@@ -47,6 +48,7 @@ export default function Products({ products }) {
               <div className="mb-4">
                 <h3 className="product-title">{product.product}</h3>
                 <p className="product-store">Store: {product.seller}</p>
+                <p className="product-store">Stock: {product.stock}</p>
               </div>
 
               <div className="product-price-container">
@@ -67,19 +69,20 @@ export default function Products({ products }) {
                   )}
                 </div>
                 <button
-                  onClick={(e) => handleAddToCart(e, product)}
+                  onClick={(e) => handleCartClick(e, product)}
                   className="product-cart-button"
-                  title="Add to Cart"
+                  title={user ? "Add to Cart" : "Login to Add to Cart"}
                 >
                   <ShoppingCartIcon className="w-5 h-5" />
                 </button>
               </div>
-
-              <div className="pt-4 border-t">
-                <span className="product-view-details">View Details</span>
-              </div>
+              <Link to={`/product/${encryptId(product.id)}`}>
+                <div className="pt-4 border-t">
+                  <span className="product-view-details">View Details</span>
+                </div>
+              </Link>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
     </section>
