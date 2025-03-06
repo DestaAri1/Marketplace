@@ -41,6 +41,27 @@ func (r *CartRepository) CreateCart(ctx context.Context, cart *models.FormCreate
 		return errors.New("insufficient stock")
 	}
 
+	var cartModel models.Cart
+	checkCart := tx.Where("product_id = ? AND user_id = ?", cart.ProductID, userId).First(&cartModel)
+	if checkCart.Error == nil {
+		// Cart exists, update quantity
+		cartModel.Quantity += cart.Quantity
+		
+		// Check if new total quantity exceeds product stock
+		if cartModel.Quantity > product.Stock {
+			tx.Rollback()
+			return errors.New("insufficient stock for total quantity")
+		}
+
+		if err := tx.Save(&cartModel).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+		
+		tx.Commit()
+		return nil
+	}
+
 	// Create new cart entry
 	newCart := &models.Cart{
 		UserId		: userId,
