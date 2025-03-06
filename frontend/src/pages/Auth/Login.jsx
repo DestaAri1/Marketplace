@@ -23,9 +23,17 @@ export default function Login() {
     try {
       var response = await login(formData.email, formData.password);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      navigate("/", {
-        state: { message: response.data.message || "Login Success!" },
-      });
+
+      // Check if there's a redirect URL in sessionStorage
+      const redirectUrl = sessionStorage.getItem("redirectAfterLogin");
+      if (redirectUrl) {
+        sessionStorage.removeItem("redirectAfterLogin"); // Clear the stored URL
+        navigate(redirectUrl);
+      } else {
+        navigate("/", {
+          state: { message: response.data.message || "Login Success!" },
+        });
+      }
     } catch (err) {
       showErrorToast(err.message || "Failed to log in");
     } finally {

@@ -8,8 +8,15 @@ import CartModal from "../../components/Home/CartModal";
 import useCart from "../../hooks/useCart";
 
 const MainTemplate = memo(({ children }) => {
-  const { user, isLoading } = useAuth();
-  const { cart, isFetched, fetchCart } = useCart();
+  const { user, isLoading: authLoading } = useAuth();
+  const {
+    cart,
+    isFetched,
+    fetchCart,
+    handleDeleteCart,
+    handleUpdateCart,
+    isLoading: cartLoading,
+  } = useCart();
   const cartModal = useModal();
 
   useEffect(() => {
@@ -18,10 +25,24 @@ const MainTemplate = memo(({ children }) => {
     }
   }, [user, fetchCart]);
 
-  // Memoize user data untuk mencegah re-render yang tidak perlu
+  // Add this effect to refresh cart when modal opens
+  useEffect(() => {
+    if (cartModal.isOpen && user) {
+      fetchCart();
+    }
+  }, [cartModal.isOpen, user, fetchCart]);
+
+  const handleSubmittedCart = async (data) => {
+    const success = await handleUpdateCart(data);
+    if (success) {
+      cartModal.closeModal();
+    }
+  };
+
+  // Memoize user data to prevent unnecessary re-renders
   const memoizedUser = useMemo(() => user, [user]);
 
-  if (isLoading) {
+  if (authLoading) {
     return <div>Loading...</div>;
   }
 
@@ -45,6 +66,9 @@ const MainTemplate = memo(({ children }) => {
         onClose={cartModal.closeModal}
         user={user}
         cart={cart}
+        onDeleteItem={handleDeleteCart}
+        onConfirm={handleSubmittedCart}
+        isLoading={cartLoading}
       />
     </div>
   );

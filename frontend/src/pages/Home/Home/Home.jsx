@@ -11,7 +11,7 @@ import useCart from "../../../hooks/useCart";
 
 export default function Home() {
   const { products, loading, isFetched, fetchProducts } = useUserProduct();
-  const { handleCreateCart, isLoading } = useCart()
+  const { handleCreateCart, isLoading, fetchCart } = useCart();
   const [searchTerm, setSearchTerm] = useState("");
   const { user } = useAuth();
 
@@ -57,11 +57,12 @@ export default function Home() {
 
   const createCart = useModal();
 
-  const handleSubmitCreateCart = async(data) => {
+  const handleSubmitCreateCart = async (data) => {
     if (await handleCreateCart(createCart.selectedItem.id, data)) {
-      createCart.closeModal()
+      createCart.closeModal();
+      await fetchCart();
     }
-  }
+  };
 
   return (
     <MainTemplate>

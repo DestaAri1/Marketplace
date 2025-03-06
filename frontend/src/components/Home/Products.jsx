@@ -1,6 +1,6 @@
 import React from "react";
 import { ShoppingCartIcon, Eye } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { encryptId } from "../../utils/crypto";
 
 export default function Products({ products, openModal, user }) {
@@ -12,6 +12,20 @@ export default function Products({ products, openModal, user }) {
       navigate("/login"); // Redirect to login if no user
     } else {
       openModal(product); // Open cart modal if user exists
+    }
+  };
+
+  const handleViewDetails = (e, productId) => {
+    e.preventDefault();
+    if (!user) {
+      // Save the intended destination before redirecting to login
+      sessionStorage.setItem(
+        "redirectAfterLogin",
+        `/product/${encryptId(productId)}`
+      );
+      navigate("/login");
+    } else {
+      navigate(`/product/${encryptId(productId)}`);
     }
   };
 
@@ -76,11 +90,14 @@ export default function Products({ products, openModal, user }) {
                   <ShoppingCartIcon className="w-5 h-5" />
                 </button>
               </div>
-              <Link to={`/product/${encryptId(product.id)}`}>
+              <div
+                onClick={(e) => handleViewDetails(e, product.id)}
+                className="cursor-pointer"
+              >
                 <div className="pt-4 border-t">
                   <span className="product-view-details">View Details</span>
                 </div>
-              </Link>
+              </div>
             </div>
           </div>
         ))}
