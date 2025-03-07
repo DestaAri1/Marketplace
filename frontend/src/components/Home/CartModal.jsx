@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Minus, Plus, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { encryptId } from "../../utils/crypto";
 
 export default function CartModal({
   isOpen,
@@ -14,6 +15,7 @@ export default function CartModal({
   // Local state to track quantities and selected items
   const [localQuantities, setLocalQuantities] = useState({});
   const [selectedItems, setSelectedItems] = useState({});
+  const navigate = useNavigate()
 
   // Reset local quantities when cart changes
   useEffect(() => {
@@ -63,20 +65,24 @@ export default function CartModal({
     return Object.values(selectedItems).some((selected) => selected);
   };
 
-  const formatQuantitiesForApi = () => {
-    // Only include selected items in the formatted data
-    const formattedData = Object.entries(localQuantities)
-      .filter(([id]) => selectedItems[id])
-      .map(([id, quantity]) => ({
-        id: parseInt(id),
-        quantity: quantity,
-      }));
-    return formattedData;
-  };
-
   const handleConfirm = () => {
-    const formattedQuantities = formatQuantitiesForApi();
-    onConfirm(formattedQuantities);
+    const checkoutData = cart
+      ?.filter((item) => selectedItems[item.id])
+      .map((item) => ({
+        id: item.id,
+        name: item.product_name,
+        quantity: localQuantities[item.id] || item.quantity,
+        price: item.product_price,
+        image: item.product_image || null,
+        total: calculateItemTotal(item),
+      }));
+
+    // Encrypt the entire checkout data
+    const encryptedData = encryptId(JSON.stringify(checkoutData));
+
+    // Save encrypted data to localStorage
+    localStorage.setItem("checkoutData", encryptedData);
+    navigate("/check-out")
   };
 
   return (

@@ -2,7 +2,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
-import { AdminRoute, AuthRoute, ProtectedRoute, SellerRoute } from "./utils/AuthRoute";
+import {
+  AdminRoute,
+  AuthRoute,
+  ProtectedRoute,
+  SellerRoute,
+} from "./utils/AuthRoute";
 import Home from "./pages/Home/Home/Home";
 import Dashboard from "./pages/Dashboard/Dashboard/Dashboard";
 import UserRequest from "./pages/Dashboard/User/User/UserRequest";
@@ -11,30 +16,54 @@ import DashboardSeller from "./pages/Seller/Dashboard/DashboardSeller";
 import SellerProducts from "./pages/Seller/Product/SellerProducts";
 import ManageCategory from "./pages/Dashboard/Product/ManageCategory";
 import DetailProduct from "./pages/Home/Product/DetailProduct";
+import CheckOut from "./pages/Home/CheckOut/CheckOut";
 
-function App() {
+export default function App() {
+  const authRoutes = [
+    { path: "/login", element: <Login />, wrapper: AuthRoute },
+    { path: "/register", element: <Register />, wrapper: AuthRoute },
+  ];
+
+  const sellerRoutes = [
+    {
+      path: "/seller/dashboard",
+      element: <DashboardSeller />,
+      wrapper: SellerRoute,
+    },
+    {
+      path: "/seller/products",
+      element: <SellerProducts />,
+      wrapper: SellerRoute,
+    },
+  ];
+
+  const adminRoutes = [
+    { path: "/admin/dashboard", element: <Dashboard />, wrapper: AdminRoute },
+    {
+      path: "/admin/user_request",
+      element: <UserRequest />,
+      wrapper: AdminRoute,
+    },
+    { path: "/admin/user-list", element: <UserList />, wrapper: AdminRoute },
+    {
+      path: "/admin/manage-category",
+      element: <ManageCategory />,
+      wrapper: AdminRoute,
+    },
+  ];
+
+  const renderRoute = ({ path, element, wrapper: Wrapper }) => (
+    <Route
+      key={path}
+      path={path}
+      element={Wrapper ? <Wrapper>{element}</Wrapper> : element}
+    />
+  );
+
   return (
     <BrowserRouter>
       <Routes>
-        {/* Auth */}
-        <Route
-          path="/login"
-          element={
-            <AuthRoute>
-              <Login />
-            </AuthRoute>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <AuthRoute>
-              <Register />
-            </AuthRoute>
-          }
-        />
-
-        {/* Main Page */}
+        {authRoutes.map(renderRoute)}
         <Route path="/" element={<Home />} />
         <Route
           path="/product/:id"
@@ -44,60 +73,17 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* Seller Page */}
         <Route
-          path="/seller/dashboard"
+          path="/check-out"
           element={
-            <SellerRoute>
-              <DashboardSeller />
-            </SellerRoute>
+            <ProtectedRoute>
+              <CheckOut/>
+            </ProtectedRoute>
           }
         />
-        <Route
-          path="/seller/products"
-          element={
-            <SellerRoute>
-              <SellerProducts />
-            </SellerRoute>
-          }
-        />
-
-        {/* Admin/Seller Page */}
-        <Route
-          path="/admin/dashboard"
-          element={
-            <AdminRoute>
-              <Dashboard />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/admin/user_request"
-          element={
-            <AdminRoute>
-              <UserRequest />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/admin/user-list"
-          element={
-            <AdminRoute>
-              <UserList />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/admin/manage-category"
-          element={
-            <AdminRoute>
-              <ManageCategory />
-            </AdminRoute>
-          }
-        />
+        {sellerRoutes.map(renderRoute)}
+        {adminRoutes.map(renderRoute)}
       </Routes>
     </BrowserRouter>
   );
 }
-
-export default App;

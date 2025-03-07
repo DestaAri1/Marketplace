@@ -2,12 +2,12 @@ import React, { memo, useEffect, useMemo } from "react";
 import TimerToaster from "../../components/TimerToaster";
 import Navbar from "../../layout/Main/Navbar";
 import useAuth from "../../hooks/useAuth";
-import { ShoppingCart } from "lucide-react";
 import { useModal } from "../../hooks/useModal";
-import CartModal from "../../components/Home/CartModal";
 import useCart from "../../hooks/useCart";
+import FloatingCartButton from "../../components/Home/FloatingCartButton";
+import CartModal from "../../components/Home/CartModal";
 
-const MainTemplate = memo(({ children }) => {
+const MainTemplate = memo(({ children, showFloatingCart = true }) => {
   const { user, isLoading: authLoading } = useAuth();
   const {
     cart,
@@ -33,10 +33,16 @@ const MainTemplate = memo(({ children }) => {
   }, [cartModal.isOpen, user, fetchCart]);
 
   const handleSubmittedCart = async (data) => {
+    console.log(data);
+
     const success = await handleUpdateCart(data);
     if (success) {
       cartModal.closeModal();
     }
+  };
+
+  const handleSubmitDeleteCart = async (data) => {
+    await handleDeleteCart(data);
   };
 
   // Memoize user data to prevent unnecessary re-renders
@@ -52,13 +58,9 @@ const MainTemplate = memo(({ children }) => {
       <Navbar user={memoizedUser} />
       {children}
 
-      {/* Floating Cart Button */}
-      <button
-        onClick={() => cartModal.openModal()}
-        className="fixed bottom-8 right-8 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 z-50"
-      >
-        <ShoppingCart size={24} />
-      </button>
+      {showFloatingCart && (
+        <FloatingCartButton onClick={() => cartModal.openModal()} />
+      )}
 
       {/* Cart Modal */}
       <CartModal
@@ -66,7 +68,7 @@ const MainTemplate = memo(({ children }) => {
         onClose={cartModal.closeModal}
         user={user}
         cart={cart}
-        onDeleteItem={handleDeleteCart}
+        onDeleteItem={handleSubmitDeleteCart}
         onConfirm={handleSubmittedCart}
         isLoading={cartLoading}
       />

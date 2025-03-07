@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Promotions from "../../../components/Home/Promotions";
-import Products from "../../../components/Home/Products";
+import ProductListSection from "../../../components/Home/ProductListSection";
 import useUserProduct from "../../../hooks/useUserProduct";
-import { Search } from "lucide-react";
 import MainTemplate from "../MainTemplate";
 import { useModal } from "../../../hooks/useModal";
 import useAuth from "../../../hooks/useAuth";
-import CreateCartModal from "../../../components/Home/CreateCartModal";
 import useCart from "../../../hooks/useCart";
+import SearchBar from "../../../components/Home/SearchBar";
+import CreateCartModal from "../../../components/Home/CreateCartModal";
 
 export default function Home() {
   const { products, loading, isFetched, fetchProducts } = useUserProduct();
@@ -67,49 +67,19 @@ export default function Home() {
   return (
     <MainTemplate>
       <main className="home-main">
-        {/* Search Bar */}
-        <div className="search-container">
-          <div className="relative">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search for products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <Search className="search-icon" />
-          </div>
-        </div>
+        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
         {/* Promotions Section */}
         <div className="mb-16">
           <Promotions />
         </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="loading-spinner"></div>
-          </div>
-        )}
-
-        {/* Error State */}
-        {!loading && products.length === 0 && (
-          <div className="no-products">
-            <p className="text-gray-600 text-lg">No products found</p>
-          </div>
-        )}
-
-        {/* Product List Section */}
-        {!loading && products.length > 0 && (
-          <div className="products-section">
-            <Products
-              products={products}
-              openModal={createCart.openModal}
-              user={user}
-            />
-          </div>
-        )}
+        <ProductListSection
+          loading={loading}
+          products={products}
+          openModal={createCart.openModal}
+          user={user}
+        />
 
         {/* Only render CreateCartModal if user exists */}
         {user && (
