@@ -17,6 +17,8 @@ import SellerProducts from "./pages/Seller/Product/SellerProducts";
 import ManageCategory from "./pages/Dashboard/Product/ManageCategory";
 import DetailProduct from "./pages/Home/Product/DetailProduct";
 import CheckOut from "./pages/Home/CheckOut/CheckOut";
+import { Profiler } from "react";
+import Profile from "./pages/Home/Profile/Profile";
 
 export default function App() {
   const authRoutes = [
@@ -77,7 +79,15 @@ export default function App() {
           path="/check-out"
           element={
             <ProtectedRoute>
-              <CheckOut/>
+              <CheckOut />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />
