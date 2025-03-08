@@ -86,6 +86,7 @@ func (r *CartRepository) GetCart(ctx context.Context, userId uint) ([]*models.Ca
 		Select("carts.id as id, products.id as product_id, products.name as product_name, carts.quantity, products.price as product_price, carts.quantity * products.price as total_price").
 		Joins("LEFT JOIN products ON products.id = carts.product_id").
 		Where("carts.user_id = ?", userId).
+		Where("carts.status = ?", models.InCart).
 		Scan(&cart)
 
 	if res.Error != nil {

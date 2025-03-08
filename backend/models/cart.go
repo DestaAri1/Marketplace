@@ -4,6 +4,15 @@ import (
 	"context"
 )
 
+type Status int 
+
+const (
+	InCart		Status = 0
+	NeedToPay	Status = 1
+	Payed		Status = 2
+	Delivered	Status = 3
+)
+
 type Cart struct {
 	Base
 	UserId     uint    `json:"user_id"`
@@ -11,6 +20,7 @@ type Cart struct {
 	ProductID  uint    `json:"product_id"`
 	Product    Product `json:"product" gorm:"foreignKey:ProductID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Quantity   int     `json:"quantity"`
+	Status	   int	   `json:"status" gorm:"default:0"`
 }
 
 type FormCreateCart struct {
