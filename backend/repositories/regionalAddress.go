@@ -7,13 +7,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type AddressRepository struct {
+type RegionalAddressRepository struct {
 	db *gorm.DB
 }
 
-func (r *AddressRepository) GetProvinces(context context.Context) ([]models.ProvinceWithRegencies, error) {
+func (r *RegionalAddressRepository) GetProvinces(context context.Context) ([]models.ProvinceWithRegencies, error) {
 	var provinces []models.Province
-	err := r.db.Find(&provinces).Error
+	err := r.db.Order("name ASC").Find(&provinces).Error
 	if err != nil {
 		return nil, err
 	}
@@ -28,9 +28,9 @@ func (r *AddressRepository) GetProvinces(context context.Context) ([]models.Prov
 	return result, nil
 }
 
-func (r *AddressRepository) GetRegenciesByProvince(context context.Context, provinceId string) ([]models.RegencyWithDistricts, error) {
+func (r *RegionalAddressRepository) GetRegenciesByProvince(context context.Context, provinceId string) ([]models.RegencyWithDistricts, error) {
 	var regencies []models.Regency
-	err := r.db.Where("province_id = ?", provinceId).Find(&regencies).Error
+	err := r.db.Where("province_id = ?", provinceId).Order("name ASC").Find(&regencies).Error
 	if err != nil {
 		return nil, err
 	}
@@ -45,9 +45,9 @@ func (r *AddressRepository) GetRegenciesByProvince(context context.Context, prov
 	return result, nil
 }
 
-func (r *AddressRepository) GetDistrictsByRegency(context context.Context, regencyId string) ([]models.DistrictWithVillages, error) {
+func (r *RegionalAddressRepository) GetDistrictsByRegency(context context.Context, regencyId string) ([]models.DistrictWithVillages, error) {
 	var districts []models.District
-	err := r.db.Where("regency_id = ?", regencyId).Find(&districts).Error
+	err := r.db.Where("regency_id = ?", regencyId).Order("name ASC").Find(&districts).Error
 	if err != nil {
 		return nil, err
 	}
@@ -62,9 +62,9 @@ func (r *AddressRepository) GetDistrictsByRegency(context context.Context, regen
 	return result, nil
 }
 
-func (r *AddressRepository) GetVillagesByDistrict(context context.Context, districtId string) ([]models.Villages, error) {
+func (r *RegionalAddressRepository) GetVillagesByDistrict(context context.Context, districtId string) ([]models.Villages, error) {
 	var villages []models.Village
-	err := r.db.Where("district_id = ?", districtId).Find(&villages).Error
+	err := r.db.Where("district_id = ?", districtId).Order("name ASC").Find(&villages).Error
 	if err != nil {
 		return nil, err
 	}
@@ -79,8 +79,8 @@ func (r *AddressRepository) GetVillagesByDistrict(context context.Context, distr
 	return result, nil
 }
 
-func NewAddressRepository(db *gorm.DB) *AddressRepository {
-	return &AddressRepository{
+func NewRegionalAddressRepository(db *gorm.DB) *RegionalAddressRepository {
+	return &RegionalAddressRepository{
 		db: db,
 	}
 }

@@ -37,13 +37,13 @@ type AppRepositories struct {
 	category      models.CategoryRepository
 	userProduct   models.UserProductRepository
 	cart 		  models.CartRepository
-	address       models.AddressRepository
+	address       models.RegionalAddressRepository
 }
 
 func setupRepositories(database *gorm.DB) AppRepositories {
 	return AppRepositories{
 		auth:          repository.NewAuthRepository(database),
-		address:	   repository.NewAddressRepository(database),
+		address:	   repository.NewRegionalAddressRepository(database),
 		seller:        repository.NewSellerRepository(database),
 		admin:         repository.NewAdminRepository(database),
 		adminUser:     repository.NewAdminUserRepository(database),
@@ -79,7 +79,7 @@ func setupRoutes(app *fiber.App, database *gorm.DB, repos AppRepositories, servi
 	protected := api.Use(middlewares.AuthProtected(database))
 
 	//Public Protected Routes
-	handlers.NewAddressHandler(protected.Group("/address"), repos.address)
+	handlers.NewRegionalAddressHandler(protected.Group("/address"), repos.address)
 	handlers.NewCartHandler(protected.Group("/cart"), repos.cart)
 
 	// User routes

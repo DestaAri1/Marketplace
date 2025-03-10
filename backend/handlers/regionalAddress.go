@@ -8,12 +8,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type AddressHandler struct {
+type RegionalAddressHandler struct {
 	BaseHandler
-	repository models.AddressRepository
+	repository models.RegionalAddressRepository
 }
 
-func (h *AddressHandler) GetProvinces(ctx *fiber.Ctx) error {
+func (h *RegionalAddressHandler) GetProvinces(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -25,7 +25,7 @@ func (h *AddressHandler) GetProvinces(ctx *fiber.Ctx) error {
 	return h.handlerSuccess(ctx, fiber.StatusOK, "", provinces)
 }
 
-func (h *AddressHandler) GetRegenciesByProvince(ctx *fiber.Ctx) error {
+func (h *RegionalAddressHandler) GetRegenciesByProvince(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -42,7 +42,7 @@ func (h *AddressHandler) GetRegenciesByProvince(ctx *fiber.Ctx) error {
 	return h.handlerSuccess(ctx, fiber.StatusOK, "", regencies)
 }
 
-func (h *AddressHandler) GetDistrictsByRegency(ctx *fiber.Ctx) error {
+func (h *RegionalAddressHandler) GetDistrictsByRegency(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -59,7 +59,7 @@ func (h *AddressHandler) GetDistrictsByRegency(ctx *fiber.Ctx) error {
 	return h.handlerSuccess(ctx, fiber.StatusOK, "", districts)
 }
 
-func (h *AddressHandler) GetVillagesByDistrict(ctx *fiber.Ctx) error {
+func (h *RegionalAddressHandler) GetVillagesByDistrict(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -76,8 +76,8 @@ func (h *AddressHandler) GetVillagesByDistrict(ctx *fiber.Ctx) error {
 	return h.handlerSuccess(ctx, fiber.StatusOK, "", villages)
 }
 
-func NewAddressHandler(router fiber.Router, repository models.AddressRepository) {
-	handler := &AddressHandler{
+func NewRegionalAddressHandler(router fiber.Router, repository models.RegionalAddressRepository) {
+	handler := &RegionalAddressHandler{
 		repository: repository,
 	}
 
