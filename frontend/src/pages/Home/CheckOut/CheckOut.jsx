@@ -6,29 +6,122 @@ import { useNavigate } from "react-router-dom";
 
 export default function CheckOut() {
   const navigate = useNavigate();
-  const encryptedCheckoutData = localStorage.getItem("checkoutData");
-  const checkoutData = encryptedCheckoutData
-    ? JSON.parse(decryptId(encryptedCheckoutData))
-    : null;
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Simpan data checkout dalam state
+  const [checkoutData, setCheckoutData] = useState(null);
   const [selectedCheckOut, setSelectedCheckOut] = useState(null);
 
+  // Load data pada mount
   useEffect(() => {
-    // Clear checkout data when component unmounts
+    try {
+      const encryptedCheckoutData = localStorage.getItem("checkoutData");
+      console.log("Encrypted checkout data:", encryptedCheckoutData);
+
+      if (!encryptedCheckoutData) {
+        console.log("Tidak ada data checkout di localStorage");
+        setError("No checkout data found");
+        setIsLoading(false);
+        return;
+      }
+
+      const decryptedData = decryptId(encryptedCheckoutData);
+      console.log("Decrypted data:", decryptedData);
+
+      const parsedData = JSON.parse(decryptedData);
+      console.log("Parsed checkout data:", parsedData);
+
+      setCheckoutData(parsedData);
+      setIsLoading(false);
+    } catch (err) {
+      console.error("Error loading checkout data:", err);
+      setError(err.message);
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Clear checkout data when component unmounts
+  useEffect(() => {
     return () => {
       localStorage.removeItem("checkoutData");
     };
   }, []);
 
-  // Redirect to home if no checkout data
+  // Redirect to home if no checkout data - with delay for debugging
   useEffect(() => {
-    if (!checkoutData) {
-      navigate("/");
+    if (!isLoading && !checkoutData) {
+      console.log("No checkout data, redirecting in 5 seconds...");
+      const timer = setTimeout(() => {
+        navigate("/");
+      }, 5000); // 5 second delay for debugging
+
+      return () => clearTimeout(timer);
     }
-  }, [checkoutData, navigate]);
+  }, [checkoutData, navigate, isLoading]);
 
   // Hitung total keseluruhan
   const totalAmount =
     checkoutData?.reduce((sum, item) => sum + item.total, 0) || 0;
+
+  // Render loading state
+  if (isLoading) {
+    return (
+      <MainTemplate showFloatingCart={false}>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-md">
+            <h2 className="text-xl font-semibold mb-4">
+              Loading checkout data...
+            </h2>
+          </div>
+        </div>
+      </MainTemplate>
+    );
+  }
+
+  // Render error state
+  if (error) {
+    return (
+      <MainTemplate showFloatingCart={false}>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-md">
+            <h2 className="text-xl font-semibold mb-4 text-red-600">
+              Error Loading Checkout
+            </h2>
+            <p>{error}</p>
+            <p className="mt-4">Redirecting to home page in a few seconds...</p>
+            <button
+              className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg"
+              onClick={() => navigate("/")}
+            >
+              Return to Home
+            </button>
+          </div>
+        </div>
+      </MainTemplate>
+    );
+  }
+
+  // Render empty checkout data state
+  if (!checkoutData || checkoutData.length === 0) {
+    return (
+      <MainTemplate showFloatingCart={false}>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Your cart is empty</h2>
+            <p>There are no items in your checkout.</p>
+            <p className="mt-4">Redirecting to home page in a few seconds...</p>
+            <button
+              className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg"
+              onClick={() => navigate("/")}
+            >
+              Return to Home
+            </button>
+          </div>
+        </div>
+      </MainTemplate>
+    );
+  }
 
   return (
     <MainTemplate showFloatingCart={false}>

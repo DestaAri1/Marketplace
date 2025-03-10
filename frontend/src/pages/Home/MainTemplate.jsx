@@ -1,11 +1,14 @@
-import React, { memo, useEffect, useMemo } from "react";
+// MainTemplate.jsx
+import React, { lazy, memo, Suspense, useEffect, useMemo } from "react";
 import TimerToaster from "../../components/TimerToaster";
-import Navbar from "../../layout/Main/Navbar";
 import useAuth from "../../hooks/useAuth";
-import { useModal } from "../../hooks/useModal";
 import useCart from "../../hooks/useCart";
-import FloatingCartButton from "../../components/Home/FloatingCartButton";
-import CartModal from "../../components/Home/CartModal";
+import Navbar from "../../layout/Main/Navbar"; // Tidak di-lazy load
+import FloatingCartButton from "../../components/Home/FloatingCartButton"; // Tidak di-lazy load
+import Fallback from "../../components/Fallback"; // Komponen fallback yang lebih baik
+import { useModal } from "../../hooks/useModal";
+
+const CartModal = lazy(() => import("../../components/Home/CartModal"));
 
 const MainTemplate = memo(({ children, showFloatingCart = true }) => {
   const { user, isLoading: authLoading } = useAuth();
@@ -25,7 +28,6 @@ const MainTemplate = memo(({ children, showFloatingCart = true }) => {
     }
   }, [user, fetchCart]);
 
-  // Add this effect to refresh cart when modal opens
   useEffect(() => {
     if (cartModal.isOpen && user) {
       fetchCart();
@@ -33,8 +35,6 @@ const MainTemplate = memo(({ children, showFloatingCart = true }) => {
   }, [cartModal.isOpen, user, fetchCart]);
 
   const handleSubmittedCart = async (data) => {
-    console.log(data);
-
     const success = await handleUpdateCart(data);
     if (success) {
       cartModal.closeModal();
@@ -45,11 +45,10 @@ const MainTemplate = memo(({ children, showFloatingCart = true }) => {
     await handleDeleteCart(data);
   };
 
-  // Memoize user data to prevent unnecessary re-renders
   const memoizedUser = useMemo(() => user, [user]);
 
   if (authLoading) {
-    return <div>Loading...</div>;
+    return <Fallback />;
   }
 
   return (
@@ -58,20 +57,19 @@ const MainTemplate = memo(({ children, showFloatingCart = true }) => {
       <Navbar user={memoizedUser} />
       {children}
 
-      {showFloatingCart && (
-        <FloatingCartButton onClick={() => cartModal.openModal()} />
-      )}
+      {showFloatingCart && <FloatingCartButton onClick={cartModal.openModal} />}
 
-      {/* Cart Modal */}
-      <CartModal
-        isOpen={cartModal.isOpen}
-        onClose={cartModal.closeModal}
-        user={user}
-        cart={cart}
-        onDeleteItem={handleSubmitDeleteCart}
-        onConfirm={handleSubmittedCart}
-        isLoading={cartLoading}
-      />
+      <Suspense>
+        <CartModal
+          isOpen={cartModal.isOpen}
+          onClose={cartModal.closeModal}
+          user={user}
+          cart={cart}
+          onDeleteItem={handleSubmitDeleteCart}
+          onConfirm={handleSubmittedCart}
+          isLoading={cartLoading}
+        />
+      </Suspense>
     </div>
   );
 });

@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 import useAuth from "../hooks/useAuth";
 import { getToken } from "../services/TokenServices";
@@ -6,7 +6,8 @@ import { getToken } from "../services/TokenServices";
 const RouteGuard = ({ children, condition, redirect }) => {
   const { isLoading } = useAuth();
   if (isLoading) return <LoadingSpinner />;
-  return condition ? <Navigate to={redirect} /> : <>{children}</>;
+  if (condition) return <Navigate to={redirect} replace />;
+  return children
 };
 
 export const AuthRoute = ({ children }) => (
@@ -15,11 +16,16 @@ export const AuthRoute = ({ children }) => (
   </RouteGuard>
 );
 
-export const ProtectedRoute = ({ children }) => (
-  <RouteGuard condition={!getToken()} redirect="/login">
-    {children}
-  </RouteGuard>
-);
+export const ProtectedRoute = ({ children }) => {
+  const token = getToken();
+  if (!token) return <Navigate to="/login" replace />;
+  return children;
+};
+
+export const NestedProtectedRoute = () => {
+  return getToken() ? <Outlet /> : <Navigate to="/login" replace />;
+};
+
 
 export const SellerRoute = ({ children }) => {
   const { user } = useAuth();

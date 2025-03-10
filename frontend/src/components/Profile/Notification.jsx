@@ -1,6 +1,24 @@
+import { CreditCard, Home } from "lucide-react";
 import React from "react";
 
-export default function Notification({ notifications }) {
+export default function Notification() {
+  // Data Notifikasi dengan Icon
+  const notifications = [
+    {
+      icon: <CreditCard size={20} className="text-blue-600" />,
+      bgColor: "bg-blue-100",
+      title: "Pembayaran Berhasil",
+      message: "Pembayaran untuk pesanan #ORD123456 telah berhasil.",
+      time: "1 jam yang lalu",
+    },
+    {
+      icon: <Home size={20} className="text-green-600" />,
+      bgColor: "bg-green-100",
+      title: "Pesanan Dikirim",
+      message: "Pesanan #ORD123455 sedang dalam perjalanan.",
+      time: "5 jam yang lalu",
+    },
+  ];
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-6">Notifikasi</h2>

@@ -5,6 +5,7 @@ import Register from "./pages/Auth/Register";
 import {
   AdminRoute,
   AuthRoute,
+  NestedProtectedRoute,
   ProtectedRoute,
   SellerRoute,
 } from "./utils/AuthRoute";
@@ -17,8 +18,8 @@ import SellerProducts from "./pages/Seller/Product/SellerProducts";
 import ManageCategory from "./pages/Dashboard/Product/ManageCategory";
 import DetailProduct from "./pages/Home/Product/DetailProduct";
 import CheckOut from "./pages/Home/CheckOut/CheckOut";
-import { Profiler } from "react";
 import Profile from "./pages/Home/Profile/Profile";
+import Address from "./pages/Home/Profile/Address";
 
 export default function App() {
   const authRoutes = [
@@ -83,14 +84,11 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/profile" element={<NestedProtectedRoute />}>
+          <Route index element={<Profile />} />
+          <Route path="biodata" element={<Profile />} />
+          <Route path="address" element={<Address />} />
+        </Route>
         {sellerRoutes.map(renderRoute)}
         {adminRoutes.map(renderRoute)}
       </Routes>
