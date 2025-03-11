@@ -16,5 +16,6 @@ func DBMigrator(db *gorm.DB) error {
 		&models.Regency{},
 		&models.District{},
 		&models.Village{},
+		&models.Address{},
 	)
 }

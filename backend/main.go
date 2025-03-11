@@ -29,28 +29,32 @@ func setupApp() *fiber.App {
 
 // Repository initialization
 type AppRepositories struct {
-	auth          models.AuthRepository
-	seller        models.SellerRequestRepository
-	admin         models.AdminRepository
-	adminUser     models.AdminUserRepository
-	sellerProduct models.SellerProductRepository
-	category      models.CategoryRepository
-	userProduct   models.UserProductRepository
-	cart 		  models.CartRepository
-	address       models.RegionalAddressRepository
+	auth          		models.AuthRepository
+	base				models.BaseRepository
+	seller       		models.SellerRequestRepository
+	admin        		models.AdminRepository
+	adminUser     		models.AdminUserRepository
+	sellerProduct 		models.SellerProductRepository
+	category      		models.CategoryRepository
+	userProduct   		models.UserProductRepository
+	cart 		  		models.CartRepository
+	regionalAaddress    models.RegionalAddressRepository
+	address				models.AddressRepository
 }
 
 func setupRepositories(database *gorm.DB) AppRepositories {
 	return AppRepositories{
-		auth:          repository.NewAuthRepository(database),
-		address:	   repository.NewRegionalAddressRepository(database),
-		seller:        repository.NewSellerRepository(database),
-		admin:         repository.NewAdminRepository(database),
-		adminUser:     repository.NewAdminUserRepository(database),
-		sellerProduct: repository.NewSellerProductRepository(database),
-		category:      repository.NewCategoryRepository(database),
-		userProduct:   repository.NewUserProductRepository(database),
-		cart:		   repository.NewCartRepository(database),
+		auth:          		repository.NewAuthRepository(database),
+		base: 				repository.NewBaseRepository(database),
+		regionalAaddress:	repository.NewRegionalAddressRepository(database),
+		address: 			repository.NewAddressRepository(database),
+		seller:        		repository.NewSellerRepository(database),
+		admin:         		repository.NewAdminRepository(database),
+		adminUser:     		repository.NewAdminUserRepository(database),
+		sellerProduct: 		repository.NewSellerProductRepository(database),
+		category:      		repository.NewCategoryRepository(database),
+		userProduct:   		repository.NewUserProductRepository(database),
+		cart:		   		repository.NewCartRepository(database),
 	}
 }
 
@@ -79,7 +83,8 @@ func setupRoutes(app *fiber.App, database *gorm.DB, repos AppRepositories, servi
 	protected := api.Use(middlewares.AuthProtected(database))
 
 	//Public Protected Routes
-	handlers.NewRegionalAddressHandler(protected.Group("/address"), repos.address)
+	handlers.NewRegionalAddressHandler(protected.Group("/regional-address"), repos.regionalAaddress)
+	handlers.NewAddressHandler(protected.Group("/address"), repos.address, repos.base)
 	handlers.NewCartHandler(protected.Group("/cart"), repos.cart)
 
 	// User routes

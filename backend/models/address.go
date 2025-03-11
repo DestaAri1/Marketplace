@@ -46,7 +46,7 @@ type RegionalAddressRepository interface {
 type AddressResponse struct {
 	Id		  uint	  `json:"id"`
 	Sender	  string  `json:"sender"`
-	Reciver	  string  `json:"reciver"`
+	Recipient string  `json:"recipient"`
 	Province  string  `json:"province"`	
 	Regency	  string  `json:"regency"`
 	District  string  `json:"district"`
@@ -63,14 +63,14 @@ const (
 )
 
 type FormAddress struct {
-	Sender	  string  `json:"sender"`
-	Reciver	  string  `json:"reciver"`
-	Province  string  `json:"province"`	
-	Regency	  string  `json:"regency"`
-	District  string  `json:"district"`
-	Village	  string  `json:"village"`
-	Details	  string  `json:"details"`
-	Status	  bool	  `json:"status"`
+	Sender    string `json:"sender" validate:"required,max=255"`
+	Recipient string `json:"recipient" validate:"required,max=255"`
+	Province  string `json:"province" validate:"required,numeric,len=2"`
+	Regency   string `json:"regency" validate:"required,numeric,len=4"`
+	District  string `json:"district" validate:"required,numeric,len=7"`
+	Village   string `json:"village" validate:"required,numeric,len=10"`
+	Details   string `json:"details" validate:"required,min=5,max=500"`
+	Status    *bool  `json:"status" validate:"required"`
 }
 
 type FormStatusAddress struct {
@@ -78,9 +78,13 @@ type FormStatusAddress struct {
 }
 
 type AddressRepository interface {
-	GetAllAddress(context context.Context) ([]*AddressResponse, error)
-	CreateAddress(context context.Context, formData *FormAddress) error
-	UpdateAddress(context context.Context, formData *FormAddress) error
-	UpdateStatusAddress(context context.Context, formData *FormStatusAddress) error
+	GetAllAddress(context context.Context, userId uint) ([]*AddressResponse, error)
+	CreateAddress(context context.Context, formData *FormAddress, userId uint) error
+	UpdateAddress(context context.Context, formData *FormAddress, addressId uint) error
+	UpdateStatusAddress(context context.Context, formData *FormStatusAddress, addressId uint) error
 	DeleteAddress(context context.Context, addressId uint) error
+	// IsValidProvinceID(provinceID string) bool
+	// IsValidRegencyID(regencyID string) bool
+	// IsValidDistrictID(districtID string) bool
+	// IsValidVillageID(villageID string) bool
 }

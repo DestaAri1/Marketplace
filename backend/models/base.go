@@ -7,3 +7,7 @@ type Base struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+type BaseRepository interface {
+	IsValidID(tableName string, id string) bool
+}

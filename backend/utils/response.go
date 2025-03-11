@@ -48,6 +48,20 @@ func HandleValidationError(ctx *fiber.Ctx, err error) error {
 				message = handleProductIDValidation(err.Tag())
 			case "Quantity" :
 				message = handleQuantityValidation(err.Tag())
+			case "Sender" :
+				message = handleSenderValidation(err.Tag())
+			case "Recipient" :
+				message = handleRecipientValidation(err.Tag())
+			case "Province" :
+				message = handleProvinceValidation(err.Tag())
+			case "Regency" :
+				message = handleRegencyValidation(err.Tag())
+			case "District" :
+				message = handleDistrictValidation(err.Tag())
+			case "Village" :
+				message = handleVillageValidation(err.Tag())
+			case "Details" :
+				message = handleDetailsValidation(err.Tag())
 			}
 			if message != "" {
 				return HandlerError(ctx, fiber.StatusBadRequest, message)
@@ -135,6 +149,84 @@ func handleQuantityValidation(tag string) string {
 		return "Only number"
 	case "min" :
 		return "minimun quantity is 1"
+	}
+	return ""
+}
+
+func handleSenderValidation(tag string) string {
+	switch tag {
+	case "required" :
+		return "Sender name is require"
+	case "max" :
+		return "Maximum sender name is 255 characters"
+	}
+	return ""
+}
+
+func handleRecipientValidation(tag string) string {
+	switch tag {
+	case "required" :
+		return "Recipient name is require"
+	case "max" :
+		return "Maximum recipient name is 255 characters"
+	}
+	return ""
+}
+
+func handleProvinceValidation(tag string) string {
+	switch tag {
+	case "required" :
+		return "Province is require"
+	case "numeric" :
+		return "Only number allowed"
+	case "len" :
+		return "Must 2 digits"
+	}
+	return ""
+}
+
+func handleRegencyValidation(tag string) string {
+	switch tag {
+	case "required" :
+		return "Regency is require"
+	case "numeric" :
+		return "Only number allowed"
+	case "len" :
+		return "Must 4 digits"
+	}
+	return ""
+}
+
+func handleDistrictValidation(tag string) string {
+	switch tag {
+	case "required" :
+		return "District is require"
+	case "numeric" :
+		return "Only number allowed"
+	case "len" :
+		return "Must 7 digits"
+	}
+	return ""
+}
+
+func handleVillageValidation(tag string) string {
+	switch tag {
+	case "required" :
+		return "Village is require"
+	case "numeric" :
+		return "Only number allowed"
+	case "len" :
+		return "Must 10 digits"
+	}
+	return ""
+}
+
+func handleDetailsValidation(tag string) string {
+	switch tag {
+	case "required" :
+		return "Details is require"
+	case "max" :
+		return "Maximum recipent name is 255 characters"
 	}
 	return ""
 }
