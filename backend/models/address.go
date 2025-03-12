@@ -13,7 +13,7 @@ type Address struct {
 	RegencyId  string `json:"regency_id"`
 	DistrictId string `json:"district_id"`
 	VillageId  string `json:"village_id"`
-	Datils	   string `json:"details,omitempty" gorm:"type:text"`
+	Details	   string `json:"details,omitempty" gorm:"type:text"`
 }
 
 type ProvinceWithRegencies struct {
@@ -74,17 +74,13 @@ type FormAddress struct {
 }
 
 type FormStatusAddress struct {
-	Status	  bool	  `json:"status"`
+	Status	  *bool	  `json:"status" validate:"required"`
 }
 
 type AddressRepository interface {
 	GetAllAddress(context context.Context, userId uint) ([]*AddressResponse, error)
 	CreateAddress(context context.Context, formData *FormAddress, userId uint) error
-	UpdateAddress(context context.Context, formData *FormAddress, addressId uint) error
-	UpdateStatusAddress(context context.Context, formData *FormStatusAddress, addressId uint) error
-	DeleteAddress(context context.Context, addressId uint) error
-	// IsValidProvinceID(provinceID string) bool
-	// IsValidRegencyID(regencyID string) bool
-	// IsValidDistrictID(districtID string) bool
-	// IsValidVillageID(villageID string) bool
+	UpdateAddress(context context.Context, formData *FormAddress, addressId uint, userId uint) error
+	UpdateStatusAddress(context context.Context, formData *FormStatusAddress, addressId uint, userId uint) error
+	DeleteAddress(context context.Context, addressId uint, userId uint) error
 }
