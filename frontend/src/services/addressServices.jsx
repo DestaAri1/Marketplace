@@ -1,10 +1,10 @@
 import apiClient from "./apiClient";
 import handleApiError from "./errorServiceHandler";
 
-export const addressAPI = {
+export const regionalAddressAPI = {
   getProvince: async () => {
     try {
-      const response = await apiClient.get("/address/provinces");
+      const response = await apiClient.get("/regional-address/provinces");
       return response;
     } catch (error) {
       handleApiError(error);
@@ -13,7 +13,7 @@ export const addressAPI = {
 
   getRegencies: async (id) => {
     try {
-      const response = await apiClient.get(`/address/regencies/${id}`)
+      const response = await apiClient.get(`/regional-address/regencies/${id}`)
       return response
     } catch (error) {
       handleApiError(error);
@@ -22,7 +22,7 @@ export const addressAPI = {
 
   getDistricts: async(id) => {
     try {
-        const response = await apiClient.get(`/address/districts/${id}`)
+        const response = await apiClient.get(`/regional-address/districts/${id}`)
         return response
     } catch (error) {
         handleApiError(error)
@@ -31,10 +31,21 @@ export const addressAPI = {
 
   getVillages: async(id) => {
     try {
-        const response = await apiClient.get(`/address/villages/${id}`)
+        const response = await apiClient.get(`/regional-address/villages/${id}`)
         return response
     } catch (error) {
         handleApiError(error)
     }
   }
 };
+
+export const addressAPI = {
+  getAddress: async() => {
+    try {
+      const response = await apiClient.get("/address")
+      return response
+    } catch (error) {
+      handleApiError(error)
+    }
+  }
+}
