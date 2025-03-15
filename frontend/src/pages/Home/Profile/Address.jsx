@@ -10,7 +10,7 @@ const AddAddressModal = lazy(() =>
 
 export default function Address() {
   const [formData, setFormData] = useState([]);
-  const { address, isFetched, isLoading, fetchAddress } = useAddress();
+  const { address, isFetched, isLoading, fetchAddress, handleCreateAddress } = useAddress();
   const createModal = useModal();
 
   useEffect(() => {
@@ -20,16 +20,17 @@ export default function Address() {
     }
   }, [isFetched]);
 
-  console.log(address);
-  
-
   const handleSubmitCreateAddress = async (data) => {
-    console.log(data);
+    // console.log(data);
+    
+    if (await handleCreateAddress(data)) {   
+      createModal.closeModal()
+    }
   };
   return (
     <Suspense fallback={<Fallback />}>
       <ProfilTemplate>
-        <AddressBox onClick={createModal.openModal} />
+        <AddressBox onClick={createModal.openModal} address={address}/>
 
         <AddAddressModal
           isOpen={createModal.isOpen}

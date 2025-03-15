@@ -47,5 +47,14 @@ export const addressAPI = {
     } catch (error) {
       handleApiError(error)
     }
+  },
+
+  create: async(payload) => {
+    try {
+      const response = await apiClient.post("/address", payload)
+      return response
+    } catch (error) {
+      handleApiError(error)
+    }
   }
 }

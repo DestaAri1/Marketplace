@@ -1,10 +1,12 @@
 import React from "react";
 import MainTemplate from "../MainTemplate";
 import Sidebar from "../../../components/Profile/Sidebar";
+import { ToastContainer } from "react-toastify";
 
 export default function ProfilTemplate({ children }) {
   return (
     <MainTemplate showFloatingCart={false}>
+      <ToastContainer/>
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Profil Saya</h1>
 
