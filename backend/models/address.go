@@ -44,15 +44,19 @@ type RegionalAddressRepository interface {
 }
 
 type AddressResponse struct {
-	Id		  uint	  `json:"id"`
-	Sender	  string  `json:"sender"`
-	Recipient string  `json:"recipient"`
-	Province  string  `json:"province"`	
-	Regency	  string  `json:"regency"`
-	District  string  `json:"district"`
-	Village	  string  `json:"village"`
-	Details	  string  `json:"details"`
-	Status	  bool	  `json:"status"`
+	Id		   uint	  `json:"id"`
+	Sender	   string `json:"sender"`
+	Recipient  string `json:"recipient"`
+	ProvinceId string `json:"province_id"`
+	Province   string `json:"province"`	
+	RegencyId  string `json:"regency_id"`
+	Regency	   string `json:"regency"`
+	DistrictId string `json:"district_id"`
+	District   string `json:"district"`
+	VillageId  string `json:"village_id"`
+	Village	   string `json:"village"`
+	Details	   string `json:"details"`
+	Status	   bool	  `json:"status"`
 }
 
 type AddressStatus int

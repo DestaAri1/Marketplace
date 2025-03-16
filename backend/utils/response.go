@@ -27,9 +27,13 @@ func HandlerSuccess(ctx *fiber.Ctx, status int, message string, data interface{}
 func HandleValidationError(ctx *fiber.Ctx, err error) error {
 	var ve validator.ValidationErrors
 	if errors.As(err, &ve) {
+		errorMessages := make(map[string]string)
+		
 		for _, err := range ve {
 			var message string
-			switch err.Field() {
+			field := err.Field()
+			
+			switch field {
 			case "Name":
 				message = handleNameValidation(err.Tag())
 			case "Stock":
@@ -38,34 +42,43 @@ func HandleValidationError(ctx *fiber.Ctx, err error) error {
 				message = handlePriceValidation(err.Tag())
 			case "Category":
 				message = handleCategoryValdation(err.Tag())
-			case "Status" :
+			case "Status":
 				message = handleStatusValidation(err.Tag())
 			case "Description":
 				if err.Tag() == "max" {
 					message = "Maximum 500 characters"
 				}
-			case "ProductID" :
+			case "ProductID":
 				message = handleProductIDValidation(err.Tag())
-			case "Quantity" :
+			case "Quantity":
 				message = handleQuantityValidation(err.Tag())
-			case "Sender" :
+			case "Sender":
 				message = handleSenderValidation(err.Tag())
-			case "Recipient" :
+			case "Recipient":
 				message = handleRecipientValidation(err.Tag())
-			case "Province" :
+			case "Province":
 				message = handleProvinceValidation(err.Tag())
-			case "Regency" :
+			case "Regency":
 				message = handleRegencyValidation(err.Tag())
-			case "District" :
+			case "District":
 				message = handleDistrictValidation(err.Tag())
-			case "Village" :
+			case "Village":
 				message = handleVillageValidation(err.Tag())
-			case "Details" :
+			case "Details":
 				message = handleDetailsValidation(err.Tag())
 			}
+			
 			if message != "" {
-				return HandlerError(ctx, fiber.StatusBadRequest, message)
+				errorMessages[field] = message
 			}
+		}
+		
+		if len(errorMessages) > 0 {
+			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"status":  "fail",
+				"message": "Validation error",
+				"errors":  errorMessages,
+			})
 		}
 	}
 	return nil

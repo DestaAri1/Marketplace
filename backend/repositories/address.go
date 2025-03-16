@@ -22,8 +22,8 @@ func (r *AddressRepository) GetAllAddress(ctx context.Context, userId uint) ([]*
 	res := r.db.
 		Table("addresses a").
 		Select("a.id as id, a.sender as sender, a.reciver as recipient, " +
-			"p.name as province, r.name as regency, d.name as district, v.name as village, " +
-			"a.status as status, a.details as details").
+			"p.name as province, p.id as province_id, r.name as regency, r.id as regency_id, d.name as district," +
+			" d.id as district_id, v.name as village, v.id as village_id, a.status as status, a.details as details").
 		Joins("LEFT JOIN provinces p ON p.id = a.province_id COLLATE utf8mb4_unicode_ci").
 		Joins("LEFT JOIN regencies r ON r.id = a.regency_id COLLATE utf8mb4_unicode_ci").
 		Joins("LEFT JOIN districts d ON d.id = a.district_id COLLATE utf8mb4_unicode_ci").
