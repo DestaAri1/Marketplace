@@ -7,10 +7,11 @@ import Navbar from "../../layout/Main/Navbar"; // Tidak di-lazy load
 import FloatingCartButton from "../../components/Home/FloatingCartButton"; // Tidak di-lazy load
 import Fallback from "../../components/Fallback"; // Komponen fallback yang lebih baik
 import { useModal } from "../../hooks/useModal";
+import { ToastContainer } from "react-toastify";
 
 const CartModal = lazy(() => import("../../components/Home/CartModal"));
 
-const MainTemplate = memo(({ children, showFloatingCart = true }) => {
+const MainTemplate = memo(({ children, showFloatingCart = true, showTimerToaster = true}) => {
   const { user, isLoading: authLoading } = useAuth();
   const {
     cart,
@@ -53,7 +54,8 @@ const MainTemplate = memo(({ children, showFloatingCart = true }) => {
 
   return (
     <div className="home-container">
-      <TimerToaster />
+      {showTimerToaster && <TimerToaster />}
+      {/* <ToastContainer/> */}
       <Navbar user={memoizedUser} />
       {children}
 

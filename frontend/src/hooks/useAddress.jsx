@@ -6,6 +6,7 @@ import { showSuccessToast } from "../utils/Toast";
 export default function useAddress() {
   const [address, setAddress] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
   const isFetched = useRef(false);
 
   const fetchAddress = useCallback(async () => {
@@ -17,7 +18,7 @@ export default function useAddress() {
       setAddress(data || []);
       isFetched.current = true;
     } catch (error) {
-      console.error("[useCart] Error fetching cart:", error);
+      console.error("[useAddress] Error fetching addresses:", error);
       isFetched.current = true;
     } finally {
       setIsLoading(false);
@@ -26,84 +27,107 @@ export default function useAddress() {
 
   const handleApiCall = async (apiFunction, successMessage) => {
     setIsLoading(true);
+    setErrors({});
     try {
       const response = await apiFunction();
       if (response?.data?.message) {
-        toast.dismiss();
         showSuccessToast(response.data.message || successMessage);
+        await fetchAddress();
         return true;
       }
       return false;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || error.message || "Operation failed";
-      toast.error(errorMessage);
-      return false;
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+        return error.response;
+      } else {
+        const errorMessage =
+          error.response?.data?.message || error.message || "Operation failed";
+        toast.error(errorMessage);
+      }
+
+      return { success: false };
     } finally {
       setIsLoading(false);
     }
   };
 
-const handleCreateAddress = async (formData) => {
-  // Pastikan status adalah pointer ke boolean dalam format Go
-  // Di JavaScript kita tidak bisa membuat pointer, tapi kita bisa mengirim nilai langsung
-  const status = Boolean(formData.status);
+  const handleCreateAddress = async (formData) => {
+    const status = Boolean(formData.status);
+    const payload = {
+      sender: String(formData.sender || "").trim(),
+      recipient: String(formData.receiver || "").trim(),
+      province: String(formData.province || "").trim(),
+      regency: String(formData.regency || "").trim(),
+      district: String(formData.district || "").trim(),
+      village: String(formData.village || "").trim(),
+      details: String(formData.description || "").trim(),
+      status: status,
+    };
 
-  const payload = {
-    sender: String(formData.sender).trim(),
-    recipient: String(formData.receiver).trim(),
-    province: String(formData.province).trim(),
-    regency: String(formData.regency).trim(),
-    district: String(formData.district).trim(),
-    village: String(formData.village).trim(),
-    details: String(formData.description).trim(),
-    status: status,
+    const success = await handleApiCall(
+      () => addressAPI.create(payload),
+      "sukses lurd"
+    );
+
+    if (success) {
+      await fetchAddress();
+    }
+
+    return success;
   };
 
-  // Validasi sesuai dengan aturan Go
-  if (payload.province.length !== 2 || !/^\d+$/.test(payload.province)) {
-    toast.error("Province must be exactly 2 numeric characters");
-    return false;
-  }
+  const handleUpdateAddress = async (id, formData) => {
+    const status = Boolean(formData.status);
+    const payload = {
+      sender: String(formData.sender || "").trim(),
+      recipient: String(formData.receiver || "").trim(),
+      province: String(formData.province || "").trim(),
+      regency: String(formData.regency || "").trim(),
+      district: String(formData.district || "").trim(),
+      village: String(formData.village || "").trim(),
+      details: String(formData.description || "").trim(),
+      status: status,
+    };
 
-  if (payload.regency.length !== 4 || !/^\d+$/.test(payload.regency)) {
-    toast.error("Regency must be exactly 4 numeric characters");
-    return false;
-  }
+    const success = await handleApiCall(
+      () => addressAPI.update(id, payload),
+      "apdet suksek lur"
+    );
 
-  if (payload.district.length !== 7 || !/^\d+$/.test(payload.district)) {
-    toast.error("District must be exactly 7 numeric characters");
-    return false;
-  }
+    if (success) {
+      await fetchAddress();
+    }
 
-  if (payload.village.length !== 10 || !/^\d+$/.test(payload.village)) {
-    toast.error("Village must be exactly 10 numeric characters");
-    return false;
-  }
+    return success;
+  };
 
-  if (payload.details.length < 5) {
-    toast.error("Details must be at least 5 characters");
-    return false;
-  }
+  const handleDeleteAddress = async (id) => {
+    const success = await handleApiCall(
+      () => addressAPI.delete(id),
+      "hapus gagal lurdd"
+    );
 
-  console.log("Validated payload:", payload);
+    if (success) {
+      await fetchAddress()
+    }
 
-  // Kirim sebagai satu objek JSON
-  const success = await handleApiCall(() => {
-    return addressAPI.create(payload);
-  });
+    return success
+  };
 
-  if (success) {
-    await fetchAddress();
-  }
+  const clearErrors = () => {
+    setErrors({});
+  };
 
-  return success;
-};
   return {
     address,
     isFetched,
     isLoading,
+    errors,
+    clearErrors,
     fetchAddress,
     handleCreateAddress,
+    handleUpdateAddress,
+    handleDeleteAddress,
   };
 }

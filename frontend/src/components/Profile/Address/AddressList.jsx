@@ -1,6 +1,6 @@
-import React from 'react'
+import React from "react";
 
-export default function AddressList({address, onClick}) {
+export default function AddressList({ address, onClick, onUpdate, onDelete }) {
   return (
     <div className="space-y-4">
       {address.length > 0 ? (
@@ -15,10 +15,16 @@ export default function AddressList({address, onClick}) {
                 <p className="text-gray-500">{address.recipient}</p>
               </div>
               <div className="flex space-x-2">
-                <button className="text-blue-600 hover:underline text-sm">
+                <button
+                  onClick={() => onUpdate(address)}
+                  className="text-blue-600 hover:underline text-sm"
+                >
                   Edit
                 </button>
-                <button className="text-red-600 hover:underline text-sm">
+                <button
+                  onClick={() => onDelete(address)}
+                  className="text-red-600 hover:underline text-sm"
+                >
                   Delete
                 </button>
               </div>

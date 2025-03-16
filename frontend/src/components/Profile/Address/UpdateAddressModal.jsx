@@ -25,7 +25,7 @@ export default function UpdateAddressModal({
   // Populate form data when modal opens and address data is available
   useEffect(() => {
     if (isOpen && address) {
-      // First set the formData with all values at once
+      // Populate form data with address values
       setFormData({
         sender: address.sender || "",
         receiver: address.recipient || "",
@@ -37,12 +37,14 @@ export default function UpdateAddressModal({
         status: address.status || false,
       });
 
-      // Then manually update the loadedData state to trigger the cascading fetches
-      setLoadedData({
-        provinceId: address.province_id || null,
-        regencyId: address.regency_id || null,
-        districtId: address.district_id || null,
-      });
+      // Set loadedData to trigger cascading API calls
+      setTimeout(() => {
+        setLoadedData({
+          provinceId: address.province_id || null,
+          regencyId: address.regency_id || null,
+          districtId: address.district_id || null,
+        });
+      }, 100); // Kecil delay untuk memastikan formData sudah diupdate
     }
   }, [isOpen, address, setFormData, setLoadedData]);
 

@@ -24,6 +24,12 @@ export default function Modal({
   }, [isOpen]);
 
   if (!isVisible && !isOpen) return null;
+
+  const handleConfirmClick = (e) => {
+    e.preventDefault();
+    onConfirm();
+  };
+
   return (
     <div
       onClick={(e) => {
@@ -62,10 +68,7 @@ export default function Modal({
             Batal
           </button>
           <button
-            onClick={() => {
-              onConfirm();
-              onClose();
-            }}
+            onClick={handleConfirmClick}
             className={`px-4 py-2 text-white rounded transition-colors duration-200 ${confirmClass}`}
           >
             {confirmText}

@@ -26,15 +26,15 @@ export default function Select({
         disabled={isDisabled}
       >
         <option value="">Select ...</option>
-        {Array.isArray(item) && item.length > 0 ? (
-          item.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.name}
+        {item && item.length > 0 ? (
+          item.map((i) => (
+            <option key={i.id} value={i.id}>
+              {i.name}
             </option>
           ))
         ) : (
           <option value="" disabled>
-            No Data
+            {disabled ? "Loading..." : "No options available"}
           </option>
         )}
       </select>

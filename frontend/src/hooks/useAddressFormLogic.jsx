@@ -114,33 +114,32 @@ export default function useAddressFormLogic(formData, setFormData, isOpen) {
     }
   }, [fetchProvinces, isFetched]);
 
-  // Initial load of dependent data if formData already has values
+  // Effect to handle changes in loadedData
   useEffect(() => {
-    // This effect runs only once after mount to setup initial state
+    // This handles cases where loadedData is directly set (like in UpdateAddressModal)
     if (isOpen) {
-      if (formData.province && formData.province !== loadedData.provinceId) {
-        fetchRegencies(formData.province);
-        setLoadedData((prev) => ({ ...prev, provinceId: formData.province }));
+      if (loadedData.provinceId && formData.province) {
+        fetchRegencies(loadedData.provinceId);
 
-        if (formData.regency && formData.regency !== loadedData.regencyId) {
-          fetchDistricts(formData.regency);
-          setLoadedData((prev) => ({ ...prev, regencyId: formData.regency }));
+        if (loadedData.regencyId && formData.regency) {
+          fetchDistricts(loadedData.regencyId);
 
-          if (
-            formData.district &&
-            formData.district !== loadedData.districtId
-          ) {
-            fetchVillages(formData.district);
-            setLoadedData((prev) => ({
-              ...prev,
-              districtId: formData.district,
-            }));
+          if (loadedData.districtId && formData.district) {
+            fetchVillages(loadedData.districtId);
           }
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]); // Only run when modal opens
+  }, [
+    loadedData,
+    isOpen,
+    formData.province,
+    formData.regency,
+    formData.district,
+    fetchRegencies,
+    fetchDistricts,
+    fetchVillages,
+  ]);
 
   return {
     provinces,
