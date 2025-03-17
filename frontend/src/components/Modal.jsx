@@ -65,7 +65,7 @@ export default function Modal({
             onClick={onClose}
             className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-colors duration-200"
           >
-            Batal
+            Cancel
           </button>
           <button
             onClick={handleConfirmClick}

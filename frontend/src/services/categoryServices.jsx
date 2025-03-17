@@ -14,28 +14,21 @@ export const categoryApi = {
   },
 
   create: async (name) => {
-    if (!name?.trim()) {
-      throw new Error("Category name is required");
-    }
     try {
       const response = await apiClient.post(`/category`, {
-        name: name.trim(),
+        name: name,
       });
       return response;
     } catch (error) {
-      handleApiError(error);
+      handleApiError(error)
     }
   },
 
   // Update category
   update: async (id, name) => {
-    if (!name?.trim()) {
-      throw new Error("Category name is required");
-    }
-
     try {
       const response = await apiClient.patch(`/category/update/${id}`, {
-        name: name.trim(),
+        name: name,
       });
       return response;
     } catch (error) {

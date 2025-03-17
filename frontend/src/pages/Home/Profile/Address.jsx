@@ -3,6 +3,7 @@ import Fallback from "../../../components/Fallback";
 import { useModal } from "../../../hooks/useModal";
 import useAddress from "../../../hooks/useAddress";
 import DeleteAddressModal from "../../../components/Profile/Address/DeleteAddressModal";
+import StatusAddressModal from "../../../components/Profile/Address/StatusAddressModal";
 
 const ProfilTemplate = lazy(() => import("./ProfilTemplate"));
 const AddressBox = lazy(() => import("../../../components/Profile/AddressBox"));
@@ -24,11 +25,13 @@ export default function Address() {
     fetchAddress,
     handleCreateAddress,
     handleUpdateAddress,
+    handleStatusAddress,
     handleDeleteAddress,
   } = useAddress();
 
   const createModal = useModal();
   const updateModal = useModal();
+  const statusModal = useModal();
   const deleteModal = useModal();
 
   useEffect(() => {
@@ -69,11 +72,18 @@ export default function Address() {
     }
   };
 
-  const handleSubmitDeleteAddress = async() => {
-    if (await handleDeleteAddress(deleteModal.selectedItem.id)) {
-      deleteModal.closeModal()
+  const handleSubmitStatusAddress = async () => {
+    const id = statusModal.selectedItem?.id;
+    if (await handleStatusAddress(id, true)) {
+      statusModal.closeModal();
     }
-  }
+  };
+
+  const handleSubmitDeleteAddress = async () => {
+    if (await handleDeleteAddress(deleteModal.selectedItem.id)) {
+      deleteModal.closeModal();
+    }
+  };
 
   const handleCloseModal = () => {
     clearErrors();
@@ -90,6 +100,7 @@ export default function Address() {
           address={address}
           onUpdate={updateModal.openModal}
           onDelete={deleteModal.openModal}
+          onStatus={statusModal.openModal}
         />
 
         <AddAddressModal
@@ -114,6 +125,13 @@ export default function Address() {
           setFormData={setFormData}
           isLoading={isLoading}
           errors={errors}
+        />
+
+        <StatusAddressModal
+          isLoading={isLoading}
+          isOpen={statusModal.isOpen}
+          onClose={statusModal.closeModal}
+          onConfirm={handleSubmitStatusAddress}
         />
 
         <DeleteAddressModal

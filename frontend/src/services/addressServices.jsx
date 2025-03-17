@@ -54,25 +54,36 @@ export const addressAPI = {
       const response = await apiClient.post("/address", payload);
       return response;
     } catch (error) {
+      handleApiError(error)
+    }
+  },
+
+  update: async (id, payload) => {
+    try {
+      const response = await apiClient.patch(`/address/${id}`, payload);
+      return response;
+    } catch (error) {
       throw error;
     }
   },
 
-  update: async(id, payload) => {
+  upStatus: async (id, status) => {
     try {
-      const response = await apiClient.patch(`/address/${id}`, payload)
+      const response = await apiClient.patch(`/address/status/${id}`, {
+        status: status,
+      });
       return response
     } catch (error) {
-      throw error
+      throw error;
     }
   },
 
-  delete: async(id) => {
+  delete: async (id) => {
     try {
-      const response = await apiClient.delete(`/address/${id}`)
-      return response
+      const response = await apiClient.delete(`/address/${id}`);
+      return response;
     } catch (error) {
-      handleApiError(error)
+      handleApiError(error);
     }
-  }
+  },
 };

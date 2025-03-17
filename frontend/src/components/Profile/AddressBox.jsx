@@ -2,7 +2,7 @@ import React from "react";
 import Button from "../Button";
 import AddressList from "./Address/AddressList";
 
-export default function AddressBox({ onClick, address, onUpdate, onDelete }) {
+export default function AddressBox({ onClick, address, onUpdate, onDelete, onStatus }) {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -23,6 +23,7 @@ export default function AddressBox({ onClick, address, onUpdate, onDelete }) {
         onClick={onClick}
         onUpdate={onUpdate}
         onDelete={onDelete}
+        onStatus={onStatus}
       />
     </div>
   );

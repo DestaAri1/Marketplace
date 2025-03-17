@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 
 export default function useCategory() {
   const [category, setCategory] = useState([]);
+  const [errors, setErrors] = useState([]);
   const isFetched = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -13,69 +14,75 @@ export default function useCategory() {
       const fetchedCategory = await categoryApi.getAll();
       setCategory(fetchedCategory.data.data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      showErrorToast(error)
+    }
+  };
+
+  const handleApiCall = async (apiFunction, successMessage) => {
+    setIsLoading(true);
+    setErrors({});
+    try {
+      const response = await apiFunction();
+      if (response?.data?.message) {
+        showSuccessToast(response.data.message || successMessage);
+        await fetchCategory();
+        return true;
+      }
+      return false;
+    } catch (error) {
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+        return error.response;
+      } else {
+        const errorMessage =
+          error.response?.data?.message || error.message || "Operation failed";
+        toast.error(errorMessage);
+      }
+
+      return { success: false };
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleCreateCategory = async (name) => {
-    setIsLoading(true);
-    try {
-      const response = await categoryApi.create(name);
-      if (response?.data?.message) {
-        toast.dismiss();
-        showSuccessToast(
-          response.data.message || "Successfully create category"
-        );
-        await fetchCategory();
-        return true;
-      }
-      return false;
-    } catch (error) {
-      showErrorToast(error.message);
-      return false;
-    } finally {
-      setIsLoading(false);
+    const success = handleApiCall(
+      () => categoryApi.create(name),
+      "sukses lurd"
+    );
+
+    if (success) {
+      await fetchCategory();
     }
+
+    return success;
   };
 
   const handleCategoryUpdate = async (id, name) => {
-    setIsLoading(true);
-    try {
-      const response = await categoryApi.update(id, name);
-      if (response?.data?.message) {
-        toast.dismiss();
-        showSuccessToast("Successfully updated category");
-        await fetchCategory();
-        return true;
-      }
-      return false;
-    } catch (error) {
-      showErrorToast(error.message);
-      return false;
-    } finally {
-      setIsLoading(false);
+    const success = handleApiCall(
+      () => categoryApi.update(id,name),
+      "sukses lurd"
+    );
+
+    if (success) {
+      await fetchCategory();
     }
+
+    return success;
   };
 
   const handleDeleteCategory = async (id) => {
-    setIsLoading(true);
-    try {
-      const response = await categoryApi.delete(id);
-      if (response?.data?.message) {
-        toast.dismiss();
-        showSuccessToast(
-          response.data.message || "Successfully delete category"
-        );
-        await fetchCategory();
-        return true;
-      }
-      return false;
-    } catch (error) {
-      showErrorToast(error.message);
-      return false;
-    } finally {
-      setIsLoading(false);
+    const success = handleApiCall(() => categoryApi.delete(id), "muehehehe")
+
+    if (success) {
+      await fetchCategory()
     }
+
+    return success
+  };
+
+  const clearErrors = () => {
+    setErrors({});
   };
 
   return {
@@ -86,5 +93,7 @@ export default function useCategory() {
     handleCreateCategory,
     handleCategoryUpdate,
     handleDeleteCategory,
+    errors,
+    clearErrors,
   };
 }

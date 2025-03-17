@@ -15,6 +15,8 @@ export default function ManageCategory() {
     handleCategoryUpdate,
     handleCreateCategory,
     handleDeleteCategory,
+    errors,
+    clearErrors,
   } = useCategory();
 
   useEffect(() => {
@@ -29,29 +31,32 @@ export default function ManageCategory() {
   const deleteModal = useModal();
 
   const handleSubmitCreateCategory = async (name) => {
-    try {
-      const result = await handleCreateCategory(name);
-      if (result) {
-        createModal.closeModal();
-        await fetchCategory(); // Refresh data
-      }
-    } catch (error) {
-      console.error("Error updating category:", error);
+    const success = await handleCreateCategory(name);
+
+    if (
+      success &&
+      success.data &&
+      success.data.message === "Validation error"
+    ) {
+      // Keep modal open if validation error
+    } else {
+      createModal.closeModal();
     }
   };
 
   const onUpdateCategory = async (name) => {
-    try {
-      const result = await handleCategoryUpdate(
-        updateModal.selectedItem.id,
-        name
-      );
-      if (result) {
-        updateModal.closeModal();
-        await fetchCategory();
-      }
-    } catch (error) {
-      console.error("Error updating category:", error);
+    const categoryId = updateModal.selectedItem?.id
+
+    const success = await handleCategoryUpdate(categoryId,name);
+
+    if (
+      success &&
+      success.data &&
+      success.data.message === "Validation error"
+    ) {
+      // Keep modal open if validation error
+    } else {
+      updateModal.closeModal();
     }
   };
 
@@ -82,16 +87,24 @@ export default function ManageCategory() {
 
       <AddCategoryModal
         isOpen={createModal.isOpen}
-        onClose={createModal.closeModal}
+        onClose={() => {
+          clearErrors();
+          createModal.closeModal();
+        }}
         user={createModal.selectedItem}
         onConfirm={handleSubmitCreateCategory}
+        errors={errors}
       />
 
       <UpdateCategoryModal
         isOpen={updateModal.isOpen}
-        onClose={updateModal.closeModal}
+        onClose={() => {
+          clearErrors();
+          updateModal.closeModal();
+        }}
         category={updateModal.selectedItem}
-        onConfirm={onUpdateCategory} // Pass the renamed function
+        onConfirm={onUpdateCategory}
+        errors={errors}
       />
 
       <DeleteCatModal

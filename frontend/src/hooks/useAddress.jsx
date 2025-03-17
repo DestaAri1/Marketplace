@@ -37,6 +37,8 @@ export default function useAddress() {
       }
       return false;
     } catch (error) {
+      // console.log(error);
+      
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
         return error.response;
@@ -102,6 +104,19 @@ export default function useAddress() {
     return success;
   };
 
+  const handleStatusAddress = async (id, status) => {
+    const success = await handleApiCall(
+      () => addressAPI.upStatus(id, status),
+      "gagal lurd"
+    );
+
+    if (success) {
+      await fetchAddress();
+    }
+
+    return success;
+  };
+
   const handleDeleteAddress = async (id) => {
     const success = await handleApiCall(
       () => addressAPI.delete(id),
@@ -109,10 +124,10 @@ export default function useAddress() {
     );
 
     if (success) {
-      await fetchAddress()
+      await fetchAddress();
     }
 
-    return success
+    return success;
   };
 
   const clearErrors = () => {
@@ -128,6 +143,7 @@ export default function useAddress() {
     fetchAddress,
     handleCreateAddress,
     handleUpdateAddress,
+    handleStatusAddress,
     handleDeleteAddress,
   };
 }

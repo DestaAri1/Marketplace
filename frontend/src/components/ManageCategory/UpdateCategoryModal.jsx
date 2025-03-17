@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Modal from "../Modal";
+import FormCategory from "./FormCategory";
 
 export default function UpdateCategoryModal({
   isOpen,
@@ -7,28 +8,18 @@ export default function UpdateCategoryModal({
   onClose,
   onConfirm,
   category,
+  errors,
 }) {
   const [newName, setNewName] = useState("");
-  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (category?.name) {
+    if (isOpen && category) {
       setNewName(category.name);
     }
-  }, [category]);
+  }, [category, isOpen]);
 
   const handleConfirm = async () => {
-    try {
-      setError("");
-      if (!newName || newName.trim() === "") {
-        setError("Category name is required");
-        return;
-      }
-      await onConfirm(newName.trim());
-      onClose();
-    } catch (error) {
-      setError(error.message);
-    }
+    onConfirm(newName);
   };
 
   return (
@@ -40,16 +31,11 @@ export default function UpdateCategoryModal({
       confirmText={isLoading ? "Processing..." : "Update"}
       confirmClass="bg-blue-500 hover:bg-blue-700"
     >
-      <div className="space-y-4">
-        <input
-          type="text"
-          className="w-full p-2 border rounded-md"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          placeholder="Enter category name"
-        />
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-      </div>
+      <FormCategory
+        errors={errors}
+        newName={newName}
+        onChange={(e) => setNewName(e.target.value)}
+      />
     </Modal>
   );
 }

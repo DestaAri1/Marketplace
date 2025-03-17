@@ -4,30 +4,31 @@ import { sellerRequestAPI } from "../services/adminServices";
 import { showSuccessToast } from "../utils/Toast";
 
 export default function useRequestSeller() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]); // Initialize as empty array, not null
   const [isLoading, setIsLoading] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(null);
   const isFetched = useRef(false);
-
-  // Apply filter whenever statusFilter change
 
   const fetchRequestUser = async () => {
     setIsLoading(true);
     try {
       const { data: { data = [] } = {} } =
         (await sellerRequestAPI.getAll()) || {};
-      setUsers(data);
+      setUsers(data || []);
     } catch (error) {
       toast.error(error.message || "Failed to fetch products");
+      setUsers([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const getFilteredUsers = () => {
+    const safeUsers = Array.isArray(users) ? users : [];
+
     return selectedStatus !== null
-      ? users.filter((u) => u.status === selectedStatus)
-      : users;
+      ? safeUsers.filter((u) => u.status === selectedStatus)
+      : safeUsers;
   };
 
   const handleApiCall = async (apiFunction, successMessage) => {

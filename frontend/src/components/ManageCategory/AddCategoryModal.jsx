@@ -1,11 +1,16 @@
 import React, { useState } from "react";
 import Modal from "../Modal";
+import useErrorHook from "../../hooks/useErrorHook";
+import Input from "../Input";
+import ErrorMessage from "../ErrorMessage";
+import FormCategory from "./FormCategory";
 
 export default function AddCategoryModal({
   isOpen,
   onClose,
   onConfirm,
   isLoading,
+  errors = {},
 }) {
   const [newName, setNewName] = useState("");
   const handleConfirm = () => {
@@ -21,12 +26,10 @@ export default function AddCategoryModal({
       confirmText={isLoading ? "Processing..." : "Save"}
       confirmClass="bg-green-500 hover:bg-green-700"
     >
-      <input
-        type="text"
-        className="w-full p-2 border rounded-md"
-        value={newName}
+      <FormCategory
+        newName={newName}
         onChange={(e) => setNewName(e.target.value)}
-        placeholder="Enter category name"
+        errors={errors}
       />
     </Modal>
   );
