@@ -29,6 +29,7 @@ func (r *AddressRepository) GetAllAddress(ctx context.Context, userId uint) ([]*
 		Joins("LEFT JOIN districts d ON d.id = a.district_id COLLATE utf8mb4_unicode_ci").
 		Joins("LEFT JOIN villages v ON v.id = a.village_id COLLATE utf8mb4_unicode_ci").
 		Where("a.user_id = ?", userId).
+		Order("status DESC").
 		Scan(&address)
 
 	if res.Error != nil {
