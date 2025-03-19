@@ -1,6 +1,7 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
 
-export default function Security() {
+export default function SecurityContent() {
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-6">Keamanan</h2>
@@ -15,9 +16,9 @@ export default function Security() {
                   Terakhir diubah 30 hari yang lalu
                 </p>
               </div>
-              <button className="px-4 py-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-50">
+              <Link to={'/profile/security/change-password'} className="px-4 py-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-50">
                 Ubah Password
-              </button>
+              </Link>
             </div>
           </div>
         </div>

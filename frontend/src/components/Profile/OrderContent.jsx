@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Order() {
+export default function OrderContent() {
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-6">Pesanan Saya</h2>

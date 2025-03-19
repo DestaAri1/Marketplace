@@ -1,7 +1,7 @@
 import { CreditCard, Home } from "lucide-react";
 import React from "react";
 
-export default function Notification() {
+export default function NotificationContent() {
   // Data Notifikasi dengan Icon
   const notifications = [
     {

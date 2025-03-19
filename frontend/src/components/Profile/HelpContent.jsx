@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Help() {
+export default function HelpContent() {
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-6">Bantuan</h2>

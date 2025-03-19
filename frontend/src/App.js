@@ -20,6 +20,11 @@ import DetailProduct from "./pages/Home/Product/DetailProduct";
 import CheckOut from "./pages/Home/CheckOut/CheckOut";
 import Profile from "./pages/Home/Profile/Profile";
 import Address from "./pages/Home/Profile/Address";
+import Order from "./pages/Home/Profile/Order";
+import Notifications from "./pages/Home/Profile/Notifications";
+import Security from "./pages/Home/Profile/Security";
+import Help from "./pages/Home/Profile/Help";
+import ChangePassword from "./pages/Home/Profile/Security/ChangePassword";
 
 export default function App() {
   const authRoutes = [
@@ -88,6 +93,13 @@ export default function App() {
           <Route index element={<Profile />} />
           <Route path="biodata" element={<Profile />} />
           <Route path="address" element={<Address />} />
+          <Route path="orders" element={<Order />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="security/" element={<NestedProtectedRoute />}>
+            <Route index element={<Security />} />
+            <Route path="change-password" element={<ChangePassword/>}/>
+          </Route>
+          <Route path="help" element={<Help />} />
         </Route>
         {sellerRoutes.map(renderRoute)}
         {adminRoutes.map(renderRoute)}
