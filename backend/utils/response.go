@@ -66,6 +66,12 @@ func HandleValidationError(ctx *fiber.Ctx, err error) error {
 				message = handleVillageValidation(err.Tag())
 			case "Details":
 				message = handleDetailsValidation(err.Tag())
+			case "Username" :
+				message = handleUsernameValidation(err.Tag())
+			case "Birthday":
+				message = handleBirthdayValidation(err.Tag())
+			case "PhoneNumber":
+				message = handlePhoneNumberValidation(err.Tag())
 			}
 			
 			if message != "" {
@@ -240,6 +246,32 @@ func handleDetailsValidation(tag string) string {
 		return "Details is require"
 	case "max" :
 		return "Maximum recipent name is 255 characters"
+	}
+	return ""
+}
+
+func handleUsernameValidation(tag string) string {
+	switch tag {
+	case "required" :
+		return "Username is required"
+	}
+	return ""
+}
+
+func handleBirthdayValidation(tag string) string {
+	switch tag {
+	case "required" :
+		return "Birthday is required"
+	}
+	return ""
+}
+
+func handlePhoneNumberValidation(tag string) string {
+	switch tag {
+	case "required" :
+		return "Phone number is required"
+	case "numeric":
+		return "Only number"
 	}
 	return ""
 }

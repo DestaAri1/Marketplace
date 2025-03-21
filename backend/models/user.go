@@ -2,6 +2,8 @@ package models
 
 import (
 	"context"
+
+	"gorm.io/gorm"
 )
 
 type UserRole int
@@ -14,10 +16,11 @@ const (
 
 type User struct {
 	Base
-	Username	string 		`json:"username" gorm:"text;not null"`
-	Email		string		`json:"email" gorm:"text;not null"`
-	Role      	*UserRole 	`json:"role" gorm:"type:int;default:2;not null"`
-	Password 	string  	`json:"-"` //Do not compute the password in json
+	Username	string 			`json:"username" gorm:"text;not null"`
+	Email		string			`json:"email" gorm:"text;not null"`
+	Role      	*UserRole 		`json:"role" gorm:"type:int;default:2;not null"`
+	Password 	string  		`json:"-"` //Do not compute the password in json
+	Biodata     BiodataReponse  `json:"biodata,omitempty" gorm:"-"`
 }
 
 type Seller_Request struct {
@@ -31,4 +34,17 @@ type Seller_Request struct {
 type SellerRequestRepository interface {
 	SellerRequest(ctx context.Context, requestData *Seller_Request, userId uint) (*Seller_Request, error)
 	GetStatusRequest(ctx context.Context, query interface{}, args ...interface{}) (*Seller_Request, error)
+}
+
+func (u *User) AfterCreate(tx *gorm.DB) (err error) {
+	biodata := Biodata{
+		UserId:      u.Id,
+	}
+
+	// Insert biodata ke dalam database
+	if err := tx.Create(&biodata).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

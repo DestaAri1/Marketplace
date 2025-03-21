@@ -1,3 +1,4 @@
+// handlers/user_handler.go
 package handlers
 
 import (
@@ -23,9 +24,9 @@ func (h *GetUserHandler) response(ctx *fiber.Ctx, status int, message string, da
 	}
 	
 	return ctx.Status(status).JSON(&fiber.Map{
-		"status" : status2,
-		"message" : message,
-		"data" : data,
+		"status": status2,
+		"message": message,
+		"data": data,
 	})
 }
 
@@ -36,16 +37,25 @@ func (h *GetUserHandler) getUser(ctx *fiber.Ctx) error {
 		return h.response(ctx, fiber.StatusUnauthorized, "Failed to get user ID from token", nil)
 	}
 
-	user, err := h.repository.GetUser(context.Background(), "id = ?", userId)
+	user, err := h.repository.GetUser(context.Background(), "id = ?", uint(userId))
 	if err != nil {
 		return h.response(ctx, fiber.StatusInternalServerError, "Internal Server Error", nil)
 	}
 
 	if user == nil {
-		return h.response(ctx, fiber.StatusNotFound, "user not found", nil)
+		return h.response(ctx, fiber.StatusNotFound, "User not found", nil)
 	}
 
-	return h.response(ctx, fiber.StatusOK, "", user)
+	// Create a response with explicitly included biodata
+	responseData := map[string]interface{}{
+		"id":        user.Id,
+		"username":  user.Username,
+		"email":     user.Email,
+		"role":      user.Role,
+		"biodata":   user.Biodata,
+	}
+
+	return h.response(ctx, fiber.StatusOK, "User data retrieved successfully", responseData)
 }
 
 func NewGetUserHandler(router fiber.Router, repository models.AuthRepository) {

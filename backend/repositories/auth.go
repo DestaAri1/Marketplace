@@ -1,8 +1,8 @@
+// repository/auth_repository.go
 package repository
 
 import (
 	"context"
-
 	"github.com/DestaAri1/models"
 	"github.com/DestaAri1/utils"
 	"gorm.io/gorm"
@@ -29,16 +29,31 @@ func (r *AuthRepository) RegisterUser(ctx context.Context, registerData *models.
 }
 
 func (r *AuthRepository) GetUser(ctx context.Context, query interface{}, args ...interface{}) (*models.User, error) {
-	// Handle ID-based queries untuk cache
+	// Handle ID-based queries for cache
 	if id, ok := extractUserID(query, args...); ok {
 		if user, exists := utils.GlobalUserCache.GetUser(id); exists {
 			return user, nil
 		}
 	}
 
+	// Find the user first
 	user := &models.User{}
-	if res := r.db.Model(&models.User{}).Where(query, args...).First(user); res.Error != nil {
+	if res := r.db.Where(query, args...).First(user); res.Error != nil {
 		return nil, res.Error
+	}
+
+	// Get biodata separately
+	var biodata models.Biodata
+	result := r.db.Where("user_id = ?", user.Id).First(&biodata)
+	
+	// Create biodata response if found
+	if result.Error == nil {
+		user.Biodata = models.BiodataReponse{
+			Birthday:    biodata.Birthday,
+			PhoneNumber: biodata.PhoneNumber,
+			Gender:      biodata.Gender,
+			Image:       biodata.Image,
+		}
 	}
 
 	// Cache the result if it's an ID-based query

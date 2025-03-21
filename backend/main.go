@@ -24,6 +24,8 @@ func setupApp() *fiber.App {
 		AllowMethods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
 	}))
 
+	app.Static("/assets", "./assets")
+
 	return app
 }
 
@@ -40,6 +42,7 @@ type AppRepositories struct {
 	cart 		  		models.CartRepository
 	regionalAaddress    models.RegionalAddressRepository
 	address				models.AddressRepository
+	biodata 			models.BiodataRepository
 }
 
 func setupRepositories(database *gorm.DB) AppRepositories {
@@ -55,6 +58,7 @@ func setupRepositories(database *gorm.DB) AppRepositories {
 		category:      		repository.NewCategoryRepository(database),
 		userProduct:   		repository.NewUserProductRepository(database),
 		cart:		   		repository.NewCartRepository(database),
+		biodata: 			repository.NewBiodataRepository(database),
 	}
 }
 
@@ -83,6 +87,7 @@ func setupRoutes(app *fiber.App, database *gorm.DB, repos AppRepositories, servi
 	protected := api.Use(middlewares.AuthProtected(database))
 
 	//Public Protected Routes
+	handlers.NewBiodataHandler(protected.Group("/biodata"), repos.biodata)
 	handlers.NewRegionalAddressHandler(protected.Group("/regional-address"), repos.regionalAaddress)
 	handlers.NewAddressHandler(protected.Group("/address"), repos.address, repos.base)
 	handlers.NewCartHandler(protected.Group("/cart"), repos.cart)
