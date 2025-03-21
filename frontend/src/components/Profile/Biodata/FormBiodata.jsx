@@ -9,25 +9,27 @@ export default function FormBiodata({
   onConfirm,
 }) {
   const [previewImage, setPreviewImage] = useState(null);
+
+  const imageUrl = process.env.REACT_APP_PROFILE_PICTURE_URL;
   // Default user avatar
   const defaultAvatar =
     "https://via.placeholder.com/150/cccccc/666666?text=User";
 
   const gender = [
-    { id: 0, name: "Laki-Laki" },
-    { id: 1, name: "Perempuan" },
+    { id: 1, name: "Laki-Laki" },
+    { id: 2, name: "Perempuan" },
   ];
 
   useEffect(() => {
     if (user?.id) {
       // Initialize all form fields to prevent controlled/uncontrolled switching
       setFormData({
-        name: user.username || "",
-        email: user.email || "",
-        birthday: user.birthday || "",
-        phone_number: user.phone_number || "",
-        gender: user.gender || "",
-        profile_image: user.profile_image || null,
+        name: user?.username || "",
+        email: user?.email || "",
+        birthday: user?.biodata.birthday || "",
+        phone_number: user?.biodata.phone_number || "",
+        gender: user?.biodata.gender || "",
+        profile_image: user.biodata.image || null,
       });
 
       // If user has a profile image, use it as preview
@@ -93,7 +95,7 @@ export default function FormBiodata({
         <div className="relative">
           <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-md mb-4">
             <img
-              src={previewImage || defaultAvatar}
+              src={previewImage || imageUrl+user?.biodata.image }
               alt="Profile"
               className="w-full h-full object-cover"
             />

@@ -31,7 +31,7 @@ export default function useAddress() {
     try {
       const response = await apiFunction();
       if (response?.data?.message) {
-        showSuccessToast(response.data.message || successMessage);
+        showSuccessToast(successMessage);
         await fetchAddress();
         return true;
       }
@@ -104,18 +104,26 @@ export default function useAddress() {
     return success;
   };
 
-  const handleStatusAddress = async (id, status) => {
-    const success = await handleApiCall(
-      () => addressAPI.upStatus(id, status),
-      "gagal lurd"
-    );
+const handleStatusAddress = async (id, status) => {
+  // Cari alamat berdasarkan ID
+  const selectedAddress = address.find((addr) => addr.id === id);
 
-    if (success) {
-      await fetchAddress();
-    }
+  if (!selectedAddress) {
+    toast.error("Address not found!");
+    return false;
+  }
 
-    return success;
-  };
+  const success = await handleApiCall(
+    () => addressAPI.upStatus(id, status),
+    `Successfully set ${selectedAddress.sender} as main address` // Menggunakan nama alamat
+  );
+
+  if (success) {
+    await fetchAddress();
+  }
+
+  return success;
+};
 
   const handleDeleteAddress = async (id) => {
     const success = await handleApiCall(

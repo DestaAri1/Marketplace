@@ -12,6 +12,8 @@ export default function Navbar({ user }) {
 
   const { status, fetchStatus } = useSeller();
 
+  const imageUrl = process.env.REACT_APP_PROFILE_PICTURE_URL;
+
   // Hapus penggunaan state dataFetched karena tidak diperlukan lagi
 
   // Fungsi untuk memperbarui status
@@ -60,7 +62,12 @@ export default function Navbar({ user }) {
               >
                 {/* Profile Image with Border */}
                 <div className="w-10 h-10 rounded-full border-2 border-white hover:border-green-500 p-0.5 overflow-hidden">
-                  <FontAwesomeIcon icon={faUser} className="w-full h-full" />
+                  <img
+                    src={imageUrl + user?.biodata?.image}
+                    alt={user?.username}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* <FontAwesomeIcon icon={faUser} className="w-full h-full" /> */}
                 </div>
 
                 {/* User Name */}

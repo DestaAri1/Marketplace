@@ -8,8 +8,11 @@ import {
 } from "lucide-react";
 import React from "react";
 import { NavLink } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 
 export default function Sidebar() {
+  const {user} = useAuth()
+  const imageUrl = process.env.REACT_APP_PROFILE_PICTURE_URL;
   const menuItems = [
     {
       id: "biodata",
@@ -54,15 +57,15 @@ export default function Sidebar() {
         <div className="flex items-center justify-center mb-4">
           <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
             <img
-              src="/api/placeholder/96/96"
+              src={imageUrl+user?.biodata.image || "/api/placeholder/96/96"}
               alt="Profile"
               className="w-full h-full object-cover"
             />
           </div>
         </div>
-        <h2 className="text-lg font-semibold text-center">John Doe</h2>
+        <h2 className="text-lg font-semibold text-center">{user?.username}</h2>
         <p className="text-gray-500 text-center text-sm">
-          john.doe@example.com
+          {user?.email}
         </p>
       </div>
 

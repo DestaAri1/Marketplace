@@ -1,9 +1,11 @@
-import React, { useState } from "react";
-import FormBiodata from "./Biodata/FormBiodata";
+import React, { lazy, useState } from "react";
 import useAuth from "../../hooks/useAuth";
+
+const FormBiodata = lazy(()=> import("./Biodata/FormBiodata"));
 
 export default function Biodata() {
   const { user } = useAuth();
+  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
