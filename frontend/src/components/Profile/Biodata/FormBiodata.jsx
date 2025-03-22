@@ -7,37 +7,41 @@ export default function FormBiodata({
   formData,
   setFormData,
   onConfirm,
+  isLoading,
 }) {
   const [previewImage, setPreviewImage] = useState(null);
+  const [localUser, setLocalUser] = useState(user);
 
   const imageUrl = process.env.REACT_APP_PROFILE_PICTURE_URL;
-  // Default user avatar
-  const defaultAvatar =
-    "https://via.placeholder.com/150/cccccc/666666?text=User";
 
   const gender = [
     { id: 1, name: "Laki-Laki" },
     { id: 2, name: "Perempuan" },
   ];
 
+  // Update local state when user changes
   useEffect(() => {
-    if (user?.id) {
-      // Initialize all form fields to prevent controlled/uncontrolled switching
+    setLocalUser(user);
+  }, [user]);
+
+  useEffect(() => {
+    if (localUser?.id) {
+      // Initialize all form fields
       setFormData({
-        name: user?.username || "",
-        email: user?.email || "",
-        birthday: user?.biodata.birthday || "",
-        phone_number: user?.biodata.phone_number || "",
-        gender: user?.biodata.gender || "",
-        profile_image: user.biodata.image || null,
+        username: localUser?.username || "",
+        email: localUser?.email || "",
+        birthday: localUser?.biodata?.birthday || "",
+        phone_number: localUser?.biodata?.phone_number || "",
+        gender: localUser?.biodata?.gender || "",
+        image: localUser.biodata?.image || null,
       });
 
       // If user has a profile image, use it as preview
-      if (user.profile_image) {
-        setPreviewImage(user.profile_image);
+      if (localUser.biodata?.image) {
+        setPreviewImage(`${imageUrl}${localUser.biodata.image}`);
       }
     }
-  }, [user, setFormData]);
+  }, [localUser, setFormData, imageUrl]);
 
   const handleChange = (e) => {
     if (e instanceof Date) {
@@ -77,9 +81,25 @@ export default function FormBiodata({
     document.getElementById("profile-image-input").click();
   };
 
-  const handleConfirm = (e) => {
+  const handleConfirm = async (e) => {
     e?.preventDefault?.();
-    onConfirm(formData);
+    const success = await onConfirm(formData);
+
+    if (success) {
+      // Jika berhasil, perbarui localUser untuk memperbarui UI
+      setLocalUser((prev) => ({
+        ...prev,
+        username: formData.username,
+        biodata: {
+          ...prev.biodata,
+          birthday: formData.birthday,
+          phone_number: formData.phone_number,
+          gender: formData.gender,
+          // Tetap gunakan preview image untuk tampilan
+          image: prev.biodata?.image, // Tetap gunakan yang lama untuk URL
+        },
+      }));
+    }
   };
 
   // Convert string date to Date object for DatePicker
@@ -87,7 +107,6 @@ export default function FormBiodata({
     if (!formData.birthday) return null;
     return new Date(formData.birthday);
   };
-
   return (
     <div className="space-y-6">
       {/* Profile Image Section at the top */}
@@ -95,7 +114,12 @@ export default function FormBiodata({
         <div className="relative">
           <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-md mb-4">
             <img
-              src={previewImage || imageUrl+user?.biodata.image }
+              src={
+                previewImage ||
+                (localUser?.biodata?.image
+                  ? `${imageUrl}${localUser.biodata.image}`
+                  : "/default-profile.jpg")
+              }
               alt="Profile"
               className="w-full h-full object-cover"
             />
@@ -143,13 +167,14 @@ export default function FormBiodata({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Form fields */}
         <div>
           <Input
             label={"Username"}
-            name={"name"}
+            name={"username"}
             onChange={handleChange}
             type={"text"}
-            value={formData.name || ""}
+            value={formData.username || ""}
           />
         </div>
         <div>
@@ -194,9 +219,12 @@ export default function FormBiodata({
       <div>
         <button
           onClick={handleConfirm}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          disabled={isLoading}
+          className={`px-6 py-2 ${
+            isLoading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+          } text-white rounded-md transition-colors`}
         >
-          Edit Biodata
+          {isLoading ? "Updating..." : "Edit Biodata"}
         </button>
       </div>
     </div>

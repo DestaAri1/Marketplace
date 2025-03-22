@@ -11,47 +11,56 @@ export default function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
   const fetchPromise = useRef(null);
   const mounted = useRef(false);
+  const userFetched = useRef(false);
 
-  const fetchUser = useCallback(async () => {
-    if (!getToken()) {
-      setIsLoading(false);
-      return null;
-    }
-
-    if (fetchPromise.current) {
-      return fetchPromise.current;
-    }
-
-    try {
-      fetchPromise.current = getUser();
-      const userData = await fetchPromise.current;
-      if (mounted.current) {
-        setUser((prev) => {
-          // Hanya update jika data benar-benar berbeda
-          if (JSON.stringify(prev) !== JSON.stringify(userData)) {
-            return userData;
-          }
-          return prev;
-        });
-      }
-      return userData;
-    } catch (error) {
-      console.error("Failed to fetch user data:", error);
-      if (mounted.current) {
-        logout();
-      }
-      return null;
-    } finally {
-      fetchPromise.current = null;
-      if (mounted.current) {
+  const fetchUser = useCallback(
+    async (force = false) => {
+      if (!getToken()) {
         setIsLoading(false);
+        return null;
       }
-    }
-  }, []);
+
+      if (user && userFetched.current && !force) {
+        setIsLoading(false);
+        return user;
+      }
+
+      if (fetchPromise.current) {
+        return fetchPromise.current;
+      }
+
+      try {
+        setIsLoading(true);
+        fetchPromise.current = getUser();
+        const userData = await fetchPromise.current;
+
+        if (mounted.current) {
+          setUser(userData);
+          userFetched.current = true;
+        }
+
+        return userData;
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        if (mounted.current) {
+          logout();
+        }
+        return null;
+      } finally {
+        fetchPromise.current = null;
+        if (mounted.current) {
+          setIsLoading(false);
+        }
+      }
+    },
+    [user]
+  );
+
 
   const logout = useCallback(() => {
     removeToken();
     setUser(null);
+    userFetched.current = false;
     setIsLoading(false);
   }, []);
 
@@ -59,7 +68,7 @@ export default function useAuth() {
     mounted.current = true;
 
     const initAuth = async () => {
-      if (getToken()) {
+      if (getToken() && !userFetched.current) {
         await fetchUser();
       } else {
         setIsLoading(false);
@@ -79,7 +88,8 @@ export default function useAuth() {
       try {
         const response = await authLogin(email, password);
         if (mounted.current) {
-          await fetchUser();
+          // Force a refresh after login
+          await fetchUser(true);
         }
         return response;
       } finally {
@@ -97,7 +107,8 @@ export default function useAuth() {
       try {
         const response = await registration(username, email, password);
         if (mounted.current) {
-          await fetchUser();
+          // Force a refresh after registration
+          await fetchUser(true);
         }
         return response;
       } finally {
@@ -109,16 +120,18 @@ export default function useAuth() {
     [fetchUser]
   );
 
-  // Memoize return value untuk mencegah re-render yang tidak perlu
+  // Memoize return value to prevent unnecessary re-renders
   const authValue = useMemo(
     () => ({
       login,
       register,
       logout,
       user,
+      setUser, // Export setUser function
       isLoading,
+      fetchUser,
     }),
-    [login, register, logout, user, isLoading]
+    [login, register, logout, fetchUser, user, isLoading]
   );
 
   return authValue;

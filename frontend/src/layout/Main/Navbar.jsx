@@ -1,34 +1,20 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import UserDropdown from "../../components/UserDropdown";
 import { Link } from "react-router-dom";
 import useDropdown from "../../hooks/useDropdown";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
 import useSeller from "../../hooks/useSeller";
 
 export default function Navbar({ user }) {
   const { isDropdownOpen, toggleDropdown } = useDropdown();
-  const { username = "Guest", role = "User" } = user || {};
-
   const { status, fetchStatus } = useSeller();
-
   const imageUrl = process.env.REACT_APP_PROFILE_PICTURE_URL;
 
-  // Hapus penggunaan state dataFetched karena tidak diperlukan lagi
-
-  // Fungsi untuk memperbarui status
-  const refreshStatus = useCallback(() => {
-    if (user?.role === 2) {
-      fetchStatus();
-    }
-  }, [user, fetchStatus]);
-
-  // Panggil fetchStatus saat komponen dimuat jika user adalah buyer
+  // Only fetch seller status once when the component mounts if user is a seller
   useEffect(() => {
     if (user?.role === 2) {
       fetchStatus();
     }
-  }, [user, fetchStatus]);
+  }, [user?.id, user?.username, user?.biodata, fetchStatus]); // Add user.id as dependency to avoid calling when user changes
 
   return (
     <header className="fixed top-0 left-0 w-full bg-indigo-600 text-white py-4 shadow-md z-50">
@@ -63,25 +49,26 @@ export default function Navbar({ user }) {
                 {/* Profile Image with Border */}
                 <div className="w-10 h-10 rounded-full border-2 border-white hover:border-green-500 p-0.5 overflow-hidden">
                   <img
-                    src={imageUrl + user?.biodata?.image}
-                    alt={user?.username}
+                    src={imageUrl + (user?.biodata?.image || "")}
+                    alt={user?.username || "User"}
                     className="w-full h-full object-cover"
                   />
-                  {/* <FontAwesomeIcon icon={faUser} className="w-full h-full" /> */}
                 </div>
 
                 {/* User Name */}
                 <span className="text-sm font-medium text-left truncate w-[120px] text-white hover:text-purple-500">
-                  {username.length > 15
-                    ? `${username.substring(0, 15)}...`
-                    : username}
+                  {user?.username
+                    ? user.username.length > 15
+                      ? `${user.username.substring(0, 15)}...`
+                      : user.username
+                    : "Guest"}
                 </span>
               </button>
               <UserDropdown
                 isDropdownOpen={isDropdownOpen}
-                role={role}
+                role={user?.role || "User"}
                 status={status}
-                onStatusChange={refreshStatus}
+                onStatusChange={fetchStatus}
               />
             </div>
           </>
