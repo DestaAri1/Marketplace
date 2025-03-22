@@ -26,7 +26,7 @@ type BiodataReponse struct {
 type FormBiodata struct {
 	Username	string				  `json:"username" validate:"required"`
 	Birthday    *time.Time            `json:"birthday" validate:"required"` // Format YYYY-MM-DD
-	PhoneNumber string                `json:"phone_number" validate:"required,numeric,min=10,max=15"` // Hanya angka, min 10 digit, max 15 digit
+	PhoneNumber string                `json:"phone_number" validate:"required,min=10,max=15"` // Hanya angka, min 10 digit, max 15 digit
 	Gender      *int                  `json:"gender" validate:"required,oneof=1 2"` // Hanya boleh 1 (Laki-laki) atau 2 (Perempuan)
 	Image       *multipart.FileHeader `json:"image" form:"image"` // Validasi file gambar
 	ImagePath   string                `json:"-"` // Internal field to store the image path
