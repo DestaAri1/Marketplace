@@ -41,6 +41,7 @@ export default function Home() {
     }
   }, [loading, products]);
 
+  // Fetch products on initial load
   useEffect(() => {
     const loadProducts = async () => {
       if (!isFetched.current) {
@@ -49,7 +50,6 @@ export default function Home() {
       }
     };
 
-    // Hanya jalankan jika komponen di-mount pertama kali
     if (!isFetched.current) {
       loadProducts();
     }
@@ -57,11 +57,23 @@ export default function Home() {
 
   const createCart = useModal();
 
-  const handleSubmitCreateCart = async (data) => {
-    if (await handleCreateCart(createCart.selectedItem.id, data)) {
-      createCart.closeModal();
-      await fetchCart();
+  // Fetch cart data when modal is opened
+  useEffect(() => {
+    if (createCart.isOpen && user) {
+      fetchCart();
     }
+  }, [createCart.isOpen, user, fetchCart]);
+
+  const handleSubmitCreateCart = async (quantity) => {
+    const result = await handleCreateCart(createCart.selectedItem.id, quantity);
+    if (result) {
+      createCart.closeModal();
+    }
+  };
+
+  // Custom modal opener that also fetches cart data
+  const handleOpenModal = (item) => {
+    createCart.openModal(item);
   };
 
   return (
@@ -76,8 +88,8 @@ export default function Home() {
 
         <ProductListSection
           loading={loading}
-          products={products}
-          openModal={createCart.openModal}
+          products={products.slice(0, 4)}
+          openModal={handleOpenModal}
           user={user}
         />
 

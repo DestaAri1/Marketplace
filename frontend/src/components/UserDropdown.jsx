@@ -84,7 +84,7 @@ export default function UserDropdown({
             </form>
           )}
           <Link
-            href="#settings"
+            to={"/profile/setting"}
             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 transition"
           >
             Settings

@@ -16,6 +16,8 @@ export const cartApi = {
       const response = await apiClient.post("/cart", payload);
       return response;
     } catch (error) {
+      console.log(error);
+      
       handleApiError(error);
     }
   },

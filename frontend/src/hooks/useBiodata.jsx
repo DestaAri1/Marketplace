@@ -36,8 +36,6 @@ export default function useBiodata() {
 
     try {
       const response = await biodataAPI.updateBio(id, payload);
-      console.log(response);
-      
 
       if (response?.data?.message) {
         // Dapatkan data user terbaru

@@ -54,9 +54,7 @@ export default function Address() {
     }
   };
 
-  // Handle update address submission
   const handleSubmitUpdateAddress = async (data) => {
-    // Assuming addressId is in the selectedItem
     const addressId = updateModal.selectedItem?.id;
     if (addressId) {
       const success = await handleUpdateAddress(addressId, data);
@@ -93,8 +91,8 @@ export default function Address() {
   };
 
   return (
-    <Suspense fallback={<Fallback />}>
-      <ProfilTemplate>
+    <ProfilTemplate>
+      <Suspense fallback={<Fallback />}>
         <AddressBox
           onClick={createModal.openModal}
           address={address}
@@ -140,7 +138,7 @@ export default function Address() {
           isOpen={deleteModal.isOpen}
           onConfirm={handleSubmitDeleteAddress}
         />
-      </ProfilTemplate>
-    </Suspense>
+      </Suspense>
+    </ProfilTemplate>
   );
 }

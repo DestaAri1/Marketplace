@@ -1,4 +1,11 @@
-import React, { lazy, memo, Suspense, useEffect, useMemo } from "react";
+import React, {
+  lazy,
+  memo,
+  Suspense,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import TimerToaster from "../../components/TimerToaster";
 import useAuth from "../../hooks/useAuth";
 import useCart from "../../hooks/useCart";
@@ -20,18 +27,23 @@ const MainTemplate = memo(
       handleUpdateCart,
       isLoading: cartLoading,
     } = useCart();
-    const cartModal = useModal();
 
-    // Only fetch cart when needed and user exists
+    const cartModal = useModal();
+    const [isCartLoaded, setIsCartLoaded] = useState(false);
+
+    // Fetch cart when user exists, regardless of modal state
     useEffect(() => {
-      if (user && !isFetched.current && cartModal.isOpen) {
-        fetchCart();
+      if (user && !isFetched.current) {
+        fetchCart().then(() => {
+          setIsCartLoaded(true);
+        });
       }
-    }, [user, fetchCart, cartModal.isOpen, isFetched]);
+    }, [user, fetchCart, isFetched]);
 
     const handleSubmittedCart = async (data) => {
       const success = await handleUpdateCart(data);
       if (success) {
+        await fetchCart()
         cartModal.closeModal();
       }
     };
@@ -54,22 +66,24 @@ const MainTemplate = memo(
         {children}
 
         {showFloatingCart && (
-          <FloatingCartButton onClick={cartModal.openModal} />
+          <FloatingCartButton
+            onClick={cartModal.openModal}
+            disabled={!user || (user && !isCartLoaded)}
+          />
         )}
 
-        {cartModal.isOpen && (
-          <Suspense fallback={<Fallback />}>
-            <CartModal
-              isOpen={cartModal.isOpen}
-              onClose={cartModal.closeModal}
-              user={user}
-              cart={cart}
-              onDeleteItem={handleSubmitDeleteCart}
-              onConfirm={handleSubmittedCart}
-              isLoading={cartLoading}
-            />
-          </Suspense>
-        )}
+        <Suspense fallback={<Fallback />}>
+          <CartModal
+            isOpen={cartModal.isOpen}
+            onClose={cartModal.closeModal}
+            user={user}
+            cart={cart}
+            onDeleteItem={handleSubmitDeleteCart}
+            onConfirm={handleSubmittedCart}
+            isLoading={cartLoading}
+            refreshCart={fetchCart}
+          />
+        </Suspense>
       </div>
     );
   }

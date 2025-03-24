@@ -6,10 +6,10 @@ const Biodata = lazy(() => import("../../../components/Profile/Biodata"));
 
 export default function Profile() {
   return (
-    <Suspense fallback={<Fallback />}>
-      <ProfilTemplate>
+    <ProfilTemplate>
+      <Suspense fallback={<Fallback />}>
         <Biodata />
-      </ProfilTemplate>
-    </Suspense>
+      </Suspense>
+    </ProfilTemplate>
   );
 }

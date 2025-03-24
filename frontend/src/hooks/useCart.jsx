@@ -35,14 +35,26 @@ export default function useCart() {
       const response = await cartApi.createCart(payload);
       if (response?.data?.message) {
         toast.dismiss();
-        showSuccessToast(response.data.message || "Cart has been added");
-        // Refresh cart after adding
+        showSuccessToast(response?.data?.message || "Cart has been added");
+
+        const newItem = {
+          id: response.data.id || Date.now(), // Use returned ID or temporary one
+          product_id: payload.product_id,
+          product_name: "Loading...", // Will be replaced after fetch
+          product_price: 0,
+          quantity: payload.quantity,
+        };
+
+        setCart((prevCart) => [...prevCart, newItem]);
+
+        // Then fetch the updated cart to get complete data
         await fetchCart();
         return true;
       }
       return false;
     } catch (error) {
-      showErrorToast(error || "Failed create a cart");
+      const errorMessage = error.message || "An unexpected error occurred";
+      showErrorToast(errorMessage);
       return false;
     } finally {
       setIsLoading(false);
@@ -52,27 +64,43 @@ export default function useCart() {
   const handleDeleteCart = async (cartId) => {
     setIsLoading(true);
     try {
+      // Optimistic UI update - remove item immediately
+      setCart((prevCart) => prevCart.filter((item) => item.id !== cartId));
+
       const response = await cartApi.deleteCart(cartId);
       if (response?.data?.message) {
         toast.dismiss();
         showSuccessToast(response.data.message || "Item removed from cart");
-        // Update cart state by removing the deleted item
-        setCart((prevCart) => prevCart.filter((item) => item.id !== cartId));
         return true;
       }
+
+      // If deletion failed, revert by fetching the cart again
+      if (!response?.data?.message) {
+        await fetchCart();
+      }
+
       return false;
     } catch (error) {
-      showErrorToast(error || "Failed to remove item from cart");
+      // If error, revert by fetching the cart again
+      await fetchCart();
+
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred";
+      showErrorToast(errorMessage);
       return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Add update cart function
   const handleUpdateCart = async (cartItems) => {
     setIsLoading(true);
     try {
+      // Optionally, you can update the UI optimistically here
+      // by matching and updating relevant cart items
+
       const response = await cartApi.updateCart(cartItems);
       if (response?.data?.message) {
         toast.dismiss();
@@ -83,7 +111,11 @@ export default function useCart() {
       }
       return false;
     } catch (error) {
-      showErrorToast(error || "Failed to update cart");
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "An unexpected error occurred";
+      showErrorToast(errorMessage);
       return false;
     } finally {
       setIsLoading(false);

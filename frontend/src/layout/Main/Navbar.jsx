@@ -1,12 +1,24 @@
 import React, { useEffect } from "react";
 import UserDropdown from "../../components/UserDropdown";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import useDropdown from "../../hooks/useDropdown";
 import useSeller from "../../hooks/useSeller";
 
 export default function Navbar({ user }) {
   const { isDropdownOpen, toggleDropdown } = useDropdown();
   const { status, fetchStatus } = useSeller();
+  const menuItems = [
+    {
+      key: 1,
+      label: "Home",
+      link: "/",
+    },
+    {
+      key: 2,
+      label: "Products",
+      link: "/products",
+    },
+  ];
   const imageUrl = process.env.REACT_APP_PROFILE_PICTURE_URL;
 
   // Only fetch seller status once when the component mounts if user is a seller
@@ -17,7 +29,7 @@ export default function Navbar({ user }) {
   }, [user?.id, user?.username, user?.biodata, fetchStatus]); // Add user.id as dependency to avoid calling when user changes
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-indigo-600 text-white py-4 shadow-md z-50">
+    <header className="fixed top-0 left-0 w-full bg-indigo-600 text-white py-2 shadow-md z-50">
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Navbar Left */}
         <div className="flex w-[186px] items-center space-x-4">
@@ -26,15 +38,15 @@ export default function Navbar({ user }) {
 
         {/* Navbar Center */}
         <nav className="space-x-6">
-          <a href="#promotions" className="hover:underline">
-            Promotions
-          </a>
-          <a href="#products" className="hover:underline">
-            Products
-          </a>
-          <a href="#contact" className="hover:underline">
-            Contact
-          </a>
+          {menuItems.map((item) => (
+            <NavLink
+              key={item.key}
+              to={`${item.link}`}
+              className={({ isActive }) => `${isActive ? `font-bold` : ``}`}
+            >
+              {item.label}
+            </NavLink>
+          ))}
         </nav>
 
         {/* Navbar Right */}

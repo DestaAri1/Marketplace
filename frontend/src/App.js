@@ -25,6 +25,7 @@ import Notifications from "./pages/Home/Profile/Notifications";
 import Security from "./pages/Home/Profile/Security";
 import Help from "./pages/Home/Profile/Help";
 import ChangePassword from "./pages/Home/Profile/Security/ChangePassword";
+import Products from "./pages/Home/Home/Products";
 
 export default function App() {
   const authRoutes = [
@@ -73,6 +74,7 @@ export default function App() {
       <Routes>
         {authRoutes.map(renderRoute)}
         <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Products/>}/>
         <Route
           path="/product/:id"
           element={

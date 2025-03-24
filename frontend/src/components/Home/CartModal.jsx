@@ -11,11 +11,39 @@ export default function CartModal({
   onDeleteItem,
   onConfirm,
   isLoading,
+  refreshCart, // Add this prop
 }) {
   // Local state to track quantities and selected items
   const [localQuantities, setLocalQuantities] = useState({});
   const [selectedItems, setSelectedItems] = useState({});
-  const navigate = useNavigate()
+  const [isRendered, setIsRendered] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const navigate = useNavigate();
+
+  // Handle modal opening and closing animations
+  useEffect(() => {
+    if (isOpen) {
+      // When modal opens, refresh cart data
+      if (user) {
+        refreshCart();
+      }
+
+      // First render the component
+      setIsRendered(true);
+      // Then after a small delay, start the animation
+      setTimeout(() => {
+        setIsAnimating(true);
+      }, 10); // Small delay to ensure DOM is ready
+    } else {
+      // First start closing animation
+      setIsAnimating(false);
+      // Then after animation completes, unmount component
+      const timer = setTimeout(() => {
+        setIsRendered(false);
+      }, 300); // Match duration with CSS transition
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, user, refreshCart]);
 
   // Reset local quantities when cart changes
   useEffect(() => {
@@ -65,6 +93,11 @@ export default function CartModal({
     return Object.values(selectedItems).some((selected) => selected);
   };
 
+  const handleDeleteItem = async (itemId) => {
+    await onDeleteItem(itemId);
+    // No need to manually update state as the parent will refresh the cart
+  };
+
   const handleConfirm = () => {
     const checkoutData = cart
       ?.filter((item) => selectedItems[item.id])
@@ -82,8 +115,13 @@ export default function CartModal({
 
     // Save encrypted data to localStorage
     localStorage.setItem("checkoutData", encryptedData);
-    navigate("/check-out")
+    navigate("/check-out");
   };
+
+  // If not rendered at all, don't return anything
+  if (!isRendered) {
+    return null;
+  }
 
   return (
     <div
@@ -93,12 +131,12 @@ export default function CartModal({
         }
       }}
       className={`fixed inset-0 bg-black/50 transition-opacity duration-300 z-50 ${
-        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        isAnimating ? "opacity-100" : "opacity-0"
       }`}
     >
       <div
         className={`fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-xl transition-transform duration-300 transform ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+          isAnimating ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
@@ -106,7 +144,7 @@ export default function CartModal({
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Shopping Cart</h2>
               <button
-                onClick={() => onClose()}
+                onClick={onClose}
                 className="p-2 hover:bg-gray-100 rounded-full"
               >
                 <X size={24} />
@@ -175,7 +213,7 @@ export default function CartModal({
                               </p>
                             </div>
                             <button
-                              onClick={() => onDeleteItem(item.id)}
+                              onClick={() => handleDeleteItem(item.id)}
                               className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded-full"
                             >
                               <Trash2 size={18} />
