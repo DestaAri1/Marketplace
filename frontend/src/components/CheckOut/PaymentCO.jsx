@@ -5,8 +5,8 @@ export default function PaymentCO() {
   const [selectedCheckOut, setSelectedCheckOut] = useState(null);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 sticky top-8">
-      <h2 className="text-xl font-semibold mb-6 text-gray-800">
+    <div className="bg-white rounded-xl shadow-sm p-4 sticky top-8">
+      <h2 className="text-lg font-semibold mb-4 text-gray-800">
         Payment Method
       </h2>
       <div className="space-y-4">
@@ -32,8 +32,8 @@ export default function PaymentCO() {
             />
           </div>
           <div>
-            <h3 className="font-medium text-gray-800">Credit Card</h3>
-            <p className="text-gray-600 text-sm">Pay with your credit card</p>
+            <h3 className="font-medium text-gray-800">Virtual Account</h3>
+            <p className="text-gray-600 text-sm">Pay with your virtual account</p>
           </div>
         </div>
         <div

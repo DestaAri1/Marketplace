@@ -60,6 +60,16 @@ export default function SideBar({ isCollapsed, toggleCollapse, user }) {
     }
   }, [subDropdown]);
 
+  useEffect(() => {
+    const path = window.location.pathname;
+
+    // Cek jika path tidak dimulai dengan /seller/ atau /dashboard/
+    if (!path.startsWith("/seller/") && !path.startsWith("/dashboard/")) {
+      localStorage.removeItem("subDropdown");
+      localStorage.removeItem("activeDropdown");
+    }
+  }, []);
+
   const toggleDropdown = (dropdown) => {
     setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
 

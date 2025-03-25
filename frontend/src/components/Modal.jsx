@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function Modal({
   isOpen,
@@ -9,6 +10,8 @@ export default function Modal({
   confirmText,
   confirmClass,
   width = "max-w-md",
+  link = null,
+  text,
 }) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -61,6 +64,14 @@ export default function Modal({
         </div>
         <div className="mb-6">{children}</div>
         <div className="flex justify-end gap-2">
+          {link !== null && (
+            <Link
+              to={link}
+              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-colors duration-200"
+            >
+              {text}
+            </Link>
+          )}
           <button
             onClick={onClose}
             className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-colors duration-200"

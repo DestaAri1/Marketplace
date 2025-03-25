@@ -33,6 +33,8 @@ const MainTemplate = memo(
 
     // Fetch cart when user exists, regardless of modal state
     useEffect(() => {
+      localStorage.removeItem("subDropdown");
+      localStorage.removeItem("activeDropdown");
       if (user && !isFetched.current) {
         fetchCart().then(() => {
           setIsCartLoaded(true);
@@ -43,7 +45,7 @@ const MainTemplate = memo(
     const handleSubmittedCart = async (data) => {
       const success = await handleUpdateCart(data);
       if (success) {
-        await fetchCart()
+        await fetchCart();
         cartModal.closeModal();
       }
     };

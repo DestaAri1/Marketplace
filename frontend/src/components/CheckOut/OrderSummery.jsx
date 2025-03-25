@@ -8,14 +8,14 @@ export default function OrderSummery({checkoutData}) {
   return (
     <div className="lg:col-span-2">
       <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-6 text-gray-800">
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">
           Order Summary
         </h2>
-        <div className="space-y-6">
+        <div className="space-y-4">
           {checkoutData?.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between border-b border-gray-100 pb-6 last:border-0"
+              className="flex items-center justify-between border-b border-gray-100 pb-4 last:border-0"
             >
               <div className="flex items-center space-x-4">
                 {item.image ? (

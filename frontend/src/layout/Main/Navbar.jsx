@@ -7,6 +7,7 @@ import useSeller from "../../hooks/useSeller";
 export default function Navbar({ user }) {
   const { isDropdownOpen, toggleDropdown } = useDropdown();
   const { status, fetchStatus } = useSeller();
+  
   const menuItems = [
     {
       key: 1,
@@ -78,7 +79,7 @@ export default function Navbar({ user }) {
               </button>
               <UserDropdown
                 isDropdownOpen={isDropdownOpen}
-                role={user?.role || "User"}
+                role={user?.role}
                 status={status}
                 onStatusChange={fetchStatus}
               />

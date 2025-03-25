@@ -7,16 +7,30 @@ import OrderSummery from "../../../components/CheckOut/OrderSummery";
 import ErrorCOState from "../../../components/CheckOut/ErrorCOState";
 import PaymentCO from "../../../components/CheckOut/PaymentCO";
 import AddressChoose from "../../../components/CheckOut/AddressChoose";
+import { useModal } from "../../../hooks/useModal";
+import AddressChooseModal from "../../../components/CheckOut/AddressChooseModal";
+import useAddress from "../../../hooks/useAddress";
 
 export default function CheckOut() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { address, isFetched, fetchAddress } = useAddress();
 
-  // Simpan data checkout dalam state
+  // State untuk menyimpan alamat yang dipilih
+  const [selectedAddress, setSelectedAddress] = useState(null);
+
+  useEffect(() => {
+    if (!isFetched.current) {
+      fetchAddress();
+      isFetched.current = true;
+    }
+  }, [isFetched, fetchAddress]);
+
   const [checkoutData, setCheckoutData] = useState(null);
 
-  // Load data pada mount
+  const selectAddress = useModal();
+
   useEffect(() => {
     try {
       const encryptedCheckoutData = localStorage.getItem("checkoutData");
@@ -28,7 +42,6 @@ export default function CheckOut() {
       }
 
       const decryptedData = decryptId(encryptedCheckoutData);
-
       const parsedData = JSON.parse(decryptedData);
 
       setCheckoutData(parsedData);
@@ -39,24 +52,32 @@ export default function CheckOut() {
     }
   }, []);
 
-  // // Clear checkout data when component unmounts
-  // useEffect(() => {
-  //   return () => {
-  //     localStorage.removeItem("checkoutData");
-  //   };
-  // }, []);
+  
+  const handleAddressData = (data) => {
+    // Set alamat yang dipilih
+    setSelectedAddress(data);
+    selectAddress.closeModal();
+  };
 
-  // // Redirect to home if no checkout data - with delay for debugging
-  // useEffect(() => {
-  //   if (!isLoading && !checkoutData) {
-  //     const timer = setTimeout(() => {
-  //       navigate("/");
-  //     }, 3000); // 3 second delay for debugging
+  // Clear checkout data when component unmounts
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("checkoutData");
+      setSelectedAddress(null)
+    };
+  }, []);
 
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [checkoutData, navigate, isLoading]);
+  // Redirect to home if no checkout data - with delay for debugging
+  useEffect(() => {
+    if (!isLoading && !checkoutData) {
+      const timer = setTimeout(() => {
+        navigate("/");
+      }, 3000); // 3 second delay for debugging
 
+      return () => clearTimeout(timer);
+    }
+  }, [checkoutData, navigate, isLoading]);
+  
   // Render loading state
   if (isLoading) {
     return (
@@ -112,14 +133,21 @@ export default function CheckOut() {
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Order Summary */}
-                <OrderSummery
-                  checkoutData={checkoutData}
-                  OrderSummery={OrderSummery}
-                />
+                <OrderSummery checkoutData={checkoutData} />
 
                 <div className="lg:col-span-1">
                   {/* Choose Address */}
-                  <AddressChoose/>
+                  <AddressChoose
+                    onClick={selectAddress.openModal}
+                    address={selectedAddress ? [selectedAddress] : ""}
+                  />
+
+                  <AddressChooseModal
+                    isOpen={selectAddress.isOpen}
+                    onClose={selectAddress.closeModal}
+                    onConfirm={handleAddressData}
+                    address={address}
+                  />
                   {/* Payment Method */}
                   <PaymentCO />
                 </div>
