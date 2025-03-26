@@ -16,7 +16,7 @@ export default function useBiodata() {
     // Add all form data to payload
     if (formData.username) payload.append("username", formData.username);
     if (formData.email) payload.append("email", formData.email);
-    if (formData.birthday) payload.append("birthday", formData.birthday);
+    if (formData.birthday) payload.append("birthday", formData.birthday + "T00:00:00Z");
     if (formData.phone_number)
       payload.append("phoneNumber", formData.phone_number);
 

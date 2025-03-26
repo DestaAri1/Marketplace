@@ -13,14 +13,18 @@ export default function SideBar({ isCollapsed, toggleCollapse, user }) {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [subDropdown, setSubDropdown] = useState(null);
 
-  // Use ref to track if we should render the dropdown components
-  const [shouldRender, setShouldRender] = useState(false);
+  // State to track user role from localStorage
+  const [userRole, setUserRole] = useState(null);
 
   // Load saved state on first render only
   useEffect(() => {
     if (!isHydrated.current) {
+      const storedUserRole = localStorage.getItem("userRole");
       const storedActiveDropdown = localStorage.getItem("activeDropdown");
       const storedSubDropdown = localStorage.getItem("subDropdown");
+
+      // Set user role from localStorage
+      setUserRole(storedUserRole ? parseInt(storedUserRole, 10) : null);
 
       // Set states all at once to avoid partial updates
       if (storedActiveDropdown && storedActiveDropdown !== "") {
@@ -33,9 +37,6 @@ export default function SideBar({ isCollapsed, toggleCollapse, user }) {
 
       // Mark as hydrated
       isHydrated.current = true;
-
-      // Allow rendering after hydration
-      setShouldRender(true);
     }
   }, []);
 
@@ -63,7 +64,7 @@ export default function SideBar({ isCollapsed, toggleCollapse, user }) {
   useEffect(() => {
     const path = window.location.pathname;
 
-    // Cek jika path tidak dimulai dengan /seller/ atau /dashboard/
+    // Remove dropdown states if not on seller or dashboard pages
     if (!path.startsWith("/seller/") && !path.startsWith("/dashboard/")) {
       localStorage.removeItem("subDropdown");
       localStorage.removeItem("activeDropdown");
@@ -98,31 +99,30 @@ export default function SideBar({ isCollapsed, toggleCollapse, user }) {
         <ul className="space-y-2">
           <li>
             <Navlink
-              to={user?.role === 0 ? "/dashboard" : "/seller/dashboard"}
+              to={userRole === 0 ? "/admin/dashboard" : "/seller/dashboard"}
               icon={Home}
               title="Home"
               isCollapsed={isCollapsed}
             />
           </li>
 
-          {shouldRender &&
-            (user?.role === 0 ? (
-              <UserManajementComponent
-                isCollapsed={isCollapsed}
-                activeDropdown={activeDropdown}
-                subDropdown={subDropdown}
-                toggleDropdown={toggleDropdown}
-                toggleSubDropdown={toggleSubDropdown}
-              />
-            ) : (
-              <SellerManajement
-                isCollapsed={isCollapsed}
-                activeDropdown={activeDropdown}
-                subDropdown={subDropdown}
-                toggleDropdown={toggleDropdown}
-                toggleSubDropdown={toggleSubDropdown}
-              />
-            ))}
+          {userRole === 0 ? (
+            <UserManajementComponent
+              isCollapsed={isCollapsed}
+              activeDropdown={activeDropdown}
+              subDropdown={subDropdown}
+              toggleDropdown={toggleDropdown}
+              toggleSubDropdown={toggleSubDropdown}
+            />
+          ) : (
+            <SellerManajement
+              isCollapsed={isCollapsed}
+              activeDropdown={activeDropdown}
+              subDropdown={subDropdown}
+              toggleDropdown={toggleDropdown}
+              toggleSubDropdown={toggleSubDropdown}
+            />
+          )}
 
           <li>
             <Navlink

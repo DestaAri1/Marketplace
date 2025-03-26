@@ -33,6 +33,7 @@ const MainTemplate = memo(
 
     // Fetch cart when user exists, regardless of modal state
     useEffect(() => {
+      localStorage.setItem("userRole", user?.role)
       localStorage.removeItem("subDropdown");
       localStorage.removeItem("activeDropdown");
       if (user && !isFetched.current) {

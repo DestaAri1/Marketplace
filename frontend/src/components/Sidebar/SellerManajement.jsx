@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import DropdownButton from "./DropdownButton";
-import { BadgePercent, List, Megaphone, Package } from "lucide-react";
+import { BadgePercent, List, Megaphone, Package, PackageOpen, TicketPercent } from "lucide-react";
 import DropdownContent from "./DropdownContent";
 import SubNavlink from "./SubNavlink";
 import Navlink from "./Navlink";
@@ -41,6 +41,14 @@ const SellerManajement = memo(function SellerManajement({
           isCollapsed={isCollapsed}
           classes={isCollapsed ? "ml-4" : "ml-8"}
         />
+
+        <SubNavlink
+          to="/seller/product/package"
+          icon={PackageOpen}
+          title="Package"
+          isCollapsed={isCollapsed}
+          classes={isCollapsed ? "ml-4" : "ml-8"}
+        />
       </DropdownContent>
 
       <DropdownButton
@@ -53,10 +61,18 @@ const SellerManajement = memo(function SellerManajement({
 
       <DropdownContent isActive={isActivePromotion}>
         <SubNavlink
-          to="/seller/discount"
+          to="/seller/promotion/discount"
           icon={BadgePercent}
           title="Discount"
           isCollapsed={isCollapsed}
+          classes={isCollapsed ? "ml-4" : "ml-8"}
+        />
+
+        <SubNavlink
+          to={"/seller/promotion/voucher"}
+          icon={TicketPercent}
+          title="Voucher"
+          isCollapsed={isActive}
           classes={isCollapsed ? "ml-4" : "ml-8"}
         />
       </DropdownContent>

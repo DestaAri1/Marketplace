@@ -26,6 +26,10 @@ import Security from "./pages/Home/Profile/Security";
 import Help from "./pages/Home/Profile/Help";
 import ChangePassword from "./pages/Home/Profile/Security/ChangePassword";
 import Products from "./pages/Home/Home/Products";
+import Sale from "./pages/Seller/Sale/Sale";
+import Discount from "./pages/Seller/Promotion/Discount";
+import Voucher from "./pages/Seller/Promotion/Voucher";
+import Package from "./pages/Seller/Product/Package";
 
 export default function App() {
   const authRoutes = [
@@ -42,6 +46,26 @@ export default function App() {
     {
       path: "/seller/products",
       element: <SellerProducts />,
+      wrapper: SellerRoute,
+    },
+    {
+      path: "/seller/product/package",
+      element: <Package />,
+      wrapper: SellerRoute,
+    },
+    {
+      path: "/seller/sale",
+      element: <Sale />,
+      wrapper: SellerRoute,
+    },
+    {
+      path: "/seller/promotion/discount",
+      element: <Discount />,
+      wrapper: SellerRoute,
+    },
+    {
+      path: "/seller/promotion/voucher",
+      element: <Voucher />,
       wrapper: SellerRoute,
     },
   ];
@@ -74,7 +98,7 @@ export default function App() {
       <Routes>
         {authRoutes.map(renderRoute)}
         <Route path="/" element={<Home />} />
-        <Route path="/products" element={<Products/>}/>
+        <Route path="/products" element={<Products />} />
         <Route
           path="/product/:id"
           element={
@@ -99,7 +123,7 @@ export default function App() {
           <Route path="notifications" element={<Notifications />} />
           <Route path="security/" element={<NestedProtectedRoute />}>
             <Route index element={<Security />} />
-            <Route path="change-password" element={<ChangePassword/>}/>
+            <Route path="change-password" element={<ChangePassword />} />
           </Route>
           <Route path="help" element={<Help />} />
         </Route>
