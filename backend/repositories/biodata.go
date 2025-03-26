@@ -45,7 +45,7 @@ func (r *BiodataRepository) UpdateBiodata(ctx context.Context, formData *models.
 	// Handle image if provided
 	if formData.Image != nil {
 		// Try to save as SVG first (now returns just the filename)
-		imagePath, err := utils.SaveProfilePicture(formData.Image)
+		imagePath, err := utils.SaveProfilePicture(formData.Image, "assets/profile-picture")
 		if err != nil {
 			// If SVG conversion fails, fall back to optimized JPG
 			imagePath, err = utils.SaveOptimizedImage(formData.Image)

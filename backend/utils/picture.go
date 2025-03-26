@@ -42,7 +42,7 @@ func ValidateImageFile(file *multipart.FileHeader) error {
 
 // SaveProfilePicture saves the uploaded profile picture to the destination directory
 // Now with proper SVG conversion and returning just the filename
-func SaveProfilePicture(file *multipart.FileHeader) (string, error) {
+func SaveProfilePicture(file *multipart.FileHeader, dirPicture string) (string, error) {
 	// Validate the image first
 	if err := ValidateImageFile(file); err != nil {
 		return "", err
@@ -82,7 +82,7 @@ func SaveProfilePicture(file *multipart.FileHeader) (string, error) {
 	newFileName := uuid.New().String()
 	
 	// Save the resized image as PNG temporarily
-	tempPngPath := filepath.Join(ProfilePictureDir, newFileName+".png")
+	tempPngPath := filepath.Join(dirPicture, newFileName+".png")
 	tempFile, err := os.Create(tempPngPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to create temporary file: %w", err)

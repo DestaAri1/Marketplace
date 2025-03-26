@@ -18,6 +18,7 @@ func (r *CategoryRepository) GetAllCategory(ctx context.Context) ([]*models.Cate
 	res := r.db.
 		Table("categories").
 		Select("id, name").
+		Where("deleted_at IS NULL").
 		Order("name asc").
 		Scan(&category)
 

@@ -8,10 +8,10 @@ import (
 
 type Biodata struct {
 	Base
-	Birthday    *time.Time `json:"birthday,omitempty" gorm:"default:null"`
-	PhoneNumber string     `json:"phone_number,omitempty" gorm:"default:null"`
-	Gender      *int       `json:"gender,omitempty" gorm:"default:null"`
-	Image       string     `json:"image,omitempty" gorm:"default:null"`
+	Birthday    *time.Time `json:"birthday,omitempty"`
+	PhoneNumber string     `json:"phone_number,omitempty"`
+	Gender      *int       `json:"gender,omitempty"`
+	Image       string     `json:"image,omitempty"`
 	UserId      uint       `json:"user_id"`
 	User        User       `json:"user" gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }

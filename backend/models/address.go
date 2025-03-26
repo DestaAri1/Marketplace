@@ -4,15 +4,15 @@ import "context"
 
 type Address struct {
 	Base
-	Sender	   string `json:"sender"`
-	Reciver	   string `json:"recive"`
+	Sender	   string `json:"sender" gorm:"not null"`
+	Reciver	   string `json:"recive" gorm:"not null"`
 	Status	   bool	  `json:"status" gorm:"default:0"`
-	UserId     int    `json:"user_id"`
+	UserId     int    `json:"user_id" gorm:"not null"`
 	User       User   `json:"user"`
-	ProvinceId string `json:"province_id"`
-	RegencyId  string `json:"regency_id"`
-	DistrictId string `json:"district_id"`
-	VillageId  string `json:"village_id"`
+	ProvinceId string `json:"province_id" gorm:"not null"`
+	RegencyId  string `json:"regency_id" gorm:"not null"`
+	DistrictId string `json:"district_id" gorm:"not null"`
+	VillageId  string `json:"village_id" gorm:"not null"`
 	Details	   string `json:"details,omitempty" gorm:"type:text"`
 }
 

@@ -1,10 +1,15 @@
 package models
 
-import "context"
+import (
+	"context"
+
+	"gorm.io/gorm"
+)
 
 type Category struct {
 	Base
-	Name 	string `json:"name"`
+	Name 		string `json:"name" gorm:"not null"`
+	DeletedAt   gorm.DeletedAt `json:"deleted_at" gorm:"index"`
 }
 
 type FormCategory struct {

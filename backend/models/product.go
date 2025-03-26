@@ -7,9 +7,9 @@ type Product struct {
 	Name        string   `json:"name" gorm:"type:varchar(255);not null"`
 	Stock       int      `json:"stock" gorm:"not null"`
 	Price       float64  `json:"price" gorm:"type:decimal(10,2);not null"`
-	CategoryId  uint     `json:"category_id"`
+	CategoryId  uint     `json:"category_id" gorm:"not null"`
 	Category    Category `json:"category" gorm:"foreignKey:CategoryId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	UserId      uint     `json:"user_id"`
+	UserId      uint     `json:"user_id" gorm:"not null"`
 	User        User     `json:"user" gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Status      bool     `json:"status,omitempty" gorm:"default:0"`
 	Description string   `json:"description,omitempty" gorm:"type:text"`
