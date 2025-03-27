@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { biodataAPI } from "../services/biodataServices";
-import { showSuccessToast } from "../utils/Toast";
+import { showErrorToast, showSuccessToast } from "../utils/Toast";
 import useAuth from "./useAuth";
 
 export default function useBiodata() {
   const { fetchUser, setUser } = useAuth(); // Pastikan setUser diekspos dari useAuth
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState({})
 
   const handleUpdateBiodata = async (id, formData) => {
     setIsLoading(true);
@@ -16,7 +17,12 @@ export default function useBiodata() {
     // Add all form data to payload
     if (formData.username) payload.append("username", formData.username);
     if (formData.email) payload.append("email", formData.email);
-    if (formData.birthday) payload.append("birthday", formData.birthday + "T00:00:00Z");
+    if (formData.birthday) {
+      const birthdayDate = new Date(formData.birthday);
+      const formattedBirthday =
+        birthdayDate.toISOString().split("T")[0] + "T00:00:00Z";
+      payload.append("birthday", formattedBirthday);
+    }
     if (formData.phone_number)
       payload.append("phoneNumber", formData.phone_number);
 
@@ -70,7 +76,11 @@ export default function useBiodata() {
       }
       return false;
     } catch (error) {
-      console.error("Error updating biodata:", error);
+      if (error.response?.data?.error) {
+        setError(error.response?.data?.error)
+      } else {
+        showErrorToast(error.message)
+      }
       return false;
     } finally {
       setIsLoading(false);

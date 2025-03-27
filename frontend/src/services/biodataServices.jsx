@@ -15,8 +15,6 @@ export const biodataAPI = {
       const response = await apiClient.patch(`/biodata/${id}`, payload, config);
       return response;
     } catch (error) {
-        console.log(error);
-        
       handleApiError(error);
     }
   },

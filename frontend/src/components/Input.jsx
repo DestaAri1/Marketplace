@@ -41,7 +41,10 @@ export default function Input({
           name={name}
           placeholder={placeholder}
           className={`w-full px-3 py-2 mt-1 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 ${classes} 
-            ${error ? "border-red-500" : "border-gray-300"} `}
+            ${error ? "border-red-500" : "border-gray-300"} ${
+            type === "number" &&
+            "appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          }`}
           value={value}
           onChange={onChange}
           readOnly={readOnly}

@@ -10,10 +10,10 @@ import {
 import React from "react";
 import { NavLink } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import { createImageUrl } from "../../utils/ImageUrlHelper";
 
 export default function Sidebar() {
   const { user } = useAuth();
-  const imageUrl = process.env.REACT_APP_PROFILE_PICTURE_URL;
   const menuItems = [
     {
       id: "biodata",
@@ -46,10 +46,10 @@ export default function Sidebar() {
       link: "/profile/security",
     },
     {
-      id:"settings",
-      label:"Settings",
-      icon:<Settings size={20}/>,
-      link:"/profile/settings"
+      id: "settings",
+      label: "Settings",
+      icon: <Settings size={20} />,
+      link: "/profile/settings",
     },
     {
       id: "help",
@@ -58,6 +58,8 @@ export default function Sidebar() {
       link: "/profile/help",
     },
   ];
+  
+  const imageUrl = process.env.REACT_APP_PROFILE_PICTURE_URL;
 
   return (
     <div className="w-full bg-white rounded-lg shadow-md p-4 overflow-y-auto h-[calc(100vh-5.8rem)]">
@@ -65,7 +67,10 @@ export default function Sidebar() {
         <div className="flex items-center justify-center mb-4">
           <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
             <img
-              src={imageUrl + user?.biodata.image || "/api/placeholder/96/96"}
+              src={createImageUrl(
+                process.env.REACT_APP_PROFILE_PICTURE_URL,
+                user?.biodata?.image
+              )}
               alt="Profile"
               className="w-full h-full object-cover"
             />

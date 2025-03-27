@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 import Modal from "../Modal";
-import useErrorHook from "../../hooks/useErrorHook";
-import Input from "../Input";
-import ErrorMessage from "../ErrorMessage";
 import FormCategory from "./FormCategory";
 
 export default function AddCategoryModal({

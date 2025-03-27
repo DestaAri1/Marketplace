@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Input from "../../Input.jsx";
 import Select from "../../Select.jsx";
+import { createImageUrl } from "../../../utils/ImageUrlHelper.jsx";
 
 export default function FormBiodata({
   user,
@@ -12,18 +13,18 @@ export default function FormBiodata({
   const [previewImage, setPreviewImage] = useState(null);
   const [localUser, setLocalUser] = useState(user);
 
-  const imageUrl = process.env.REACT_APP_PROFILE_PICTURE_URL;
-
+  
   const gender = [
     { id: 1, name: "Laki-Laki" },
     { id: 2, name: "Perempuan" },
   ];
-
+  
   // Update local state when user changes
   useEffect(() => {
     setLocalUser(user);
   }, [user]);
-
+  
+  const imageUrl = process.env.REACT_APP_PROFILE_PICTURE_URL;
   useEffect(() => {
     if (localUser?.id) {
       // Initialize all form fields
@@ -114,12 +115,10 @@ export default function FormBiodata({
         <div className="relative">
           <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-md mb-4">
             <img
-              src={
-                previewImage ||
-                (localUser?.biodata?.image
-                  ? `${imageUrl}${localUser.biodata.image}`
-                  : "/default-profile.jpg")
-              }
+              src={createImageUrl(
+                process.env.REACT_APP_PROFILE_PICTURE_URL,
+                localUser?.biodata?.image
+              )}
               alt="Profile"
               className="w-full h-full object-cover"
             />
