@@ -48,7 +48,7 @@ func (r *BiodataRepository) UpdateBiodata(ctx context.Context, formData *models.
 		imagePath, err := utils.SaveProfilePicture(formData.Image, "assets/profile-picture")
 		if err != nil {
 			// If SVG conversion fails, fall back to optimized JPG
-			imagePath, err = utils.SaveOptimizedImage(formData.Image)
+			imagePath, err = utils.SaveOptimizedImage(formData.Image, "assets/profile-picture")
 			if err != nil {
 				tx.Rollback()
 				return fmt.Errorf("error processing image: %w", err)

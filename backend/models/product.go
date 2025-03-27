@@ -1,10 +1,14 @@
 package models
 
-import "context"
+import (
+	"context"
+	"mime/multipart"
+)
 
 type Product struct {
 	Base
 	Name        string   `json:"name" gorm:"type:varchar(255);not null"`
+	Image       string   `json:"image,omitempty"`
 	Stock       int      `json:"stock" gorm:"not null"`
 	Price       float64  `json:"price" gorm:"type:decimal(10,2);not null"`
 	CategoryId  uint     `json:"category_id" gorm:"not null"`
@@ -18,6 +22,7 @@ type Product struct {
 type ProductResponse struct {
 	Id          uint    `json:"id"`
 	Name        string  `json:"name"`
+	Image		string	`json:"image"`
 	Stock       int     `json:"stock"`
 	Price       float64 `json:"price"`
 	CategoryId  uint    `json:"category_id"`
@@ -27,12 +32,14 @@ type ProductResponse struct {
 }
 
 type FormCreateProduct struct {
-	Name        string   `json:"name" validate:"required,min=3,max=100"`     // Minimal 3 karakter, maksimal 100
-	Stock       *int     `json:"stock" validate:"required,numeric,min=1"`    // Minimal stok 1
-	Price       *float64 `json:"price" validate:"required,numeric,gt=0"`     // Harga wajib diisi dan harus lebih dari 0
-	Status		*bool	 `json:"status" validate:"omitempty"`
-	Category	*int	 `json:"category_id" validate:"required,numeric,gt=0"`
-	Description string   `json:"description" validate:"omitempty,max=500"`   // Opsional, maksimal 500 karakter
+	Name        string   `json:"name" validate:"omitempty,min=3,max=100"`
+	Stock       *int     `json:"stock" validate:"omitempty,numeric,min=1"`
+	Price       *float64 `json:"price" validate:"omitempty,numeric,gt=0"`
+	Status      *bool    `json:"status" validate:"omitempty"`
+	Category    *int     `json:"category_id" validate:"omitempty,numeric,gt=0"`
+	Image       *string  `json:"image" validate:"omitempty"`
+	ImageFile   *multipart.FileHeader `json:"-" form:"image"`
+	Description string   `json:"description" validate:"omitempty,max=500"`
 }
 
 type FormStatusProduct struct {
@@ -43,7 +50,7 @@ type SellerProductRepository interface {
 	GetAllProduct(ctx context.Context, userId uint) ([]*ProductResponse, error)
 	GetOneProduct(ctx context.Context, productId uint, userId uint) (*ProductResponse, error)
 	CreateOneProduct(ctx context.Context, formData *FormCreateProduct, userId uint) (*Product, error)
-	UpdateProduct(ctx context.Context, updateData map[string]interface{}, productId uint, userId uint) (*Product, error)
+	UpdateProduct(ctx context.Context, updateData *FormCreateProduct, productId uint, userId uint) (*Product, error)
 	DeleteProduct(ctx context.Context, productId uint, userId uint) error
 }
 

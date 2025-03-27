@@ -3,8 +3,11 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
+	"path/filepath"
 
 	"github.com/DestaAri1/models"
+	"github.com/DestaAri1/utils"
 	"gorm.io/gorm"
 )
 
@@ -17,7 +20,8 @@ func (r *SellerProductRepository) GetAllProduct(ctx context.Context, userId uint
 
 	res := r.db.
 		Table("products").
-		Select("products.id, products.name, products.stock, products.price, products.description, products.status, categories.id as category_id, categories.name as category").
+		Select("products.id, products.name, products.image, products.stock, products.price, products.description," + 
+			   "products.status, categories.id as category_id, categories.name as category").
 		Joins("LEFT JOIN categories ON categories.id = products.category_id").
 		Where("products.user_id = ?", userId).
 		Scan(&products)
@@ -72,6 +76,20 @@ func (r *SellerProductRepository) CreateOneProduct(ctx context.Context, formData
         Description: formData.Description,
 	}
 
+	if formData.Image != nil {
+		imagePath, err := utils.SaveProfilePicture(formData.ImageFile, "assets/products")
+		if err != nil {
+			// If SVG conversion fails, fall back to optimized JPG
+			imagePath, err = utils.SaveOptimizedImage(formData.ImageFile, "assets/products")
+			if err != nil {
+				return nil, fmt.Errorf("error processing image: %w", err)
+			}
+		}
+				
+		// Add image filename to updates
+		data.Image = imagePath
+	}
+
 	res := r.db.Model(product).Create(data)
 
 	if res.Error != nil {
@@ -80,7 +98,7 @@ func (r *SellerProductRepository) CreateOneProduct(ctx context.Context, formData
 	return product, nil
 }
 
-func (r *SellerProductRepository) UpdateProduct(ctx context.Context, updateData map[string]interface{}, productId, userId uint) (*models.Product, error) {
+func (r *SellerProductRepository) UpdateProduct(ctx context.Context, updateData *models.FormCreateProduct, productId, userId uint) (*models.Product, error) {
 	product := &models.Product{}
 
 	// Memulai transaksi
@@ -95,8 +113,56 @@ func (r *SellerProductRepository) UpdateProduct(ctx context.Context, updateData 
 		return nil, err
 	}
 
+	// Create a map to store updates
+	updates := make(map[string]interface{})
+
+	// Add non-nil fields to updates
+	if updateData.Name != "" {
+		updates["name"] = updateData.Name
+	}
+	if updateData.Stock != nil {
+		updates["stock"] = *updateData.Stock
+	}
+	if updateData.Price != nil {
+		updates["price"] = *updateData.Price
+	}
+	if updateData.Category != nil {
+		updates["category_id"] = *updateData.Category
+	}
+	if updateData.Description != "" {
+		updates["description"] = updateData.Description
+	}
+	if updateData.Status != nil {
+		updates["status"] = *updateData.Status
+	}
+
+	// Handle image upload
+	if updateData.ImageFile != nil {
+		// Try to save as SVG first (now returns just the filename)
+		imagePath, err := utils.SaveProfilePicture(updateData.ImageFile, "assets/products")
+		if err != nil {
+			// If SVG conversion fails, fall back to optimized JPG
+			imagePath, err = utils.SaveOptimizedImage(updateData.ImageFile, "assets/products")
+			if err != nil {
+				tx.Rollback()
+				return nil, fmt.Errorf("error processing image: %w", err)
+			}
+		}
+		
+		// Delete old image if exists
+		if product.Image != "" {
+			oldImagePath := filepath.Join("assets/products", product.Image)
+			if err := utils.DeleteProfilePicture(oldImagePath); err != nil {
+				fmt.Printf("Warning: failed to delete old image: %v\n", err)
+			}
+		}
+		
+		// Add image filename to updates
+		updates["image"] = imagePath
+	}
+
 	// Melakukan update pada produk
-	if err := tx.Model(product).Updates(updateData).Error; err != nil {
+	if err := tx.Model(product).Updates(updates).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}

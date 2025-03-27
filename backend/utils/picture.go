@@ -143,7 +143,7 @@ func SaveProfilePicture(file *multipart.FileHeader, dirPicture string) (string, 
 }
 
 // SaveOptimizedImage is a fallback method with improved quality
-func SaveOptimizedImage(file *multipart.FileHeader) (string, error) {
+func SaveOptimizedImage(file *multipart.FileHeader, dirPicture string) (string, error) {
 	// Validate the image
 	if err := ValidateImageFile(file); err != nil {
 		return "", err
@@ -181,7 +181,7 @@ func SaveOptimizedImage(file *multipart.FileHeader) (string, error) {
 
 	// Save as JPG with unique filename
 	newFileName := uuid.New().String() + ".jpg"
-	filePath := filepath.Join(ProfilePictureDir, newFileName)
+	filePath := filepath.Join(dirPicture, newFileName)
 	
 	// Create the output file
 	out, err := os.Create(filePath)

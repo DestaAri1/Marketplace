@@ -71,39 +71,41 @@ func (h *SellerProductHandler) CreateOneProduct(ctx *fiber.Ctx) error {
 
 func (h *SellerProductHandler) UpdateProduct(ctx *fiber.Ctx) error {
 	productId, err := strconv.Atoi(ctx.Params("productId"))
-
 	if err != nil {
-        return h.handlerError(ctx, fiber.StatusBadRequest, "invalid product ID")
-    }
+		return h.handlerError(ctx, fiber.StatusBadRequest, "invalid product ID")
+	}
 
 	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
 	defer cancel()
 
 	userId := ctx.Locals("userId")
-    if userId == nil {
-        return h.handlerError(ctx, fiber.StatusUnauthorized, "userId not found")
-    }
-
+	if userId == nil {
+		return h.handlerError(ctx, fiber.StatusUnauthorized, "userId not found")
+	}
 	userIdUint := uint(userId.(float64))
 
-	updateData := make(map[string]interface{})
-	if err := ctx.BodyParser(&updateData); err != nil {
+	// Create a struct to parse form data
+	updateData := &models.FormCreateProduct{}
+
+	// Parse form data
+	if err := ctx.BodyParser(updateData); err != nil {
 		return h.handlerError(ctx, fiber.StatusUnprocessableEntity, err.Error())
 	}
 
-	formData := &models.FormCreateProduct{}
+	// Handle file upload separately
+	file, err := ctx.FormFile("image")
+	if err == nil && file != nil {
+		updateData.ImageFile = file
+	}
 
-	if err := mapToStruct(updateData, formData); err != nil {
+	// Validate the struct
+	validate := validator.New()
+	if err := validate.Struct(updateData); err != nil {
 		return h.handleValidationError(ctx, err)
 	}
 
-	validate := validator.New()
-    if err := validate.Struct(formData); err != nil {
-        return h.handleValidationError(ctx, err)
-    }
-
+	// Update product
 	product, err := h.repository.UpdateProduct(context, updateData, uint(productId), userIdUint)
-
 	if err != nil {
 		return h.handlerError(ctx, fiber.StatusBadGateway, err.Error())
 	}
@@ -146,8 +148,8 @@ func (h *SellerProductHandler) UpdateStatusProduct(ctx *fiber.Ctx) error {
 	}
 
 	// Pastikan hanya 'status' yang dikirim ke database
-	updateData := map[string]interface{}{
-		"status": *formData.Status,
+	updateData := &models.FormCreateProduct{
+		Status: formData.Status,
 	}
 
 	// Update status produk

@@ -72,6 +72,8 @@ func HandleValidationError(ctx *fiber.Ctx, err error) error {
 				message = handleBirthdayValidation(err.Tag())
 			case "PhoneNumber":
 				message = handlePhoneNumberValidation(err.Tag())
+			case "Image" :
+				message = handleImageValidation(err)
 			}
 			
 			if message != "" {
@@ -274,4 +276,16 @@ func handlePhoneNumberValidation(tag string) string {
 		return "Only number"
 	}
 	return ""
+}
+
+func handleImageValidation(err validator.FieldError) string {
+	// Default image validation messages
+	switch err.Tag() {
+	case "required":
+		return "Image is required"
+	case "file":
+		return "Invalid file"
+	default:
+		return "Image validation failed"
+	}
 }
