@@ -57,6 +57,7 @@ type SellerProductRepository interface {
 type UserProductResponse struct {
 	Id          uint    `json:"id"`
 	Product     string  `json:"product"`
+	Image		string	`json:"image"`
 	Seller		string	`json:"seller"`
 	Stock       int     `json:"stock"`
 	Price       float64 `json:"price"`

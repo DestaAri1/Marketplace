@@ -20,7 +20,7 @@ func setupApp() *fiber.App {
 	})
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:5000",
+		AllowOrigins: "*",
 		AllowMethods: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
 	}))
 
@@ -116,5 +116,5 @@ func main() {
 	setupRoutes(app, database, repositories, services)
 
 	// Start server
-	app.Listen(":3000")
+	app.Listen("0.0.0.0:3000")
 }

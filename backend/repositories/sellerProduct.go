@@ -60,42 +60,67 @@ func (r *SellerProductRepository) CreateOneProduct(ctx context.Context, formData
 	product := &models.Product{}
 	category := &models.Category{}
 	
-	if cekData := r.db.Model(category).Where("id = ?", formData.Category).First(category).Error; cekData != nil {
-		if errors.Is(cekData, gorm.ErrRecordNotFound) {
-			return nil, errors.New("category not found")
+	// Validate category
+	if formData.Category != nil {
+		if cekData := r.db.Model(category).Where("id = ?", formData.Category).First(category).Error; cekData != nil {
+			if errors.Is(cekData, gorm.ErrRecordNotFound) {
+				return nil, errors.New("category not found")
+			}
+			return nil, cekData
 		}
-		return nil, cekData
 	}
 
+	// Prepare product data
 	data := &models.Product{
-        Name: formData.Name,
-        Stock: *formData.Stock,
-        Price: *formData.Price,
-        UserId: userId,
-        CategoryId: uint(*formData.Category), // Tambahkan CategoryId
-        Description: formData.Description,
+		Name:        formData.Name,
+		UserId:      userId,
+		Description: formData.Description,
 	}
 
-	if formData.Image != nil {
+	// Add optional fields
+	if formData.Stock != nil {
+		data.Stock = *formData.Stock
+	}
+	if formData.Price != nil {
+		data.Price = *formData.Price
+	}
+	if formData.Category != nil {
+		data.CategoryId = uint(*formData.Category)
+	}
+	if formData.Status != nil {
+		data.Status = *formData.Status
+	}
+
+	// Handle image upload
+	if formData.ImageFile != nil {
+		// Open the uploaded file
+		file, err := formData.ImageFile.Open()
+		if err != nil {
+			return nil, fmt.Errorf("error opening image file: %w", err)
+		}
+		defer file.Close()
+
+		// Generate unique filename and save
 		imagePath, err := utils.SaveProfilePicture(formData.ImageFile, "assets/products")
 		if err != nil {
-			// If SVG conversion fails, fall back to optimized JPG
+			// Fallback to optimized image if SVG fails
 			imagePath, err = utils.SaveOptimizedImage(formData.ImageFile, "assets/products")
 			if err != nil {
 				return nil, fmt.Errorf("error processing image: %w", err)
 			}
 		}
-				
-		// Add image filename to updates
+		
+		// Set image path
 		data.Image = imagePath
 	}
 
+	// Create product in database
 	res := r.db.Model(product).Create(data)
-
 	if res.Error != nil {
 		return nil, res.Error
 	}
-	return product, nil
+
+	return data, nil
 }
 
 func (r *SellerProductRepository) UpdateProduct(ctx context.Context, updateData *models.FormCreateProduct, productId, userId uint) (*models.Product, error) {

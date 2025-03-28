@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"mime/multipart"
 	"strconv"
 	"time"
 
@@ -43,30 +44,81 @@ func (h *SellerProductHandler) CreateOneProduct(ctx *fiber.Ctx) error {
 	defer cancel()
 
 	userId := ctx.Locals("userId")
-    if userId == nil {
-        return h.handlerError(ctx, fiber.StatusUnauthorized, "Unauthorized, userId not found")
-    }
+	if userId == nil {
+		return h.handlerError(ctx, fiber.StatusUnauthorized, "Unauthorized, userId not found")
+	}
 
 	userIdUint := uint(userId.(float64))
 
+	// Create FormCreateProduct struct
 	formData := &models.FormCreateProduct{}
 
-	if err := ctx.BodyParser(formData); err != nil {
-		return h.handlerError(ctx, fiber.StatusUnprocessableEntity, err.Error())
+	// Parse text fields
+	formData.Name = ctx.FormValue("name")
+	formData.Description = ctx.FormValue("description")
+
+	// Parse numeric fields
+	if stockStr := ctx.FormValue("stock"); stockStr != "" {
+		stock, err := strconv.Atoi(stockStr)
+		if err == nil {
+			formData.Stock = &stock
+		}
 	}
 
+	if priceStr := ctx.FormValue("price"); priceStr != "" {
+		price, err := strconv.ParseFloat(priceStr, 64)
+		if err == nil {
+			formData.Price = &price
+		}
+	}
+
+	if categoryStr := ctx.FormValue("category_id"); categoryStr != "" {
+		category, err := strconv.Atoi(categoryStr)
+		if err == nil {
+			formData.Category = &category
+		}
+	}
+
+	if statusStr := ctx.FormValue("status"); statusStr != "" {
+		status, err := strconv.ParseBool(statusStr)
+		if err == nil {
+			formData.Status = &status
+		}
+	}
+
+	// Flexible image upload handling
+	var file *multipart.FileHeader
+	var err error
+
+	// Try multiple keys for image upload
+	imageKeys := []string{"image", "image_file", "file", "uploaded_file"}
+	for _, key := range imageKeys {
+		file, err = ctx.FormFile(key)
+		if err == nil && file != nil {
+			formData.ImageFile = file
+			break
+		}
+	}
+
+	// If no image found, return error
+	if formData.ImageFile == nil {
+		return h.handlerError(ctx, fiber.StatusBadRequest, "Image file is required. Please upload an image using one of these keys: "+
+			"image, image_file, file, uploaded_file")
+	}
+
+	// Validate the struct
 	validate := validator.New()
-    if err := validate.Struct(formData); err != nil {
-        return h.handleValidationError(ctx, err)
-    }
+	if err := validate.Struct(formData); err != nil {
+		return h.handleValidationError(ctx, err)
+	}
 
-	_, err := h.repository.CreateOneProduct(context, formData, userIdUint)
-
+	// Create product
+	data, err := h.repository.CreateOneProduct(context, formData, userIdUint)
 	if err != nil {
 		return h.handlerError(ctx, fiber.StatusBadGateway, err.Error())
 	}
 	
-	return h.handlerSuccess(ctx, fiber.StatusOK, "Successfully create a product", nil)
+	return h.handlerSuccess(ctx, fiber.StatusOK, "Successfully create a product", data)
 }
 
 func (h *SellerProductHandler) UpdateProduct(ctx *fiber.Ctx) error {

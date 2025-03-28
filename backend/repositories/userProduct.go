@@ -18,7 +18,7 @@ func (r *UserProductRepository) UserGetAllProduct(ctx context.Context) ([]*model
 	res := r.db.
 		Table("products").
 		Select("products.id, products.name as product, products.stock, products.price, products.description, " +
-			"categories.name as category, users.username as seller").
+			"categories.name as category, users.username as seller, products.image as image").
 		Joins("LEFT JOIN users ON users.id = products.user_id").
 		Joins("LEFT JOIN categories ON categories.id = products.category_id").
 		Where("products.status = 1").
@@ -37,7 +37,7 @@ func(r *UserProductRepository) GetOneProduct(ctx context.Context, productId uint
 	res := r.db.
 		Table("products").
 		Select("products.id, products.name as product, products.stock, products.price, products.description, " +
-			"categories.name as category, users.username as seller").
+			"categories.name as category, users.username as seller, products.image as image").
 		Joins("LEFT JOIN users ON users.id = products.user_id").
 		Joins("LEFT JOIN categories ON categories.id = products.category_id").
 		Where("products.status = 1").
