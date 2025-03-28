@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Modal from "../Modal";
-import Input from "../Input";
 import FormProduct from "./Product/FormProduct";
 
 export default function AddProductModal({

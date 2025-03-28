@@ -1,7 +1,8 @@
-import { Package } from 'lucide-react';
-import React from 'react'
+import { Package } from "lucide-react";
+import React from "react";
+import { createImageUrl } from "../../utils/ImageUrlHelper";
 
-export default function OrderSummery({checkoutData}) {
+export default function OrderSummery({ checkoutData }) {
   // Hitung total keseluruhan
   const totalAmount =
     checkoutData?.reduce((sum, item) => sum + item.total, 0) || 0;
@@ -20,7 +21,10 @@ export default function OrderSummery({checkoutData}) {
               <div className="flex items-center space-x-4">
                 {item.image ? (
                   <img
-                    src={item.image}
+                    src={createImageUrl(
+                      process.env.REACT_APP_PRODUCT_URL,
+                      item?.image
+                    )}
                     alt={item.name}
                     className="w-20 h-20 object-cover rounded-lg shadow-sm"
                   />

@@ -2,6 +2,7 @@ import React from "react";
 import { ShoppingCartIcon, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { encryptId } from "../../utils/crypto";
+import { createImageUrl } from "../../utils/ImageUrlHelper";
 
 export default function Products({ products, openModal, user }) {
   const navigate = useNavigate();
@@ -40,7 +41,10 @@ export default function Products({ products, openModal, user }) {
           <div key={index} className="product-card">
             <div className="product-image-container">
               <img
-                src={product.image}
+                src={createImageUrl(
+                  process.env.REACT_APP_PRODUCT_URL,
+                  product?.image
+                )}
                 alt={product.product}
                 className="product-image"
               />

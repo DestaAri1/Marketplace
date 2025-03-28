@@ -26,8 +26,6 @@ export default function Products() {
     }
   }, [fetchProducts, isFetched]);
 
-  console.log(products);
-
   const handleSubmitCreateCart = async (quantity) => {
     const result = await handleCreateCart(createCart.selectedItem.id, quantity);
     if (result) {

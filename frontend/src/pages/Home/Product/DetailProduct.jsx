@@ -3,6 +3,7 @@ import MainTemplate from "../MainTemplate";
 import { useParams } from "react-router-dom";
 import { decryptId } from "../../../utils/crypto";
 import useUserProduct from "../../../hooks/useUserProduct";
+import { createImageUrl } from "../../../utils/ImageUrlHelper";
 
 export default function DetailProduct() {
   const { id } = useParams();
@@ -41,7 +42,8 @@ export default function DetailProduct() {
             <div className="product-detail-image-section">
               <div className="product-detail-image-wrapper group">
                 <img
-                  src={product?.image || "https://via.placeholder.com/600x400"}
+                  src={createImageUrl(
+                  process.env.REACT_APP_PRODUCT_URL,product?.image)}
                   alt={product?.name || "Product"}
                   className="product-detail-image"
                 />

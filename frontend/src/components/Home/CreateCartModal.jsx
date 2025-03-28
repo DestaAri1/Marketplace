@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../Modal";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { createImageUrl } from "../../utils/ImageUrlHelper";
 
 export default function CreateCartModal({
   isOpen,
@@ -75,7 +76,10 @@ export default function CreateCartModal({
           {/* Product Image */}
           <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100">
             <img
-              src={localProduct.image}
+              src={createImageUrl(
+                process.env.REACT_APP_PRODUCT_URL,
+                localProduct.image
+              )}
               alt={localProduct.product}
               className="w-full h-full object-cover"
             />

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { X, Minus, Plus, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { encryptId } from "../../utils/crypto";
+import { createImageUrl } from "../../utils/ImageUrlHelper";
 
 export default function CartModal({
   isOpen,
@@ -194,10 +195,10 @@ export default function CartModal({
                         </div>
                         <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
                           <img
-                            src={
-                              item.product_image ||
-                              "https://via.placeholder.com/150"
-                            }
+                            src={createImageUrl(
+                              process.env.REACT_APP_PRODUCT_URL,
+                              item?.product_image
+                            )}
                             alt={item.product_name}
                             className="w-full h-full object-cover"
                           />

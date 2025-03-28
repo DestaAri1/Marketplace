@@ -14,9 +14,6 @@ export default function AddressChooseModal({
     setSelectedAddress(addr);
   };
 
-  console.log(selectedAddress);
-  
-
   const handleConfirm = () => {
     if (selectedAddress) {
       onConfirm(selectedAddress);

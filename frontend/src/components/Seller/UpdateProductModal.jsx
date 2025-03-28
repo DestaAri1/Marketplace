@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../Modal";
-import Input from "../Input";
 import { toast } from "react-toastify";
+import FormProduct from "./Product/FormProduct";
 
 export default function UpdateProductModal({
   isOpen,
@@ -12,6 +12,7 @@ export default function UpdateProductModal({
   category,
 }) {
   const [data, setData] = useState({});
+  const [previewImage, setPreviewImage] = useState(null);
 
   useEffect(() => {
     if (product?.id) {
@@ -22,7 +23,11 @@ export default function UpdateProductModal({
         price: product.price || 0,
         category_id: product.category_id || "",
         description: product.description || "",
+        image: product.image || "",
       });
+
+      // Reset preview image when a new product is selected
+      setPreviewImage(null);
     }
   }, [product]);
 
@@ -32,6 +37,28 @@ export default function UpdateProductModal({
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Add the file to formData
+      setData((prev) => ({
+        ...prev,
+        product_image: file,
+      }));
+
+      // Create and set preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewImage(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const triggerFileInput = () => {
+    document.getElementById("product-image-input").click();
   };
 
   const handleConfirm = async () => {
@@ -53,74 +80,16 @@ export default function UpdateProductModal({
       confirmClass="bg-green-500 hover:bg-green-700"
       width="max-w-4xl"
     >
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-4">
-          <Input
-            label="Name"
-            name="name"
-            value={data.name || ""}
-            onChange={handleChange}
-          />
-          <div>
-            <label
-              htmlFor="category"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Category
-            </label>
-            <select
-              name="category_id"
-              value={data.category_id || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 mt-4 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="" disabled>
-                Select Category
-              </option>
-              {category.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <Input
-            label="Stock"
-            name="stock"
-            type="number"
-            min="1"
-            value={data.stock || ""}
-            onChange={handleChange}
-          />
-          <Input
-            label="Price"
-            name="price"
-            type="number"
-            min="1"
-            value={data.price || ""}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
-
-      <div className="mt-4">
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Description
-        </label>
-        <textarea
-          name="description"
-          value={data.description || ""}
-          onChange={handleChange}
-          rows="3"
-          className="w-full px-3 py-2 mt-1 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-        ></textarea>
-      </div>
+      <FormProduct
+        category={category}
+        formData={data}
+        setFormData={setData}
+        handleChange={handleChange}
+        handleImageChange={handleImageChange}
+        previewImage={previewImage}
+        setPreviewImage={setPreviewImage}
+        triggerFileInput={triggerFileInput}
+      />
     </Modal>
   );
 }

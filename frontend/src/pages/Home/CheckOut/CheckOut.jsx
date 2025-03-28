@@ -59,7 +59,7 @@ export default function CheckOut() {
     selectAddress.closeModal();
   };
 
-  // Clear checkout data when component unmounts
+  // // Clear checkout data when component unmounts
   useEffect(() => {
     return () => {
       localStorage.removeItem("checkoutData");

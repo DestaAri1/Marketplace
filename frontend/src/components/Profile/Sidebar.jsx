@@ -58,8 +58,6 @@ export default function Sidebar() {
       link: "/profile/help",
     },
   ];
-  
-  const imageUrl = process.env.REACT_APP_PROFILE_PICTURE_URL;
 
   return (
     <div className="w-full bg-white rounded-lg shadow-md p-4 overflow-y-auto h-[calc(100vh-5.8rem)]">

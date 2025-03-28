@@ -33,9 +33,10 @@ const MainTemplate = memo(
 
     // Fetch cart when user exists, regardless of modal state
     useEffect(() => {
-      localStorage.setItem("userRole", user?.role)
+      localStorage.setItem("userRole", user?.role);
       localStorage.removeItem("subDropdown");
       localStorage.removeItem("activeDropdown");
+
       if (user && !isFetched.current) {
         fetchCart().then(() => {
           setIsCartLoaded(true);
@@ -63,15 +64,18 @@ const MainTemplate = memo(
     }
 
     return (
-      <div className="home-container">
+      <div className="home-container min-h-screen pt-16 md:pt-0">
         {showTimerToaster && <TimerToaster />}
         <Navbar user={memoizedUser} />
-        {children}
+
+        {/* Adjust main content padding for mobile/desktop */}
+        <main className="px-4 md:px-6 lg:px-8">{children}</main>
 
         {showFloatingCart && (
           <FloatingCartButton
             onClick={cartModal.openModal}
             disabled={!user || (user && !isCartLoaded)}
+            className="fixed bottom-4 right-4 z-40 md:bottom-6 md:right-6 lg:bottom-8 lg:right-8"
           />
         )}
 

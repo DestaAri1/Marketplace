@@ -20,16 +20,18 @@ export const sellerProductsApi = {
     }
   },
 
-  create: async (name, stock, price, category_id, status, description) => {
+  create: async (payload) => {
     try {
-      const response = await apiClient.post("/seller/product", {
-        name,
-        stock,
-        price,
-        category_id,
-        status,
-        description,
-      });
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      const response = await apiClient.post(
+        "/seller/product",
+        payload,
+        config
+      );
 
       return response;
     } catch (error) {
@@ -55,9 +57,14 @@ export const sellerProductsApi = {
 
   update: async (id, payload) => {
     try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
       const response = await apiClient.patch(
         `/seller/product/update/${id}`,
-        payload
+        payload, config
       );
       return response;
     } catch (error) {

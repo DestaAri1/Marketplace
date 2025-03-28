@@ -1,5 +1,6 @@
 import React from "react";
 import Input from "../../Input";
+import { createImageUrl } from "../../../utils/ImageUrlHelper";
 
 export default function FormProduct({
   handleChange,
@@ -9,8 +10,42 @@ export default function FormProduct({
   formData,
   setFormData,
   handleImageChange,
-  category
+  category,
 }) {
+  const renderImagePreview = () => {
+    // If there's a preview image, show it
+    if (previewImage) {
+      return (
+        <img
+          src={previewImage}
+          alt="Product Preview"
+          className="max-w-full max-h-full object-contain"
+        />
+      );
+    }
+
+    // If there's an existing image in formData, show the server image
+    if (formData.image) {
+      return (
+        <img
+          src={createImageUrl(
+            process.env.REACT_APP_PRODUCT_URL,
+            formData.image
+          )}
+          alt="Product Preview"
+          className="max-w-full max-h-full object-contain"
+        />
+      );
+    }
+
+    // If no image, show upload prompt
+    return (
+      <p className="text-gray-500 cursor-pointer hover:text-gray-700">
+        Click to upload product image
+      </p>
+    );
+  };
+
   return (
     <div className="grid grid-cols-3 gap-4">
       {/* Image Upload Column */}
@@ -26,26 +61,16 @@ export default function FormProduct({
           className="w-full h-64 border-2 border-dashed border-gray-300 flex items-center justify-center relative"
           onClick={triggerFileInput}
         >
-          {previewImage ? (
-            <img
-              src={previewImage}
-              alt="Product Preview"
-              className="max-w-full max-h-full object-contain"
-            />
-          ) : (
-            <p className="text-gray-500 cursor-pointer hover:text-gray-700">
-              Click to upload product image
-            </p>
-          )}
+          {renderImagePreview()}
         </div>
-        {previewImage && (
+        {(previewImage || formData.image) && (
           <button
             type="button"
-            className="text-red-500 hover:text-red-700 text-sm"
+            className="text-red-500 hover:text-red-700 text-sm mt-2"
             onClick={() => {
               setPreviewImage(null);
               setFormData((prev) => {
-                const { product_image, ...rest } = prev;
+                const { product_image, image, ...rest } = prev;
                 return rest;
               });
               // Reset file input
@@ -58,7 +83,7 @@ export default function FormProduct({
         )}
       </div>
 
-      {/* Existing Form Columns */}
+      {/* Rest of the form remains the same */}
       <div className="col-span-2 grid grid-cols-2 gap-4">
         {/* Kolom Pertama */}
         <div className="space-y-4">
